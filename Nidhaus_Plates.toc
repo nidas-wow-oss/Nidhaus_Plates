@@ -1,0 +1,24 @@
+## Interface: 30300
+## Title: |cffffffffNidhaus|r|cff00ff00_Plates|r
+## Notes: Tidy Plates + Threat Plates + marcador de sanadores, build unificada y simplificada
+## Author: Nidhaus  |cff808080(base: Binbwen and Friends / Suicidal Katt / Kader backport; sanadores: Khal)|r
+## SavedVariables: TidyPlatesData, TidyPlatesHubTankCache, TidyPlatesHubDamageCache, ThreatPlatesDB, BGHsettings
+## SavedVariablesPerCharacter: TidyPlatesOptions, TidyPlatesHubTankSavedVariables, TidyPlatesHubDamageSavedVariables
+## X-Date: 2022-08-07 @ 03:19 PM |cff808080UTC|r
+
+# Engine
+TidyPlates.xml
+
+# Threat Plates theme (merged in, was TidyPlates_ThreatPlates)
+ThreatPlates\Libs\embeds.xml
+ThreatPlates\Locales\locales.xml
+ThreatPlates\Core.lua
+ThreatPlates\commands.lua
+ThreatPlates\Functions.lua
+ThreatPlates\Widgets.xml
+ThreatPlates\options.lua
+ThreatPlates\Styles.xml
+
+# Marcador de sanadores en BG (portado de BattleGroundHealers, de Khal)
+Healers\Locales.xml
+Healers\Healers.lua
