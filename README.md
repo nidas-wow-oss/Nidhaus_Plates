@@ -1,59 +1,61 @@
+*[Leer en español](README.es.md)*
+
 # Nidhaus_Plates
 
-**Build unificada y simplificada de Tidy Plates + Threat Plates para World of Warcraft 3.3.5a (WotLK)**, con marcador de sanadores en battlegrounds integrado.
+**A unified, simplified build of Tidy Plates + Threat Plates for World of Warcraft 3.3.5a (WotLK)**, with a battleground healer marker built in.
 
-> **Buscabas TidyPlates?** Estás en el lugar correcto. Nidhaus_Plates es una versión mantenida de **TidyPlates** (con **Threat Plates** ya fusionado adentro) portada y adaptada para 3.3.5a. Instalás una sola carpeta en vez de tres addons separados.
+> **Looking for TidyPlates?** You are in the right place. Nidhaus_Plates is a maintained version of **TidyPlates** (with **Threat Plates** already merged in) ported and adapted for 3.3.5a. You install one folder instead of three separate addons.
 
-**Autor:** Nidhaus
-**Basado en:** Tidy Plates de *Binbwen and Friends* / *Suicidal Katt*, backport de *Kader* · Marcador de sanadores portado de *BattleGroundHealers* de *Khal*
+**Author:** Nidhaus
+**Based on:** Tidy Plates by *Binbwen and Friends* / *Suicidal Katt*, backport by *Kader* · Healer marker ported from *BattleGroundHealers* by *Khal*
 
-## Por qué existe
+## Why it exists
 
-El stack clásico de nameplates en 3.3.5a eran tres addons que había que instalar y mantener por separado (`TidyPlates`, `TidyPlates_ThreatPlates`, `BattleGroundHealers`), con un panel de opciones enorme donde el 90% de las opciones no se tocan nunca. Nidhaus_Plates los junta en un solo addon y recorta la configuración a lo que realmente se usa.
+The classic nameplate stack on 3.3.5a was three addons you had to install and keep in sync separately (`TidyPlates`, `TidyPlates_ThreatPlates`, `BattleGroundHealers`), with a huge options panel where 90% of the settings are never touched. Nidhaus_Plates merges them into one addon and trims the configuration down to what actually gets used.
 
-## Qué trae
+## What's included
 
-- **Motor Tidy Plates completo** — nameplates reemplazadas, castbars, widgets, detección de objetivo.
-- **Tema Threat Plates fusionado** — coloreo por amenaza para tanque y para DPS, sin instalarlo aparte.
-- **Marcador de sanadores en BG** — resalta a los healers enemigos en battlegrounds (portado de BattleGroundHealers, de Khal).
-- **Fuentes extra** registradas vía LibSharedMedia, seleccionables desde las opciones: *Accidental Presidency*, *Continuum Medium* y *Domyouji Regular*, además de la fuente por defecto.
-- **Opciones simplificadas** — panel recortado a los ajustes que se usan de verdad.
-- **Botón de minimapa** para abrir la configuración sin comandos.
-- Localización incluida: `en`, `es`, `de`, `fr`, `ru`, `cn`, `tw`, `kr`.
+- **The full Tidy Plates engine** — replaced nameplates, cast bars, widgets, target detection.
+- **Threat Plates merged in** — threat colouring for tank and DPS, with nothing extra to install.
+- **Battleground healer marker** — highlights enemy healers in battlegrounds (ported from BattleGroundHealers by Khal).
+- **Extra fonts** registered through LibSharedMedia and selectable from the options: *Accidental Presidency*, *Continuum Medium* and *Domyouji Regular*, alongside the default font.
+- **Simplified options** — the panel trimmed down to the settings that matter.
+- **Minimap button** to open the configuration without typing commands.
+- Localisation included: `en`, `es`, `de`, `fr`, `ru`, `cn`, `tw`, `kr`.
 
-## Instalación
+## Installation
 
-1. Cerrá el juego.
-2. **Importante:** si tenías `TidyPlates`, `TidyPlates_ThreatPlates` o `BattleGroundHealers` instalados, borralos o desactivalos. Nidhaus_Plates los reemplaza a los tres y van a chocar entre sí.
-3. Copiá la carpeta `Nidhaus_Plates` dentro de `World of Warcraft\Interface\AddOns\`.
-4. Iniciá el juego y activá el addon en el selector de la pantalla de personajes.
+1. Close the game.
+2. **Important:** if you have `TidyPlates`, `TidyPlates_ThreatPlates` or `BattleGroundHealers` installed, delete or disable them. Nidhaus_Plates replaces all three and they will conflict.
+3. Copy the `Nidhaus_Plates` folder into `World of Warcraft\Interface\AddOns\`.
+4. Start the game and enable the addon on the character selection screen.
 
-## Comandos
+## Commands
 
-| Comando | Qué hace |
+| Command | Action |
 |---|---|
-| `/tidyplates` | Abre el panel de opciones principal |
-| `/nphealers` o `/bgh` | Opciones del marcador de sanadores en BG |
-| `/tptptoggle` | Alterna el tema Threat Plates |
-| `/tptptank` | Modo tanque |
-| `/tptpdps` | Modo DPS |
-| `/tptpol` | Alterna el control de superposición de nameplates |
-| `/tptpverbose` | Salida detallada para depurar |
+| `/tidyplates` | Open the main options panel |
+| `/nphealers` or `/bgh` | Battleground healer marker options |
+| `/tptptoggle` | Toggle the Threat Plates theme |
+| `/tptptank` | Tank mode |
+| `/tptpdps` | DPS mode |
+| `/tptpol` | Toggle nameplate overlap control |
+| `/tptpverbose` | Verbose output for debugging |
 
-## Créditos
+## Credits
 
-Este addon es trabajo derivado. El crédito del motor y del tema es de sus autores originales:
+This addon is derivative work. Credit for the engine and the theme belongs to their original authors:
 
 - **Tidy Plates** — Binbwen and Friends / Suicidal Katt
-- **Backport a 3.3.5a** — Kader
-- **Threat Plates** — sus autores originales, incluido aquí como tema fusionado
+- **3.3.5a backport** — Kader
+- **Threat Plates** — its original authors, included here as a merged theme
 - **BattleGroundHealers** — Khal
-- **Unificación, simplificación, fuentes y mantenimiento** — Nidhaus
+- **Unification, simplification, fonts and maintenance** — Nidhaus
 
-## Compatibilidad
+## Compatibility
 
-Interface 30300 — WotLK 3.3.5a. Probado en Warmane.
+Interface 30300 — WotLK 3.3.5a. Tested on Warmane.
 
-## Licencia
+## License
 
-Se distribuye respetando las licencias de los proyectos originales en los que se basa. Si lo redistribuís o lo usás como base, mantené los créditos de arriba.
+Distributed in accordance with the licenses of the original projects it builds on. If you redistribute it or build on it, keep the credits above.
