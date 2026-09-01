@@ -36,11 +36,12 @@ The classic nameplate stack on 3.3.5a was three addons you had to install and ke
 |---|---|
 | `/tidyplates` | Open the main options panel |
 | `/nphealers` or `/bgh` | Battleground healer marker options |
-| `/tptptoggle` | Toggle the Threat Plates theme |
-| `/tptptank` | Tank mode |
-| `/tptpdps` | DPS mode |
 | `/tptpol` | Toggle nameplate overlap control |
 | `/tptpverbose` | Verbose output for debugging |
+
+> The addon detects your role from your talents and flips the threat colour scale automatically
+> (and by shapeshift form on druids), so there are no manual tank/dps commands to remember.
+
 
 ## Credits
 

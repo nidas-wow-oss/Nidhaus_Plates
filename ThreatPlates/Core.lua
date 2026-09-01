@@ -712,9 +712,9 @@ function TidyPlatesThreat:OnInitialize()
 			},
 			classWidget = {
 				ON = true,
-				scale = 22,
-				x = -74,
-				y = -7,
+				scale = 15,
+				x = -59,
+				y = 0,
 				theme = "default",
 				anchor = "CENTER",
 				-- Borde alrededor del icono. Cuadrado en los temas cuadrados

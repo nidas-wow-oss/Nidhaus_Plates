@@ -36,11 +36,12 @@ El stack clásico de nameplates en 3.3.5a eran tres addons que había que instal
 |---|---|
 | `/tidyplates` | Abre el panel de opciones principal |
 | `/nphealers` o `/bgh` | Opciones del marcador de sanadores en BG |
-| `/tptptoggle` | Alterna el tema Threat Plates |
-| `/tptptank` | Modo tanque |
-| `/tptpdps` | Modo DPS |
 | `/tptpol` | Alterna el control de superposición de nameplates |
 | `/tptpverbose` | Salida detallada para depurar |
+
+> El addon detecta tu rol por los talentos y da vuelta la escala de colores de amenaza solo
+> (y por forma en druidas), así que no hay comandos manuales de tanque/dps que recordar.
+
 
 ## Créditos
 
