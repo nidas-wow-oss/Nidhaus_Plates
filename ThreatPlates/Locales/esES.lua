@@ -315,6 +315,8 @@ L["Hide Your Own Snakes"] = "Ocultar tambien las propias"
 L["Also hides the snakes summoned by you and your allies, not just the enemy ones."] = "Oculta tambien las serpientes invocadas por ti y por tus aliados, no solo las enemigas."
 L["Hide Mirror Images"] = "Ocultar imágenes especulares"
 L["Light"] = "Light"
+L["Rounded"] = "Redondeado"
+L["Rounded swaps the square highlight for a frame with rounded corners."] = "Redondeado cambia el resalte cuadrado por un marco de esquinas redondeadas."
 L["Light also frames the cast bar and the spell icon, with the same border the minimap uses."] = "Light enmarca tambien la barra de casteo y el icono del hechizo, con el mismo borde que usa el minimapa."
 L["Hides the nameplates of the mage's Mirror Image copies."] = "Oculta las placas de las copias del Mirror Image del mago."
 

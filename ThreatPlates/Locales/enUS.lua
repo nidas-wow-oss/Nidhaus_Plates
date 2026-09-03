@@ -482,6 +482,8 @@ L["Hide Your Own Snakes"] = true
 L["Also hides the snakes summoned by you and your allies, not just the enemy ones."] = true
 L["Hide Mirror Images"] = true
 L["Light"] = true
+L["Rounded"] = true
+L["Rounded swaps the square highlight for a frame with rounded corners."] = true
 L["Light also frames the cast bar and the spell icon, with the same border the minimap uses."] = true
 L["Hides the nameplates of the mage's Mirror Image copies."] = true
 

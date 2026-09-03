@@ -175,6 +175,7 @@ function TidyPlatesThreat:OnInitialize()
 			hideSnakesFriendly = true,  -- serpientes de la trampa: propias y aliadas
 			hideMirrorImage = true,     -- Mirror Image (mago)
 			lightBorder = false,        -- marco fino Border_Light en vida, casteo e icono
+			roundTarget = false,        -- resalte del objetivo con esquinas redondeadas
 			friendlyClass = false,
 			friendlyNameOnly = false,
 			friendlyClickThrough = false,

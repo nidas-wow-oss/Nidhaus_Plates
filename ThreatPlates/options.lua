@@ -451,6 +451,25 @@ end
 -- dibuja como un marco aparte (mira TidyPlatesCore) y aca lo unico que se
 -- hace es levantar la bandera y dejar la textura anterior donde estaba: el
 -- motor la esconde igual mientras el modo este puesto.
+-- Mismo caso que el borde Light: "Rounded" no es una textura que el motor
+-- pueda estirar, es un marco con backdrop. Comparte el desplegable y tiene
+-- get y set propios.
+local function GetTargetHighlight(info)
+	if db.roundTarget then return "Border_Rounded" end
+	return GetValue(info)
+end
+
+local function SetTargetHighlight(info, val)
+	local round = (val == "Border_Rounded")
+	db.roundTarget = round
+	if TidyPlates_RefreshLightBorder then TidyPlates_RefreshLightBorder() end
+	if round then
+		Update()
+	else
+		SetThemeValueArt(info, val)
+	end
+end
+
 local function GetHealthBorder(info)
 	if db.lightBorder then return "Border_Light" end
 	return GetValue(info)
@@ -854,9 +873,14 @@ local function GetOptions()
 											type = "select",
 											order = 6,
 											name = L["Target"],
-											get = GetValue,
-											set = SetThemeValueArt,
-											values = {TP_HealthBarHighlight = "Default", Empty = "None"},
+											desc = L["Rounded swaps the square highlight for a frame with rounded corners."],
+											get = GetTargetHighlight,
+											set = SetTargetHighlight,
+											values = {
+												TP_HealthBarHighlight = "Default",
+												Border_Rounded = L["Rounded"],
+												Empty = "None",
+											},
 											arg = {"settings", "target", "texture"}
 										},
 										Mouseover = {

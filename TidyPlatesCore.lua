@@ -40,28 +40,41 @@ local EMPTY_TEXTURE = "Interface\\Addons\\Nidhaus_Plates\\Media\\Empty"
 -- y quedarian uno encima del otro; la misma leccion que dio el borde del
 -- minimapa cuando convivia con el cuadrado.
 -- ---------------------------------------------------------
+local ART = "Interface\\AddOns\\Nidhaus_Plates\\ThreatPlates\\Media\\Artwork\\"
+
 local LIGHT_BACKDROP = {
-	edgeFile = "Interface\\AddOns\\Nidhaus_Plates\\ThreatPlates\\Media\\Artwork\\Border_Light",
+	edgeFile = ART .. "Border_Light",
+	edgeSize = 8,
+	insets = { left = 2, right = 2, top = 2, bottom = 2 },
+}
+
+-- Border_Rounded se genera a partir de Border_Light: mismos cuatro lados
+-- rectos, byte por byte, y solo las cuatro esquinas redibujadas como un
+-- arco. Por eso empalman exacto y el trazo tiene el mismo grosor.
+local ROUND_BACKDROP = {
+	edgeFile = ART .. "Border_Rounded",
 	edgeSize = 8,
 	insets = { left = 2, right = 2, top = 2, bottom = 2 },
 }
 
 TidyPlates_LightBorder = false
+TidyPlates_RoundTarget = false
 
 function TidyPlates_RefreshLightBorder()
 	local t = _G.TidyPlatesThreat
 	local prof = t and t.db and t.db.profile
 	TidyPlates_LightBorder = (prof and prof.lightBorder) and true or false
+	TidyPlates_RoundTarget = (prof and prof.roundTarget) and true or false
 end
 
 -- Un marco de borde pegado a su objeto. El inset negativo lo saca un par de
 -- pixeles hacia afuera para que el filo no se coma la barra.
-local function CreateLightBorder(parent, target, pad)
+local function CreateLightBorder(parent, target, pad, backdrop)
 	local f = CreateFrame("Frame", nil, parent)
 	f:SetFrameLevel(parent:GetFrameLevel() + 1)
 	f:SetPoint("TOPLEFT", target, "TOPLEFT", -pad, pad)
 	f:SetPoint("BOTTOMRIGHT", target, "BOTTOMRIGHT", pad, -pad)
-	f:SetBackdrop(LIGHT_BACKDROP)
+	f:SetBackdrop(backdrop or LIGHT_BACKDROP)
 	f:SetBackdropBorderColor(1, 1, 1, 1)
 	f:Hide()
 	return f
@@ -253,6 +266,7 @@ do
 		end
 		if not unit.isTarget then
 			visual.target:Hide()
+			if visual.roundTarget then visual.roundTarget:Hide() end
 		end
 		if not unit.isMarked then
 			visual.raidicon:Hide()
@@ -345,7 +359,14 @@ do
 	end
 	-- UpdateIndicator_Target
 	function UpdateIndicator_Target()
-		if unit.isTarget and style.target.show then
+		-- El resalte del objetivo tiene dos formas: la textura cuadrada del
+		-- tema, o el marco de esquinas redondeadas. Nunca las dos.
+		local round = TidyPlates_RoundTarget
+		local on = unit.isTarget and style.target.show
+		if visual.roundTarget then
+			if on and round then visual.roundTarget:Show() else visual.roundTarget:Hide() end
+		end
+		if on and not round then
 			visual.target:Show()
 		else
 			visual.target:Hide()
@@ -1138,6 +1159,9 @@ do
 		visual.lightHealth = CreateLightBorder(healthbar, healthbar, 2)
 		visual.lightCast   = CreateLightBorder(castbar, castbar, 2)
 		visual.lightIcon   = CreateLightBorder(castbar, visual.spellicon, 2)
+		-- El marco redondo del objetivo va un pelo mas afuera para no comerse
+		-- el borde normal de la barra, que puede seguir puesto.
+		visual.roundTarget = CreateLightBorder(healthbar, healthbar, 3, ROUND_BACKDROP)
 
 		visual.customtext = extended:CreateFontString(nil, "OVERLAY")
 		visual.name = extended:CreateFontString(nil, "OVERLAY")
