@@ -454,6 +454,26 @@ end
 -- Mismo caso que el borde Light: "Rounded" no es una textura que el motor
 -- pueda estirar, es un marco con backdrop. Comparte el desplegable y tiene
 -- get y set propios.
+-- Borde de la barra de casteo. Mismo mecanismo que los otros dos: "Light"
+-- no es una textura del tema sino un marco con backdrop, asi que comparte
+-- el desplegable pero no el camino. Arrastra al icono del hechizo, que
+-- cuelga de la barra y aparece y desaparece con ella.
+local function GetCastBorder(info)
+	if db.lightCast then return "Border_Light" end
+	return GetValue(info)
+end
+
+local function SetCastBorder(info, val)
+	local light = (val == "Border_Light")
+	db.lightCast = light
+	if TidyPlates_RefreshLightBorder then TidyPlates_RefreshLightBorder() end
+	if light then
+		Update()
+	else
+		SetThemeValueArt(info, val)
+	end
+end
+
 local function GetTargetHighlight(info)
 	if db.roundTarget then return "Border_Rounded" end
 	return GetValue(info)
@@ -823,7 +843,7 @@ local function GetOptions()
 											type = "select",
 											order = 3,
 											name = L["Normal Border"],
-											desc = L["Light also frames the cast bar and the spell icon, with the same border the minimap uses."],
+											desc = L["The same thin frame the minimap uses. The cast bar has its own setting."],
 											get = GetHealthBorder,
 											set = SetHealthBorder,
 											disabled = function()
@@ -1152,6 +1172,19 @@ local function GetOptions()
 											get = GetValue,
 											set = SetLSMTexture,
 											arg = {"settings", "castbar", "texture"}
+										},
+										CastBorder = {
+											name = L["Border"],
+											type = "select",
+											order = 2,
+											desc = L["Light also frames the spell icon, which travels with the cast bar."],
+											get = GetCastBorder,
+											set = SetCastBorder,
+											values = {
+												TP_CastBarOverlay = "Default",
+												Border_Light = L["Light"],
+											},
+											arg = {"settings", "castborder", "texture"}
 										}
 									}
 								},

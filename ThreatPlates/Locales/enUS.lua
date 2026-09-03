@@ -482,9 +482,11 @@ L["Hide Your Own Snakes"] = true
 L["Also hides the snakes summoned by you and your allies, not just the enemy ones."] = true
 L["Hide Mirror Images"] = true
 L["Light"] = true
+L["Border"] = true
 L["Rounded"] = true
+L["Light also frames the spell icon, which travels with the cast bar."] = true
 L["Rounded swaps the square highlight for a frame with rounded corners."] = true
-L["Light also frames the cast bar and the spell icon, with the same border the minimap uses."] = true
+L["The same thin frame the minimap uses. The cast bar has its own setting."] = true
 L["Hides the nameplates of the mage's Mirror Image copies."] = true
 
 -- Marcador de sanadores en BG (modulo Healers)

@@ -57,13 +57,18 @@ local ROUND_BACKDROP = {
 	insets = { left = 2, right = 2, top = 2, bottom = 2 },
 }
 
-TidyPlates_LightBorder = false
-TidyPlates_RoundTarget = false
+-- Tres banderas y no una: cada barra elige su borde en su propia seccion
+-- del panel. El icono del hechizo viaja con la barra de casteo, que es de
+-- donde cuelga y con la que aparece y desaparece.
+TidyPlates_LightBorder = false   -- barra de vida
+TidyPlates_LightCast   = false   -- barra de casteo + icono del hechizo
+TidyPlates_RoundTarget = false   -- resalte del objetivo
 
 function TidyPlates_RefreshLightBorder()
 	local t = _G.TidyPlatesThreat
 	local prof = t and t.db and t.db.profile
 	TidyPlates_LightBorder = (prof and prof.lightBorder) and true or false
+	TidyPlates_LightCast   = (prof and prof.lightCast)   and true or false
 	TidyPlates_RoundTarget = (prof and prof.roundTarget) and true or false
 end
 
@@ -289,15 +294,16 @@ do
 				visual.lightHealth:Hide()
 			end
 		end
+		local lightCast = TidyPlates_LightCast
 		if visual.lightCast then
-			if light and style.castborder.show then
+			if lightCast and style.castborder.show then
 				visual.lightCast:Show()
 			else
 				visual.lightCast:Hide()
 			end
 		end
 		if visual.lightIcon then
-			if light and style.spellicon.show then
+			if lightCast and style.spellicon.show then
 				visual.lightIcon:Show()
 			else
 				visual.lightIcon:Hide()
@@ -986,7 +992,7 @@ do
 			visual.spelltext:SetText(spell)
 
 			visual.spellicon:SetTexture(icon)
-			if TidyPlates_LightBorder then
+			if TidyPlates_LightCast then
 				-- Con el borde Light los dos overlays del tema quedan fuera, y
 				-- el aviso de "no se puede interrumpir" pasa al color del
 				-- filo: rojo en vez de blanco. Si no, se perderia el dato.
