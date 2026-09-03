@@ -442,6 +442,31 @@ local function SetThemeValueArt(info, val)
 	Update()
 end
 
+-- Borde de la barra de vida: comparte el desplegable con las texturas del
+-- tema, pero "Light" no es una de ellas.
+--
+-- Las otras dos son un .tga que el motor estira al ancho de la placa. La
+-- textura Light esta hecha para SetBackdrop, con esquinas propias: estirada
+-- como overlay plano las esquinas se emborronan. Por eso el modo Light se
+-- dibuja como un marco aparte (mira TidyPlatesCore) y aca lo unico que se
+-- hace es levantar la bandera y dejar la textura anterior donde estaba: el
+-- motor la esconde igual mientras el modo este puesto.
+local function GetHealthBorder(info)
+	if db.lightBorder then return "Border_Light" end
+	return GetValue(info)
+end
+
+local function SetHealthBorder(info, val)
+	local light = (val == "Border_Light")
+	db.lightBorder = light
+	if TidyPlates_RefreshLightBorder then TidyPlates_RefreshLightBorder() end
+	if light then
+		Update()
+	else
+		SetThemeValueArt(info, val)
+	end
+end
+
 -- Shared Media
 
 local function SetLSMFont(info, val)
@@ -551,17 +576,6 @@ local function GetOptions()
 											get = GetValue,
 											set = SetValue,
 											arg = {"hideSnakesFriendly"}
-										},
-										LightBorder = {
-											type = "toggle",
-											order = 8,
-											width = "double",
-											name = L["Light Border"],
-											desc = L["Thin white frame around the health bar, the cast bar and the spell icon. The same one the minimap uses. Replaces the theme borders."],
-											descStyle = "inline",
-											get = GetValue,
-											set = SetValue,
-											arg = {"lightBorder"}
 										},
 										HideMirrorImage = {
 											type = "toggle",
@@ -790,12 +804,17 @@ local function GetOptions()
 											type = "select",
 											order = 3,
 											name = L["Normal Border"],
-											get = GetValue,
-											set = SetThemeValueArt,
+											desc = L["Light also frames the cast bar and the spell icon, with the same border the minimap uses."],
+											get = GetHealthBorder,
+											set = SetHealthBorder,
 											disabled = function()
 												return not db.settings.healthborder.show
 											end,
-											values = {TP_HealthBarOverlay = "Default", TP_HealthBarOverlayThin = "Thin"},
+											values = {
+												TP_HealthBarOverlay = "Default",
+												TP_HealthBarOverlayThin = "Thin",
+												Border_Light = L["Light"],
+											},
 											arg = {"settings", "healthborder", "texture"}
 										},
 										Header2 = {

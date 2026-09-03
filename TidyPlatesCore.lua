@@ -264,9 +264,11 @@ do
 		-- Borde Light. Como esta anclado, alcanza con prenderlo o apagarlo;
 		-- y cuando esta puesto se apagan los bordes del tema, que rodean
 		-- exactamente lo mismo.
+		-- Cada uno respeta el "mostrar" que ya tenia su objeto en el tema: si
+		-- el borde de vida esta apagado, el modo Light tampoco lo dibuja.
 		local light = TidyPlates_LightBorder
 		if visual.lightHealth then
-			if light then
+			if light and style.healthborder.show then
 				visual.lightHealth:Show()
 				visual.healthborder:Hide()
 			else
@@ -274,7 +276,11 @@ do
 			end
 		end
 		if visual.lightCast then
-			if light then visual.lightCast:Show() else visual.lightCast:Hide() end
+			if light and style.castborder.show then
+				visual.lightCast:Show()
+			else
+				visual.lightCast:Hide()
+			end
 		end
 		if visual.lightIcon then
 			if light and style.spellicon.show then
