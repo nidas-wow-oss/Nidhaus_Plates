@@ -152,6 +152,10 @@ TidyPlates.LoadTheme = LoadTheme
 TidyPlates._LoadTheme = LoadTheme
 
 function TidyPlates:ReloadTheme()
+	-- Por aca pasa cualquier cambio de opciones y el cambio de perfil, asi
+	-- que es el punto para releer el estado del borde Light y no andar
+	-- consultando la base de datos en cada actualizacion de cada placa.
+	if TidyPlates_RefreshLightBorder then TidyPlates_RefreshLightBorder() end
 	LoadTheme(TidyPlatesOptions[activespec])
 	TidyPlates:ForceUpdate()
 end

@@ -20,6 +20,52 @@ local targetQueue = setmetatable({}, weaktable)
 
 local ForEachPlate
 local EMPTY_TEXTURE = "Interface\\Addons\\Nidhaus_Plates\\Media\\Empty"
+
+-- ---------------------------------------------------------
+-- BORDE LIGHT  (Nidhaus)
+--
+-- El mismo marco fino que lleva el minimapa: Border_Light, de KkthnxUI.
+-- Rodea la barra de vida, la de casteo y el icono del hechizo.
+--
+-- Es un Frame con backdrop y no una textura mas del tema a proposito. Las
+-- del tema son un .tga que se estira al ancho de la placa, asi que el filo
+-- se engorda o se afina segun el tamaño; un backdrop con edgeSize fijo
+-- mantiene el mismo grosor mida lo que mida la barra.
+--
+-- Los tres van ANCLADOS a su objeto, no posicionados a mano: siguen solos
+-- cualquier cambio de ancho, alto o posicion que haga el tema, asi que en
+-- cada actualizacion solo hay que mostrarlos u ocultarlos.
+--
+-- Y REEMPLAZA a los bordes del tema, no se suma. Rodean el mismo perimetro
+-- y quedarian uno encima del otro; la misma leccion que dio el borde del
+-- minimapa cuando convivia con el cuadrado.
+-- ---------------------------------------------------------
+local LIGHT_BACKDROP = {
+	edgeFile = "Interface\\AddOns\\Nidhaus_Plates\\ThreatPlates\\Media\\Artwork\\Border_Light",
+	edgeSize = 8,
+	insets = { left = 2, right = 2, top = 2, bottom = 2 },
+}
+
+TidyPlates_LightBorder = false
+
+function TidyPlates_RefreshLightBorder()
+	local t = _G.TidyPlatesThreat
+	local prof = t and t.db and t.db.profile
+	TidyPlates_LightBorder = (prof and prof.lightBorder) and true or false
+end
+
+-- Un marco de borde pegado a su objeto. El inset negativo lo saca un par de
+-- pixeles hacia afuera para que el filo no se coma la barra.
+local function CreateLightBorder(parent, target, pad)
+	local f = CreateFrame("Frame", nil, parent)
+	f:SetFrameLevel(parent:GetFrameLevel() + 1)
+	f:SetPoint("TOPLEFT", target, "TOPLEFT", -pad, pad)
+	f:SetPoint("BOTTOMRIGHT", target, "BOTTOMRIGHT", pad, -pad)
+	f:SetBackdrop(LIGHT_BACKDROP)
+	f:SetBackdropBorderColor(1, 1, 1, 1)
+	f:Hide()
+	return f
+end
 local select, pairs, tostring = select, pairs, tostring
 local CreateTidyPlatesStatusbar = CreateTidyPlatesStatusbar
 
@@ -213,6 +259,29 @@ do
 		end
 		if activetheme.SetStatusbarWidthMatching then
 			MatchTextWidth()
+		end
+
+		-- Borde Light. Como esta anclado, alcanza con prenderlo o apagarlo;
+		-- y cuando esta puesto se apagan los bordes del tema, que rodean
+		-- exactamente lo mismo.
+		local light = TidyPlates_LightBorder
+		if visual.lightHealth then
+			if light then
+				visual.lightHealth:Show()
+				visual.healthborder:Hide()
+			else
+				visual.lightHealth:Hide()
+			end
+		end
+		if visual.lightCast then
+			if light then visual.lightCast:Show() else visual.lightCast:Hide() end
+		end
+		if visual.lightIcon then
+			if light and style.spellicon.show then
+				visual.lightIcon:Show()
+			else
+				visual.lightIcon:Hide()
+			end
 		end
 	end
 end
@@ -890,7 +959,20 @@ do
 			visual.spelltext:SetText(spell)
 
 			visual.spellicon:SetTexture(icon)
-			if notInterruptible then
+			if TidyPlates_LightBorder then
+				-- Con el borde Light los dos overlays del tema quedan fuera, y
+				-- el aviso de "no se puede interrumpir" pasa al color del
+				-- filo: rojo en vez de blanco. Si no, se perderia el dato.
+				visual.castnostop:Hide()
+				visual.castborder:Hide()
+				if visual.lightCast then
+					if notInterruptible then
+						visual.lightCast:SetBackdropBorderColor(1, 0.25, 0.25, 1)
+					else
+						visual.lightCast:SetBackdropBorderColor(1, 1, 1, 1)
+					end
+				end
+			elseif notInterruptible then
 				visual.castnostop:Show()
 				visual.castborder:Hide()
 			else
@@ -1044,6 +1126,12 @@ do
 		for i, v in pairs(visual) do
 			v:SetNonBlocking(true)
 		end
+
+		-- Los bordes Light van DESPUES del bucle de SetNonBlocking: ese metodo
+		-- es de Texture y sobre un Frame revienta.
+		visual.lightHealth = CreateLightBorder(healthbar, healthbar, 2)
+		visual.lightCast   = CreateLightBorder(castbar, castbar, 2)
+		visual.lightIcon   = CreateLightBorder(castbar, visual.spellicon, 2)
 
 		visual.customtext = extended:CreateFontString(nil, "OVERLAY")
 		visual.name = extended:CreateFontString(nil, "OVERLAY")

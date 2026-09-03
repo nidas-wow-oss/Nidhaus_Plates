@@ -552,6 +552,17 @@ local function GetOptions()
 											set = SetValue,
 											arg = {"hideSnakesFriendly"}
 										},
+										LightBorder = {
+											type = "toggle",
+											order = 8,
+											width = "double",
+											name = L["Light Border"],
+											desc = L["Thin white frame around the health bar, the cast bar and the spell icon. The same one the minimap uses. Replaces the theme borders."],
+											descStyle = "inline",
+											get = GetValue,
+											set = SetValue,
+											arg = {"lightBorder"}
+										},
 										HideMirrorImage = {
 											type = "toggle",
 											order = 7,

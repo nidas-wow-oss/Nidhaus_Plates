@@ -314,6 +314,8 @@ L["Hides the nameplates of Viper and Venomous Snake from the hunter's Snake Trap
 L["Hide Your Own Snakes"] = "Ocultar tambien las propias"
 L["Also hides the snakes summoned by you and your allies, not just the enemy ones."] = "Oculta tambien las serpientes invocadas por ti y por tus aliados, no solo las enemigas."
 L["Hide Mirror Images"] = "Ocultar imágenes especulares"
+L["Light Border"] = "Borde Light"
+L["Thin white frame around the health bar, the cast bar and the spell icon. The same one the minimap uses. Replaces the theme borders."] = "Marco fino y blanco alrededor de la barra de vida, la de casteo y el icono del hechizo. El mismo del minimapa. Reemplaza a los bordes del tema."
 L["Hides the nameplates of the mage's Mirror Image copies."] = "Oculta las placas de las copias del Mirror Image del mago."
 
 -- Marcador de sanadores en BG (modulo Healers)

@@ -40,6 +40,7 @@ TidyPlatesThemeList["Threat Plates"] = {}
 
 -- Callback Functions
 function TidyPlatesThreat:ProfChange()
+	if TidyPlates_RefreshLightBorder then TidyPlates_RefreshLightBorder() end
 	if TidyPlatesThreat.ApplySimpleLayout then
 		TidyPlatesThreat.ApplySimpleLayout()
 	end
@@ -173,6 +174,7 @@ function TidyPlatesThreat:OnInitialize()
 			hideSnakes = true,          -- serpientes de la trampa: enemigas
 			hideSnakesFriendly = true,  -- serpientes de la trampa: propias y aliadas
 			hideMirrorImage = true,     -- Mirror Image (mago)
+			lightBorder = false,        -- marco fino Border_Light en vida, casteo e icono
 			friendlyClass = false,
 			friendlyNameOnly = false,
 			friendlyClickThrough = false,
