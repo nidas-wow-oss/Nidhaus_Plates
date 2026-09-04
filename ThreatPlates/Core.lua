@@ -176,6 +176,7 @@ function TidyPlatesThreat:OnInitialize()
 			hideMirrorImage = true,     -- Mirror Image (mago)
 			lightBorder = false,        -- marco fino Border_Light en la barra de vida
 			lightCast   = false,        -- idem en la barra de casteo y el icono
+			castbarCVarInit = false,    -- marca de que ya se prendio showVKeyCastbar una vez
 			roundTarget = false,        -- resalte del objetivo con esquinas redondeadas
 			friendlyClass = false,
 			friendlyNameOnly = false,
@@ -1516,6 +1517,28 @@ function TidyPlatesThreat:StartUp()
 			print(Conclusion)
 		end
 		self.db.char.threat.tanking = TidyPlatesThreat:currentRoleBool(Active()) -- Aligns tanking role with current spec on log in, post setup.
+
+		-- BARRA DE CASTEO DE LOS QUE NO SON TU OBJETIVO.
+		--
+		-- No la decide el addon sino showVKeyCastbar, una CVar del cliente
+		-- que Blizzard trae apagada. El addon solo la leia y obedecia, asi
+		-- que de fabrica no se veia ninguna barra y toda la seccion Castbar
+		-- del panel salia en gris, sin que nada explicara por que.
+		--
+		-- Ahora se prende UNA sola vez, la primera. Despues queda la marca
+		-- puesta y no se vuelve a tocar: si la apagas desde el panel, se
+		-- queda apagada. Prenderla en cada login seria pelearle al usuario.
+		--
+		-- La CVar es del cliente y va por cuenta, no viaja con los perfiles
+		-- del addon; por eso conviene que la ponga el addon y no quedarse
+		-- esperando que uno se acuerde de prenderla en cada cuenta.
+		if not TidyPlatesThreat.db.profile.castbarCVarInit then
+			TidyPlatesThreat.db.profile.castbarCVarInit = true
+			if GetCVar("ShowVKeyCastbar") ~= "1" then
+				SetCVar("ShowVKeyCastbar", "1")
+			end
+		end
+
 		if GetCVar("ShowVKeyCastbar") == "1" then
 			TidyPlatesThreat.db.profile.settings.castbar.show = true
 		else
