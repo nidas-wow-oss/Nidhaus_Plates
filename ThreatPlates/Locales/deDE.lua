@@ -1,23 +1,34 @@
 local L = LibStub("AceLocale-3.0"):NewLocale("TidyPlatesThreat", "deDE", false)
 if not L then return end
+-- =========================================================
+-- EL NOMBRE QUE SE VE EN EL CHAT
+--
+-- El addon se llama Nidhaus_Plates, pero los mensajes seguian diciendo
+-- "Threat Plates" y "Tidy Plates", que es de donde viene la base.
+--
+-- OJO: en AceLocale la CLAVE es el texto en ingles y es lo que busca el
+-- codigo. Cambiar la clave rompe la busqueda -- AceLocale tira error al
+-- pedir una que no existe. Las claves quedan intactas; lo que cambia es el
+-- VALOR, que es lo unico que se imprime.
+-- =========================================================
 
 ----------------------
 --[[ commands.lua ]]--
 ----------------------
 
 L["-->>|cffff0000DPS Plates Enabled|r<<--"] = "-->>|cffff0000DPS Plaketten eingeschaltet|r<<--"
-L["|cff89F559Threat Plates|r: DPS switch detected, you are now in your |cff89F559"] = "|cff89F559Threat Plates|r: Wechsel auf DPS festgestellt, Du bist jetzt in Deiner |cff89F559"
+L["|cff89F559Threat Plates|r: DPS switch detected, you are now in your |cff89F559"] = "|cff89F559Nidhaus Plates|r: Wechsel auf DPS festgestellt, Du bist jetzt in Deiner |cff89F559"
 L["|r spec and are now in your |cffff0000dpsing / healing|r role."] = "|r Talente, Du bist jetzt in Deiner |cffff0000DPS-/Heiler|r-Rolle."
 
 L["-->>|cff00ff00Tank Plates Enabled|r<<--"] = "-->>|cff00ff00Tank-Plates eingeschaltet|r<<--"
-L["|cff89F559Threat Plates|r: Tank switch detected, you are now in your |cff89F559"] = "|cff89F559Threat Plates|r: Wechsel auf Tank festgestellt, du bist jetzt in Deiner |cff89F559"
+L["|cff89F559Threat Plates|r: Tank switch detected, you are now in your |cff89F559"] = "|cff89F559Nidhaus Plates|r: Wechsel auf Tank festgestellt, du bist jetzt in Deiner |cff89F559"
 L["|r spec and are now in your |cff00ff00tanking|r role."] = "|r Talente, Du bist jetzt in Deiner |cff00ff00Tank|r -Rolle."
 
 L["-->>Nameplate Overlapping is now |cff00ff00ON!|r<<--"] = "-->>Namensplaketten-Überlappung ist nun |cff00ff00ON!|r<<--"
 L["-->>Nameplate Overlapping is now |cffff0000OFF!|r<<--"] = "-->>Namensplaketten-Überlappung ist nun |cffff0000OFF!|r<<--"
 
-L["-->>Threat Plates verbose is now |cff00ff00ON!|r<<--"] = "-->>Threat Plates-Meldungen sind nun |cff00ff00ON!|r<<--"
-L["-->>Threat Plates verbose is now |cffff0000OFF!|r<<-- shhh!!"] = "-->>Threat Plates-Meldungen sind nun |cffff0000OFF!|r<<-- psst!!"
+L["-->>Threat Plates verbose is now |cff00ff00ON!|r<<--"] = "-->>Nidhaus Plates-Meldungen sind nun |cff00ff00ON!|r<<--"
+L["-->>Threat Plates verbose is now |cffff0000OFF!|r<<-- shhh!!"] = "-->>Nidhaus Plates-Meldungen sind nun |cffff0000OFF!|r<<-- psst!!"
 
 ------------------------------
 --[[ TidyPlatesThreat.lua ]]--
@@ -31,23 +42,23 @@ L["secondary"] = "Sekundär"
 L["unknown"] = "Unbekannt"
 L["Undetermined"] = "Unbestimmt"
 
-L["|cff89f559Welcome to |rTidy Plates: |cff89f559Threat Plates!\nThis is your first time using Threat Plates and you are a(n):\n|r|cff"] = "|cff89f559Willkommen bei |rTidy Plates: |cff89f559Threat Plates!\nDas ist das erste Mal, dass Du Threat Plates benutzt und Du bist ein(n):\n|r|cff"
+L["|cff89f559Welcome to |rTidy Plates: |cff89f559Threat Plates!\nThis is your first time using Threat Plates and you are a(n):\n|r|cff"] = "|cff89f559Willkommen bei |r|cff89f559Nidhaus Plates!\nDas ist das erste Mal, dass Du Nidhaus Plates benutzt und Du bist ein(n):\n|r|cff"
 
 L["|cff89f559Your dual spec's have been set to |r"] = "|cff89f559Deine sekundären Talente wurden auf |r gestellt"
 L["|cff89f559You are currently in your "] = "|cff89f559Du bist derzeit in Deiner "
 L["|cff89f559 role.|r"] = "|cff89f559 Rolle.|r"
-L["|cff89f559Your role can not be determined.\nPlease set your dual spec preferences in the |rThreat Plates|cff89f559 options.|r"] = "|cff89f559Deine Rolle konnte nicht festgestellt werden.\nBitte stelle Deine Dualskillung in den |rThreat Plates|cff89f559-Optionen ein.|r"
+L["|cff89f559Your role can not be determined.\nPlease set your dual spec preferences in the |rThreat Plates|cff89f559 options.|r"] = "|cff89f559Deine Rolle konnte nicht festgestellt werden.\nBitte stelle Deine Dualskillung in den |rNidhaus Plates|cff89f559-Optionen ein.|r"
 L["|cff89f559Additional options can be found by typing |r'/tptp'|cff89F559.|r"] = "|cff89f559Weitere Optionen können durch die Eingabe von |r'/tptp'|cff89F559 aufgerufen werden.|r"
-L[":\n----------\nWould you like to \nset your theme to |cff89F559Threat Plates|r?\n\nClicking '|cff00ff00Yes|r' will set you to Threat Plates & reload UI. \n Clicking '|cffff0000No|r' will open the Tidy Plates options."] = ":\n----------\nMöchtest Du Deine \nAnzeige auf |cff89F559Threat Plates|rumschalten?\n\nEin Klick auf '|cff00ff00Ja|r' wird Threat Plates voreinstellen und das UI neuladen. \n Durch Klick auf '|cffff0000Nein|r' öffnen sich die Tidy Plates-Optionen."
+L[":\n----------\nWould you like to \nset your theme to |cff89F559Threat Plates|r?\n\nClicking '|cff00ff00Yes|r' will set you to Threat Plates & reload UI. \n Clicking '|cffff0000No|r' will open the Tidy Plates options."] = ":\n----------\nMöchtest Du Deine \nAnzeige auf |cff89F559Nidhaus Plates|rumschalten?\n\nEin Klick auf '|cff00ff00Ja|r' wird Nidhaus Plates voreinstellen und das UI neuladen. \n Durch Klick auf '|cffff0000Nein|r' öffnen sich die Nidhaus Plates-Optionen."
 
 L["Yes"] = "Ja"
 L["Cancel"] = "Abbruch"
 L["No"] = "Nein"
 
-L["-->>|cffff0000Activate Threat Plates from the Tidy Plates options!|r<<--"] = "-->>|cffff0000Aktiviere Threat Plates über die Tidy Plates-Optionen|r<<--"
-L["|cff89f559Threat Plates:|r Welcome back |cff"] = "|cff89f559Threat Plates:|r Willkommen zurück |cff"
+L["-->>|cffff0000Activate Threat Plates from the Tidy Plates options!|r<<--"] = "-->>|cffff0000Aktiviere Nidhaus Plates über die Nidhaus Plates-Optionen|r<<--"
+L["|cff89f559Threat Plates:|r Welcome back |cff"] = "|cff89f559Nidhaus Plates:|r Willkommen zurück |cff"
 
-L["|cff89F559Threat Plates|r: Player spec change detected: |cff"] = "|cff89F559Threat Plates|r: Talentwechsel festgestellt: |cff"
+L["|cff89F559Threat Plates|r: Player spec change detected: |cff"] = "|cff89F559Nidhaus Plates|r: Talentwechsel festgestellt: |cff"
 L[")|r, you are now in your |cff89F559"] = ")|r, Du bist jetzt in Deiner |cff89F559"
 L["|r spec and are now in your "] = "|r -Skillung und nun in Deiner "
 L[" role."] = " -Rolle."

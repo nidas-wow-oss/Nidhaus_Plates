@@ -180,7 +180,29 @@ panel:SetBackdrop({
 	bgFile = "Interface/Tooltips/UI-Tooltip-Background",
 	insets = {left = 2, right = 2, top = 2, bottom = 2}
 })
-panel:SetBackdropColor(0.06, 0.06, 0.06, 1)
+-- FONDO MAS TRANSPARENTE.
+--
+-- Estaba en alfa 1, o sea opaco del todo. 0.85 es el mismo valor que ya
+-- usa el panel de Battleground Healers de este addon, asi que los dos
+-- quedan parejos.
+panel:SetBackdropColor(0.06, 0.06, 0.06, 0.85)
+
+-- TITULO MAS OSCURO.
+--
+-- Venia en GameFontNormalLarge, que es el dorado brillante de Blizzard, y
+-- ademas el texto trae codigos de color propios desde el .toc -- por eso
+-- se veia parte blanco y parte verde. Mientras esos codigos esten, un
+-- SetTextColor no hace nada: el color embebido gana.
+--
+-- Se limpian los codigos y se pinta de un gris tenue, que es lo que se
+-- pidio. Si algun dia se quiere volver al verde, alcanza con sacar el
+-- gsub y dejar el SetText original.
+if panel.Label then
+	local plain = string.gsub(titleString, "|c%x%x%x%x%x%x%x%x", "")
+	plain = string.gsub(plain, "|r", "")
+	panel.Label:SetText(plain)
+	panel.Label:SetTextColor(0.55, 0.55, 0.55, 1)
+end
 
 -- Convert the Theme List into a Menu List
 local function UpdateThemeNames()

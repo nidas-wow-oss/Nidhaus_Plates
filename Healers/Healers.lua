@@ -37,9 +37,10 @@ local DefaultSettings = {
     iconStyle = "Blizzlike",    -- Icon style ("Blizzlike" or "Minimalist")
     iconSize = 40,              -- Icon size (20 to 40)
     iconAnchor = "top",         -- Icon anchor relative to the nameplate ("left", "top" or "right")
-    iconXoffset = 0,            -- Horizontal offset relative to the icon anchor (-40 to 40)
+    iconXoffset = 0,            -- Horizontal offset relative to the icon anchor (-100 to 100)
     iconYoffset = 0,            -- Vertical offset relative to the icon anchor (-40 to 40)
     iconInvertColor = 0,        -- Invert icon colors, by default enemies are red and allies are blue (1 = enabled, 0 = disabled)
+    enableInArena = 0,          -- Tambien marcar healers en ARENAS (1 = si, 0 = solo battlegrounds)
     showMessages = 1,           -- Addon chat messages (1 = enabled, 0 = disabled)
 }
 
@@ -829,7 +830,7 @@ end
 local function ConfigUI()
     if not BGHConfigUIglobalFrame then
         local ConfigUIFrame = CreateFrame("Frame", "BGHConfigUIglobalFrame", UIParent)
-        ConfigUIFrame:SetSize(294, 556)
+        ConfigUIFrame:SetSize(294, 586)
         ConfigUIFrame:SetScale(0.9/UIParent:GetScale())
         ConfigUIFrame:SetPoint("CENTER")
         ConfigUIFrame:SetToplevel(true)
@@ -1111,7 +1112,10 @@ local function ConfigUI()
         local iconXoffsetSlider = CreateFrame("Slider", "BGHConfigUIiconXoffsetSlider", ConfigUIFrame, "OptionsSliderTemplate")
         iconXoffsetSlider:SetSize(185, 15)
         iconXoffsetSlider:SetPoint("TOP", 0, -343)
-        iconXoffsetSlider:SetMinMaxValues(-40, 40)
+        -- RANGO AMPLIADO A 100 (de fabrica eran 40).
+        -- Solo cambia el limite del control: el valor guardado y como se
+        -- aplica siguen igual.
+        iconXoffsetSlider:SetMinMaxValues(-100, 100)
         iconXoffsetSlider:SetValueStep(1)
         iconXoffsetSlider:SetValue(BGHsettings.iconXoffset or 0)
         iconXoffsetSlider.Label = iconXoffsetSlider:CreateFontString(nil, "ARTWORK", "GameFontNormal")
@@ -1123,8 +1127,8 @@ local function ConfigUI()
         iconXoffsetSlider.Value:SetPoint("BOTTOM", iconXoffsetSlider.Thumb, "TOP", 0, -4)
         iconXoffsetSlider.Value:SetText(iconXoffsetSlider:GetValue())
         iconXoffsetSlider.Value:SetFont(GameFontHighlight:GetFont(), 10.5)
-        _G[iconXoffsetSlider:GetName() .. "Low"]:SetText("-40")
-        _G[iconXoffsetSlider:GetName() .. "High"]:SetText("40")
+        _G[iconXoffsetSlider:GetName() .. "Low"]:SetText("-100")
+        _G[iconXoffsetSlider:GetName() .. "High"]:SetText("100")
         iconXoffsetSlider:SetScript("OnValueChanged", function(self, value)
             BGHsettings.iconXoffset = math_floor(value + 0.5)
             iconXoffsetSlider.Value:SetText(math_floor(value + 0.5))
@@ -1260,6 +1264,29 @@ local function ConfigUI()
                 UpdateAllMarks()
             end
         end)    
+
+        -- Tambien en arenas (Checkbox)
+        --
+        -- El modulo nacio pensado para battlegrounds: la deteccion por
+        -- marcador (Scoreboard) solo existe ahi. En arena queda la
+        -- deteccion por combat log, que alcanza de sobra -- un healer
+        -- tira su primera curacion en los primeros segundos.
+        local arenaCheckbox = CreateFrame("CheckButton", "BGHConfigUIarenaCheckbox", ConfigUIFrame, "UICheckButtonTemplate")
+        arenaCheckbox:SetPoint("TOPLEFT", 34, -492)
+        arenaCheckbox:SetSize(24, 24)
+        arenaCheckbox.Text = _G[arenaCheckbox:GetName().."Text"]
+        arenaCheckbox.Text:SetText(L["Also mark healers in arenas"] or "Also mark healers in arenas")
+        arenaCheckbox.Text:SetPoint("LEFT", arenaCheckbox, "RIGHT", 1, 1)
+        arenaCheckbox.Text:SetTextColor(1, 1, 1, 1)
+        arenaCheckbox:SetChecked(BGHsettings.enableInArena == 1)
+        arenaCheckbox:SetScript("OnClick", function(self)
+            BGHsettings.enableInArena = self:GetChecked() and 1 or 0
+            -- Se pide por CAMPO y no por local: RefreshZoneState se define
+            -- mas abajo en el archivo, y en Lua un local de mas abajo no
+            -- existe para el codigo de arriba. Como campo se resuelve
+            -- recien al hacer click, que es despues de todo.
+            if BGH.RefreshZoneState then BGH.RefreshZoneState() end
+        end)
 
         -- Reset Settings (Button)
         local resetButton = CreateFrame("Button", "BGHConfigUIresetButton", ConfigUIFrame, "UIPanelButtonTemplate")
@@ -1475,6 +1502,49 @@ local function HideAllMarks()
     end
 end
 
+-- ¿ESTA ZONA CUENTA?
+--
+-- Antes la pregunta estaba escrita dos veces como instanceType == "pvp",
+-- una en el arranque en caliente y otra en PLAYER_ENTERING_WORLD. Dos
+-- copias de la misma regla es como se desincronizan las cosas, asi que
+-- ahora hay una sola y las dos preguntan aca.
+local function ZoneWanted(instanceType)
+    if instanceType == "pvp" then return true end
+    if instanceType == "arena" then return BGHsettings.enableInArena == 1 end
+    return false
+end
+
+-- Volver a mirar la zona AHORA MISMO.
+--
+-- La usa la casilla de arenas: si la tildas estando ya adentro de una, no
+-- tiene sentido esperar al proximo PLAYER_ENTERING_WORLD para que empiece
+-- a marcar. Hace lo mismo que ese evento, ni mas ni menos.
+local function RefreshZoneState()
+    if not moduleEnabled then return end
+    local _, instanceType = IsInInstance()
+    if ZoneWanted(instanceType) then
+        if not inBG then
+            RequestBattlefieldScoreData()
+            UpdateCurrentBGplayers()
+            UpdateWSSFhealers()
+            UpdateCLEUstate()
+        end
+        inBG = true
+        BGH:SetScript("OnUpdate", OnUpdate)
+        CLEUframe:SetScript("OnEvent", CLEUhandler)
+    elseif inBG then
+        inBG = false
+        ResetTrackingState()
+        wipe(MarkedNames)
+        HideAllMarks()
+    end
+end
+
+-- Se cuelga del frame para que el panel, que esta ESCRITO MAS ARRIBA en
+-- el archivo, pueda llamarla. Un local declarado aca abajo no existe para
+-- el codigo de arriba.
+BGH.RefreshZoneState = RefreshZoneState
+
 local function ApplyEnabled()
     local want = (BGHsettings and BGHsettings.enabled == 1) and true or false
     if want == moduleEnabled then return end
@@ -1486,7 +1556,7 @@ local function ApplyEnabled()
         BGH:RegisterEvent("UPDATE_BATTLEFIELD_STATUS")
         -- Si ya estabas dentro de un BG al encenderlo, arrancar en caliente.
         local _, instanceType = IsInInstance()
-        if instanceType == "pvp" then
+        if ZoneWanted(instanceType) then
             inBG = true
             RequestBattlefieldScoreData()
             UpdateCurrentBGplayers()
@@ -1542,7 +1612,7 @@ BGH:SetScript("OnEvent", function(self, event, ...)
         ApplyEnabled()
     elseif event == "PLAYER_ENTERING_WORLD" then
         local _, instanceType = IsInInstance()
-        if instanceType == "pvp" then
+        if ZoneWanted(instanceType) then
             if not inBG then
                 RequestBattlefieldScoreData()
                 UpdateCurrentBGplayers()

@@ -20,6 +20,7 @@ El stack clásico de nameplates en 3.3.5a eran tres addons que había que instal
 - **Marcador de sanadores en BG** — resalta a los healers enemigos en battlegrounds (portado de BattleGroundHealers, de Khal).
 - **Fuentes extra** registradas vía LibSharedMedia, seleccionables desde las opciones: *Accidental Presidency*, *Continuum Medium* y *Domyouji Regular*, además de la fuente por defecto.
 - **Opciones simplificadas** — panel recortado a los ajustes que se usan de verdad.
+- **Ocultar las placas de los Mirror Image enemigos** — una opción que saca las placas de los clones para que el mago real se lea.
 - **Botón de minimapa** para abrir la configuración sin comandos.
 - Localización incluida: `en`, `es`, `de`, `fr`, `ru`, `cn`, `tw`, `kr`.
 
@@ -34,7 +35,7 @@ El stack clásico de nameplates en 3.3.5a eran tres addons que había que instal
 
 | Comando | Qué hace |
 |---|---|
-| `/tidyplates` | Abre el panel de opciones principal |
+| `/tidyplates` o `/tptp` | Abre el panel de opciones principal |
 | `/nphealers` o `/bgh` | Opciones del marcador de sanadores en BG |
 | `/tptpol` | Alterna el control de superposición de nameplates |
 | `/tptpverbose` | Salida detallada para depurar |

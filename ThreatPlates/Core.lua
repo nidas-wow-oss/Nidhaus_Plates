@@ -171,6 +171,7 @@ function TidyPlatesThreat:OnInitialize()
 			healthColorChange = false,
 			customColor = false,
 			allowClass = true,
+			arcaneSkin = true,       -- tema Arcane en la ventana de opciones
 			hideSnakes = true,          -- serpientes de la trampa: enemigas
 			hideSnakesFriendly = true,  -- serpientes de la trampa: propias y aliadas
 			hideMirrorImage = true,     -- Mirror Image (mago)
@@ -661,7 +662,34 @@ function TidyPlatesThreat:OnInitialize()
 					alpha = 0,
 					color = {r = 1, g = 1, b = 1}
 				},
-				[31] = {},
+				-- IMAGEN ESPECULAR DEL MAGO  (Mirror Image)
+				--
+				-- Traido de RefinedBlizzPlates, que la tenia en su lista de
+				-- "placas que se dibujan como icono". Es la unica del set que
+				-- faltaba aca: Shadow Fiend, Spirit Wolf, Gargola, Elemental de
+				-- agua, Treants y serpientes ya estaban arriba.
+				--
+				-- Sirve para lo mismo que las otras: tres copias del mago con
+				-- barra de vida tapan media pantalla y encima confunden sobre
+				-- cual es el de verdad. Como icono ocupan un cuadradito y se
+				-- distinguen de una.
+				--
+				-- El icono NO es un archivo nuevo: es el del propio hechizo,
+				-- que ya viene en el juego. Un .tga menos que mantener.
+				[31] = {
+					name = L["Mirror Image"],
+					showNameplate = true,
+					showIcon = true,
+					useStyle = true,
+					useColor = true,
+					allowMarked = true,
+					overrideScale = false,
+					overrideAlpha = false,
+					icon = "Interface\\Icons\\Spell_Magic_LesserInvisibilty",
+					scale = 0.45,
+					alpha = 1,
+					color = {r = 0.41, g = 0.80, b = 0.94}
+				},
 				[32] = {},
 				[33] = {},
 				[34] = {},
@@ -1269,6 +1297,141 @@ AddNames(HIDE_MIRROR,
 	"Image miroir",                      -- frFR
 	"Spiegelbild")                       -- deDE
 
+-- Y EL NOMBRE QUE USA ESTE CLIENTE, SIN ADIVINARLO.
+--
+-- Lo de arriba son traducciones escritas a mano, y una traduccion escrita a
+-- mano es una que puede estar mal -- o puede no ser la que usa ESTE core.
+-- Basta una letra o un acento distinto para que la tabla no acierte y la
+-- placa salga igual, que es exactamente el sintoma.
+--
+-- Las copias del mago se llaman igual que el hechizo que las invoca, asi
+-- que en vez de adivinar se lo preguntamos al juego: GetSpellInfo devuelve
+-- el nombre en el idioma del cliente, sea cual sea. Eso no se puede
+-- escribir mal.
+--
+-- La lista de arriba se deja como respaldo por si el core no conociera el
+-- hechizo (GetSpellInfo devolveria nil).
+do
+	local n = GetSpellInfo(55342)        -- Mirror Image
+	if n then AddNames(HIDE_MIRROR, n) end
+end
+
+-- =========================================================
+-- LAS COPIAS DEL MAGO NO SE LLAMAN "MIRROR IMAGE"
+--
+-- Esto lo dijo la medicion, no una suposicion. Con tres copias en pantalla,
+-- /nphide devolvio CUATRO placas llamadas "Shaddox" -- el nombre del MAGO.
+-- La criatura no se llama "Mirror Image" en ningun idioma: se llama como su
+-- dueno, que es justamente para lo que sirve el hechizo.
+--
+-- Conclusion incomoda: ningun filtro por nombre puede funcionar aca. Ni el
+-- ingles, ni el traducido, ni el que saca GetSpellInfo. Hay que reconocerlas
+-- por otra cosa.
+--
+-- Y esa otra cosa se ve en la misma captura: EL COLOR DE LA BARRA. El mago
+-- es un jugador y va con color de clase -> unit.type == "PLAYER". Las
+-- copias son criaturas y van en rojo hostil -> unit.type == "NPC".
+--
+--     Una placa de NPC que se llama igual que un jugador es una copia.
+--
+-- De donde sacamos "ese nombre es de un jugador", en orden de confianza:
+--
+--   1. EL COMBAT LOG. Alguien lanza Mirror Image y anotamos su nombre por
+--      35 segundos (el hechizo dura 30). Llega ANTES de que aparezcan las
+--      placas, asi que las copias nacen ya ocultas.
+--   2. LA PLACA DEL MAGO, si esta a la vista. Es la red de seguridad para
+--      cuando nos perdimos el casteo -- entraste a mitad de la ronda, o
+--      estabas fuera de rango.
+--
+-- Las dos alimentan la misma tabla y las dos caducan solas.
+-- =========================================================
+local MIRROR_IMAGE_SPELLID = 55342
+local MIRROR_WINDOW        = 35    -- el hechizo dura 30; el resto es margen
+local PLAYER_SEEN_WINDOW   = 30    -- cuanto vale haber visto a un jugador
+
+local cloneOwners = {}   -- [nombre normalizado] = momento en que caduca
+
+local function NoteName(name, ttl)
+	local n = Normalize(name)
+	if not n then return false end
+	local expires = GetTime() + ttl
+	if (cloneOwners[n] or 0) >= expires then return false end
+	local isNew = (cloneOwners[n] == nil)
+	cloneOwners[n] = expires
+	return isNew
+end
+
+local function IsCloneOwner(name)
+	local n = Normalize(name)
+	if not n then return false end
+	local t = cloneOwners[n]
+	if not t then return false end
+	if GetTime() > t then
+		cloneOwners[n] = nil
+		return false
+	end
+	return true
+end
+
+-- Fuente 1: el casteo.
+--
+-- El evento es carisimo (llega por cada golpe de cada bicho en pantalla),
+-- asi que lo primero de todo es la salida rapida: con la casilla apagada
+-- son dos comparaciones y chau.
+local mirrorWatch = CreateFrame("Frame")
+mirrorWatch:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+mirrorWatch:SetScript("OnEvent", function(self, event, timestamp, subEvent,
+		srcGUID, srcName, srcFlags, dstGUID, dstName, dstFlags, spellId)
+	if subEvent ~= "SPELL_CAST_SUCCESS" and subEvent ~= "SPELL_SUMMON" then return end
+	if tonumber(spellId) ~= MIRROR_IMAGE_SPELLID then return end
+	local db = TidyPlatesThreat.db and TidyPlatesThreat.db.profile
+	if not db or not db.hideMirrorImage then return end
+	if NoteName(srcName, MIRROR_WINDOW) then
+		-- Una placa ya dibujada no recalcula su estilo sola: solo lo hace
+		-- cuando algo del unit cambia. Sin este empujon, una copia quieta
+		-- podia quedarse a la vista hasta que le pasara algo.
+		if TidyPlates and TidyPlates.ForceUpdate then
+			pcall(TidyPlates.ForceUpdate, TidyPlates)
+		end
+	end
+end)
+
+-- Fuente 3: LOS JUGADORES QUE EL JUEGO NOS DEJA MIRAR DIRECTO.
+--
+-- Las dos fuentes de arriba dejan un hueco real, y en arena es EL hueco: el
+-- mago castea detras de un pilar -- fuera del combat log y con su placa sin
+-- dibujar -- y las copias salen corriendo hacia vos. Ninguna de las dos lo
+-- vio, asi que las copias aparecen con placa.
+--
+-- Pero en arena no hace falta ver la placa de nadie: arena1..arena5 son los
+-- rivales, y el juego te da sus nombres siempre, esten donde esten. Lo mismo
+-- target, foco y los del grupo.
+--
+-- Se relee una vez por segundo. Recorrer once unidades cada cuadro seria
+-- trabajo al pedo: los nombres de una arena no cambian.
+local ROSTER_UNITS = {
+	"arena1", "arena2", "arena3", "arena4", "arena5",
+	"target", "focus", "mouseover",
+	"party1", "party2", "party3", "party4",
+}
+local rosterStamp = 0
+
+local function RefreshRosterNames()
+	local now = GetTime()
+	if now - rosterStamp < 1 then return end
+	rosterStamp = now
+	for i = 1, #ROSTER_UNITS do
+		local u = ROSTER_UNITS[i]
+		-- Solo JUGADORES. La mascota del cazador tambien responde a
+		-- "arena1pet", pero un nombre de mascota metido aca haria
+		-- desaparecer placas que no son copias de nadie.
+		if UnitExists(u) and UnitIsPlayer(u) then
+			local n = UnitName(u)
+			if n then NoteName(n, PLAYER_SEEN_WINDOW) end
+		end
+	end
+end
+
 -- SetStyle se llama varias veces por placa y por refresco, asi que el
 -- resultado se memoriza por nombre: a partir de la segunda vez que se ve una
 -- criatura es una sola busqueda en tabla, sin normalizar de nuevo.
@@ -1283,22 +1446,67 @@ local function KindOf(name)
 	return kind
 end
 
+-- UN SOLO DUENO DE LA REGLA "ESTO VA OCULTO".
+--
+-- La decision la tomaba SetStyle y nadie mas la conocia. El problema es que
+-- los widgets (el icono de Custom Nameplates, por ejemplo) se dibujan por
+-- su cuenta, sin mirar que estilo salio: la placa quedaba escondida y el
+-- iconito flotando igual en el aire. Ocultar es ocultar.
+--
+-- Ahora la regla vive en un solo lado y la pueden consultar los dos.
+function TidyPlatesThreat.IsNameHidden(name, reaction, unitType)
+	if not name then return false end
+	local db = TidyPlatesThreat.db and TidyPlatesThreat.db.profile
+	if not db then return false end
+
+	local kind = KindOf(name)
+
+	-- Las copias del mago, por el criterio de arriba: criatura con nombre de
+	-- jugador. El unit.type es la mitad que no se puede saltear -- sin el
+	-- estariamos ocultando al mago de verdad, que se llama igual.
+	--
+	-- Se exige ademas que el nombre no sea uno de los conocidos: si alguien
+	-- se llamara "Viper", sus serpientes de trampa no tienen por que
+	-- desaparecer por culpa de la casilla del mago. Cada casilla manda sobre
+	-- lo suyo.
+	if not kind and db.hideMirrorImage and unitType == "NPC"
+		and IsCloneOwner(name) then
+		return true
+	end
+
+	if not kind then return false end
+	if kind == "snake" then
+		-- Propias y aliadas van por su propia casilla: hay quien quiere
+		-- ver las suyas para saber si la trampa sigue viva.
+		if reaction == "FRIENDLY" then
+			return db.hideSnakesFriendly and true or false
+		end
+		return db.hideSnakes and true or false
+	end
+	if kind == "mirror" then
+		return db.hideMirrorImage and true or false
+	end
+	return false
+end
+
 function TidyPlatesThreat.SetStyle(unit)
 	DB = TidyPlatesThreat.db.profile
 
-	if unit.name then
-		local kind = KindOf(unit.name)
-		if kind == "snake" then
-			-- Propias y aliadas van por su propia casilla: hay quien quiere
-			-- ver las suyas para saber si la trampa sigue viva.
-			if unit.reaction == "FRIENDLY" then
-				if DB.hideSnakesFriendly then return "empty" end
-			elseif DB.hideSnakes then
-				return "empty"
-			end
-		elseif kind == "mirror" then
-			if DB.hideMirrorImage then return "empty" end
-		end
+	-- Fuente 2: si esta placa es la de un JUGADOR, se anota su nombre. La
+	-- copia se llama igual, asi que cuando toque evaluarla ya vamos a saber
+	-- que ese nombre es de alguien de carne y hueso.
+	--
+	-- Se anota siempre, no solo con la casilla puesta: es una tabla de
+	-- nombres con vencimiento, cuesta nada, y asi al tildar la casilla ya
+	-- esta poblada en vez de tener que esperar a que el mago vuelva a
+	-- castear.
+	if unit.type == "PLAYER" and unit.name then
+		NoteName(unit.name, PLAYER_SEEN_WINDOW)
+	end
+	RefreshRosterNames()
+
+	if TidyPlatesThreat.IsNameHidden(unit.name, unit.reaction, unit.type) then
+		return "empty"
 	end
 
 	local T, custom = TidyPlatesThreat.UnitType(unit)

@@ -1,5 +1,16 @@
 local L = LibStub("AceLocale-3.0"):NewLocale("TidyPlatesThreat", "ruRU", false)
 if not L then return end
+-- =========================================================
+-- EL NOMBRE QUE SE VE EN EL CHAT
+--
+-- El addon se llama Nidhaus_Plates, pero los mensajes seguian diciendo
+-- "Threat Plates" y "Tidy Plates", que es de donde viene la base.
+--
+-- OJO: en AceLocale la CLAVE es el texto en ingles y es lo que busca el
+-- codigo. Cambiar la clave rompe la busqueda -- AceLocale tira error al
+-- pedir una que no existe. Las claves quedan intactas; lo que cambia es el
+-- VALOR, que es lo unico que se imprime.
+-- =========================================================
 
 -- translated by: SorenMills#3894
 
@@ -8,18 +19,18 @@ if not L then return end
 ----------------------
 
 L["-->>|cffff0000DPS Plates Enabled|r<<--"] = "-->>|cffff0000DPS Plates Enabled|r<<--"
-L["|cff89F559Threat Plates|r: DPS switch detected, you are now in your |cff89F559"] = "|cff89F559Threat Plates|r: обнаружен спек в ДПС, сейчас вы в |cff89F559"
+L["|cff89F559Threat Plates|r: DPS switch detected, you are now in your |cff89F559"] = "|cff89F559Nidhaus Plates|r: обнаружен спек в ДПС, сейчас вы в |cff89F559"
 L["|r spec and are now in your |cffff0000dpsing / healing|r role."] = "|r спек и сейчас вы в |cffff0000дпс / хил|r роли."
 
 L["-->>|cff00ff00Tank Plates Enabled|r<<--"] = "-->>|cff00ff00Tank Plates Enabled|r<<--"
-L["|cff89F559Threat Plates|r: Tank switch detected, you are now in your |cff89F559"] = "|cff89F559Threat Plates|r: обнаружен спек в Танк, сейчас вы в |cff89F559"
+L["|cff89F559Threat Plates|r: Tank switch detected, you are now in your |cff89F559"] = "|cff89F559Nidhaus Plates|r: обнаружен спек в Танк, сейчас вы в |cff89F559"
 L["|r spec and are now in your |cff00ff00tanking|r role."] = "|r спек и сейчас вы в |cff00ff00танк|r роли."
 
 L["-->>Nameplate Overlapping is now |cff00ff00ON!|r<<--"] = "-->>Наложение индикаторов здоровья |cff00ff00ВКЛ!|r<<--"
 L["-->>Nameplate Overlapping is now |cffff0000OFF!|r<<--"] = "-->>Наложение индикаторов здоровья |cffff0000ВЫКЛ!|r<<--"
 
-L["-->>Threat Plates verbose is now |cff00ff00ON!|r<<--"] = "-->>Threat Plates подробность установлена на |cff00ff00ON!|r<<--"
-L["-->>Threat Plates verbose is now |cffff0000OFF!|r<<-- shhh!!"] = "-->>Threat Plates подробность установлена на |cffff0000OFF!|r<<-- shhh!!"
+L["-->>Threat Plates verbose is now |cff00ff00ON!|r<<--"] = "-->>Nidhaus Plates подробность установлена на |cff00ff00ON!|r<<--"
+L["-->>Threat Plates verbose is now |cffff0000OFF!|r<<-- shhh!!"] = "-->>Nidhaus Plates подробность установлена на |cffff0000OFF!|r<<-- shhh!!"
 
 ------------------------------
 --[[ TidyPlatesThreat.lua ]]--
@@ -33,23 +44,23 @@ L["secondary"] = "второстепенный"
 L["unknown"] = "неизвестный"
 L["Undetermined"] = "Неопределенный"
 
-L["|cff89f559Welcome to |rTidy Plates: |cff89f559Threat Plates!\nThis is your first time using Threat Plates and you are a(n):\n|r|cff"] = "|cff89f559Добро пожаловать в |rTidy Plates: |cff89f559Threat Plates!\nЭто ваше первое использование Threat Plates и вы(n):\n|r|cff"
+L["|cff89f559Welcome to |rTidy Plates: |cff89f559Threat Plates!\nThis is your first time using Threat Plates and you are a(n):\n|r|cff"] = "|cff89f559Добро пожаловать в |r|cff89f559Nidhaus Plates!\nЭто ваше первое использование Nidhaus Plates и вы(n):\n|r|cff"
 
 L["|cff89f559Your dual spec's have been set to |r"] = "|cff89f559Ваш дуал спек был установлен на |r"
 L["|cff89f559You are currently in your "] = "|cff89f559Сейчас вы в "
 L["|cff89f559 role.|r"] = "|cff89f559 роли.|r"
-L["|cff89f559Your role can not be determined.\nPlease set your dual spec preferences in the |rThreat Plates|cff89f559 options.|r"] = "|cff89f559Не можем определить вашу роль.\nПожалуйся утановите ваши предпочтения в |rThreat Plates|cff89f559 опциях.|r"
+L["|cff89f559Your role can not be determined.\nPlease set your dual spec preferences in the |rThreat Plates|cff89f559 options.|r"] = "|cff89f559Не можем определить вашу роль.\nПожалуйся утановите ваши предпочтения в |rNidhaus Plates|cff89f559 опциях.|r"
 L["|cff89f559Additional options can be found by typing |r'/tptp'|cff89F559.|r"] = "|cff89f559Для дополнительных настроек наберите команду |r'/tptp'|cff89F559.|r"
-L[":\n----------\nWould you like to \nset your theme to |cff89F559Threat Plates|r?\n\nClicking '|cff00ff00Yes|r' will set you to Threat Plates & reload UI. \n Clicking '|cffff0000No|r' will open the Tidy Plates options."] = ":\n----------\nХотели бы вы \nустановить тему на |cff89F559Threat Plates|r?\n\nНажатие '|cff00ff00Да|r' установит Threat Plates & перезагрузит интерфейс. \n Нажатие '|cffff0000Нет|r' откроет Tidy Plates настройки."
+L[":\n----------\nWould you like to \nset your theme to |cff89F559Threat Plates|r?\n\nClicking '|cff00ff00Yes|r' will set you to Threat Plates & reload UI. \n Clicking '|cffff0000No|r' will open the Tidy Plates options."] = ":\n----------\nХотели бы вы \nустановить тему на |cff89F559Nidhaus Plates|r?\n\nНажатие '|cff00ff00Да|r' установит Nidhaus Plates & перезагрузит интерфейс. \n Нажатие '|cffff0000Нет|r' откроет Nidhaus Plates настройки."
 
 L["Yes"] = "Да"
 L["Cancel"] = "Отмена"
 L["No"] = "Нет"
 
-L["-->>|cffff0000Activate Threat Plates from the Tidy Plates options!|r<<--"] = "-->>|cffff0000Активируйте Threat Plates через опции Tidy Plates!|r<<--"
-L["|cff89f559Threat Plates:|r Welcome back |cff"] = "|cff89f559Threat Plates:|r С возвращением |cff"
+L["-->>|cffff0000Activate Threat Plates from the Tidy Plates options!|r<<--"] = "-->>|cffff0000Активируйте Nidhaus Plates через опции Nidhaus Plates!|r<<--"
+L["|cff89f559Threat Plates:|r Welcome back |cff"] = "|cff89f559Nidhaus Plates:|r С возвращением |cff"
 
-L["|cff89F559Threat Plates|r: Player spec change detected: |cff"] = "|cff89F559Threat Plates|r: Обнаружена смена специализации: |cff"
+L["|cff89F559Threat Plates|r: Player spec change detected: |cff"] = "|cff89F559Nidhaus Plates|r: Обнаружена смена специализации: |cff"
 L[")|r, you are now in your |cff89F559"] = ")|r, сейчас вы в |cff89F559"
 L["|r spec and are now in your "] = "|r спеке в "
 L[" role."] = " роли."

@@ -1,23 +1,34 @@
 local L = LibStub("AceLocale-3.0"):NewLocale("TidyPlatesThreat", "enUS", true)
 if not L then return end
+-- =========================================================
+-- EL NOMBRE QUE SE VE EN EL CHAT
+--
+-- El addon se llama Nidhaus_Plates, pero los mensajes seguian diciendo
+-- "Threat Plates" y "Tidy Plates", que es de donde viene la base.
+--
+-- OJO CON UNA COSA: en AceLocale la CLAVE es el texto en ingles, y es lo
+-- que busca el codigo. Cambiar la clave rompe la busqueda -- AceLocale
+-- tira error al pedir una que no existe. Asi que las claves quedan
+-- intactas y lo que cambia es el VALOR, que es lo unico que se imprime.
+-- =========================================================
 
 ----------------------
 --[[ commands.lua ]]--
 ----------------------
 
 L["-->>|cffff0000DPS Plates Enabled|r<<--"] = true
-L["|cff89F559Threat Plates|r: DPS switch detected, you are now in your |cff89F559"] = true
+L["|cff89F559Threat Plates|r: DPS switch detected, you are now in your |cff89F559"] = "|cff89F559Nidhaus Plates|r: DPS switch detected, you are now in your |cff89F559"
 L["|r spec and are now in your |cffff0000dpsing / healing|r role."] = true
 
 L["-->>|cff00ff00Tank Plates Enabled|r<<--"] = true
-L["|cff89F559Threat Plates|r: Tank switch detected, you are now in your |cff89F559"] = true
+L["|cff89F559Threat Plates|r: Tank switch detected, you are now in your |cff89F559"] = "|cff89F559Nidhaus Plates|r: Tank switch detected, you are now in your |cff89F559"
 L["|r spec and are now in your |cff00ff00tanking|r role."] = true
 
 L["-->>Nameplate Overlapping is now |cff00ff00ON!|r<<--"] = true
 L["-->>Nameplate Overlapping is now |cffff0000OFF!|r<<--"] = true
 
-L["-->>Threat Plates verbose is now |cff00ff00ON!|r<<--"] = true
-L["-->>Threat Plates verbose is now |cffff0000OFF!|r<<-- shhh!!"] = true
+L["-->>Threat Plates verbose is now |cff00ff00ON!|r<<--"] = "-->>Nidhaus Plates verbose is now |cff00ff00ON!|r<<--"
+L["-->>Threat Plates verbose is now |cffff0000OFF!|r<<-- shhh!!"] = "-->>Nidhaus Plates verbose is now |cffff0000OFF!|r<<-- shhh!!"
 
 ------------------------------
 --[[ TidyPlatesThreat.lua ]]--
@@ -31,23 +42,23 @@ L["secondary"] = true
 L["unknown"] = true
 L["Undetermined"] = true
 
-L["|cff89f559Welcome to |rTidy Plates: |cff89f559Threat Plates!\nThis is your first time using Threat Plates and you are a(n):\n|r|cff"] = true
+L["|cff89f559Welcome to |rTidy Plates: |cff89f559Threat Plates!\nThis is your first time using Threat Plates and you are a(n):\n|r|cff"] = "|cff89f559Welcome to |r|cff89f559Nidhaus Plates!\nThis is your first time using Nidhaus Plates and you are a(n):\n|r|cff"
 
 L["|cff89f559Your dual spec's have been set to |r"] = true
 L["|cff89f559You are currently in your "] = true
 L["|cff89f559 role.|r"] = true
-L["|cff89f559Your role can not be determined.\nPlease set your dual spec preferences in the |rThreat Plates|cff89f559 options.|r"] = true
+L["|cff89f559Your role can not be determined.\nPlease set your dual spec preferences in the |rThreat Plates|cff89f559 options.|r"] = "|cff89f559Your role can not be determined.\nPlease set your dual spec preferences in the |rNidhaus Plates|cff89f559 options.|r"
 L["|cff89f559Additional options can be found by typing |r'/tptp'|cff89F559.|r"] = true
-L[":\n----------\nWould you like to \nset your theme to |cff89F559Threat Plates|r?\n\nClicking '|cff00ff00Yes|r' will set you to Threat Plates & reload UI. \n Clicking '|cffff0000No|r' will open the Tidy Plates options."] = true
+L[":\n----------\nWould you like to \nset your theme to |cff89F559Threat Plates|r?\n\nClicking '|cff00ff00Yes|r' will set you to Threat Plates & reload UI. \n Clicking '|cffff0000No|r' will open the Tidy Plates options."] = ":\n----------\nWould you like to \nset your theme to |cff89F559Nidhaus Plates|r?\n\nClicking '|cff00ff00Yes|r' will set you to Nidhaus Plates & reload UI. \n Clicking '|cffff0000No|r' will open the Nidhaus Plates options."
 
 L["Yes"] = true
 L["Cancel"] = true
 L["No"] = true
 
-L["-->>|cffff0000Activate Threat Plates from the Tidy Plates options!|r<<--"] = true
-L["|cff89f559Threat Plates:|r Welcome back |cff"] = true
+L["-->>|cffff0000Activate Threat Plates from the Tidy Plates options!|r<<--"] = "-->>|cffff0000Activate Nidhaus Plates from the Nidhaus Plates options!|r<<--"
+L["|cff89f559Threat Plates:|r Welcome back |cff"] = "|cff89f559Nidhaus Plates:|r Welcome back |cff"
 
-L["|cff89F559Threat Plates|r: Player spec change detected: |cff"] = true
+L["|cff89F559Threat Plates|r: Player spec change detected: |cff"] = "|cff89F559Nidhaus Plates|r: Player spec change detected: |cff"
 L[")|r, you are now in your |cff89F559"] = true
 L["|r spec and are now in your "] = true
 L[" role."] = true
@@ -83,6 +94,7 @@ L["Drudge Ghoul"] = true
 L["Living Inferno"] = true
 L["Living Ember"] = true
 L["Fanged Pit Viper"] = true
+L["Mirror Image"] = true
 L["Canal Crab"] = true
 L["Muddy Crawfish"] = true
 
@@ -474,7 +486,7 @@ L["Show Non-Target Casting Bars (When Possible)"] = true
 L["Enable Minimap Icon"] = true
 L["Blizzard Nameplate Motion & Visibility"] = true
 L["Reset Configuration"] = true
-L["Restores the Tidy Plates defaults and reloads the UI."] = true
+L["Restores the Tidy Plates defaults and reloads the UI."] = "Restores the Nidhaus Plates defaults and reloads the UI."
 
 L["Hide Hunter Snakes"] = true
 L["Hides the nameplates of Viper and Venomous Snake from the hunter's Snake Trap."] = true
@@ -493,6 +505,8 @@ L["Hides the nameplates of the mage's Mirror Image copies."] = true
 L["Battleground Healers"] = true
 L["Enable Healer Marks"] = true
 L["Marks the nameplates of enemy and allied healers in battlegrounds."] = true
+L["Also mark healers in arenas"] = true
+L["In arenas only the combat log detection works, which is enough."] = true
 L["Detection"] = true
 L["Combat Log"] = true
 L["Detects a healer as soon as they cast one of about ninety telltale healing spells."] = true

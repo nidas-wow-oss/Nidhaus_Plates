@@ -1,23 +1,34 @@
 local L = LibStub("AceLocale-3.0"):NewLocale("TidyPlatesThreat", "zhTW", false)
 if not L then return end
+-- =========================================================
+-- EL NOMBRE QUE SE VE EN EL CHAT
+--
+-- El addon se llama Nidhaus_Plates, pero los mensajes seguian diciendo
+-- "Threat Plates" y "Tidy Plates", que es de donde viene la base.
+--
+-- OJO: en AceLocale la CLAVE es el texto en ingles y es lo que busca el
+-- codigo. Cambiar la clave rompe la busqueda -- AceLocale tira error al
+-- pedir una que no existe. Las claves quedan intactas; lo que cambia es el
+-- VALOR, que es lo unico que se imprime.
+-- =========================================================
 
 ----------------------
 --[[ commands.lua ]]--
 ----------------------
 
 L["-->>|cffff0000DPS Plates Enabled|r<<--"] = "-->>|cffff0000傷害輸出面板已啟用|r<<--"
-L["|cff89F559Threat Plates|r: DPS switch detected, you are now in your |cff89F559"] = "|cff89F559Threat Plates|r：傷害輸出天賦改變檢測，你現在啟用了你的 |cff89F559"
+L["|cff89F559Threat Plates|r: DPS switch detected, you are now in your |cff89F559"] = "|cff89F559Nidhaus Plates|r：傷害輸出天賦改變檢測，你現在啟用了你的 |cff89F559"
 L["|r spec and are now in your |cffff0000dpsing / healing|r role."] = "|r 天賦並且角色類型為 |cffff0000傷害輸出/治療者|r 角色。"
 
 L["-->>|cff00ff00Tank Plates Enabled|r<<--"] = "-->>|cff00ff00坦克面板已啟用|r<<--"
-L["|cff89F559Threat Plates|r: Tank switch detected, you are now in your |cff89F559"] = "|cff89F559Threat Plates|r：坦克天賦改變檢測，你現在啟用了你的 |cff89F559"
+L["|cff89F559Threat Plates|r: Tank switch detected, you are now in your |cff89F559"] = "|cff89F559Nidhaus Plates|r：坦克天賦改變檢測，你現在啟用了你的 |cff89F559"
 L["|r spec and are now in your |cff00ff00tanking|r role."] = "|r 天賦並且角色類型為 |cff00ff00坦克|r 角色。"
 
 L["-->>Nameplate Overlapping is now |cff00ff00ON!|r<<--"] = "-->>姓名板重疊現在 |cff00ff00開啟！|r<<--"
 L["-->>Nameplate Overlapping is now |cffff0000OFF!|r<<--"] = "-->>姓名板重疊現在 |cff00ff00關閉！|r<<--"
 
-L["-->>Threat Plates verbose is now |cff00ff00ON!|r<<--"] = "-->>Threat Plates聊天框反饋信息現在 |cff00ff00開啟！|r<<--"
-L["-->>Threat Plates verbose is now |cffff0000OFF!|r<<-- shhh!!"] = "-->>Threat Plates聊天框反饋信息現在 |cffff0000關閉！|r<<--噓！！"
+L["-->>Threat Plates verbose is now |cff00ff00ON!|r<<--"] = "-->>Nidhaus Plates聊天框反饋信息現在 |cff00ff00開啟！|r<<--"
+L["-->>Threat Plates verbose is now |cffff0000OFF!|r<<-- shhh!!"] = "-->>Nidhaus Plates聊天框反饋信息現在 |cffff0000關閉！|r<<--噓！！"
 
 ------------------------------
 --[[ TidyPlatesThreat.lua ]]--
@@ -31,23 +42,23 @@ L["secondary"] = "第二"
 L["unknown"] = "未知"
 L["Undetermined"] = "未確定"
 
-L["|cff89f559Welcome to |rTidy Plates: |cff89f559Threat Plates!\nThis is your first time using Threat Plates and you are a(n):\n|r|cff"] = "|cff89f559歡迎使用 |rTidy Plates: |cff89f559Threat Plates!\n這是你第一次使用Threat Plates，你是一個：\n|r|cff"
+L["|cff89f559Welcome to |rTidy Plates: |cff89f559Threat Plates!\nThis is your first time using Threat Plates and you are a(n):\n|r|cff"] = "|cff89f559歡迎使用 |r|cff89f559Nidhaus Plates!\n這是你第一次使用Nidhaus Plates，你是一個：\n|r|cff"
 
 L["|cff89f559Your dual spec's have been set to |r"] = "|cff89f559你的雙天賦已被設置為 |r"
 L["|cff89f559You are currently in your "] = "|cff89f559你現在正處於 "
 L["|cff89f559 role.|r"] = "|cff89f559 角色。|r"
-L["|cff89f559Your role can not be determined.\nPlease set your dual spec preferences in the |rThreat Plates|cff89f559 options.|r"] = "|cff89f559你的角色類型無法被確定。\n請在|rThreat Plates|cff89f559選項|r|cff89f559中設置你的雙天賦。|r"
+L["|cff89f559Your role can not be determined.\nPlease set your dual spec preferences in the |rThreat Plates|cff89f559 options.|r"] = "|cff89f559你的角色類型無法被確定。\n請在|rNidhaus Plates|cff89f559選項|r|cff89f559中設置你的雙天賦。|r"
 L["|cff89f559Additional options can be found by typing |r'/tptp'|cff89F559.|r"] = "|cff89f559可以通過輸入 |r'/tptp'|cff89f559來找到剩餘選項。|r"
-L[":\n----------\nWould you like to \nset your theme to |cff89F559Threat Plates|r?\n\nClicking '|cff00ff00Yes|r' will set you to Threat Plates & reload UI. \n Clicking '|cffff0000No|r' will open the Tidy Plates options."] = ":\n----------\n你希望 \n設置你的主題為 |cff89F559Threat Plates|r嗎?\n\n點擊 '|cff00ff00是|r' 將設置你的主題為Threat Plates並且重新載入插件。 \n 點擊 '|cffff0000否|r' 將打開Tidy Plates選項。"
+L[":\n----------\nWould you like to \nset your theme to |cff89F559Threat Plates|r?\n\nClicking '|cff00ff00Yes|r' will set you to Threat Plates & reload UI. \n Clicking '|cffff0000No|r' will open the Tidy Plates options."] = ":\n----------\n你希望 \n設置你的主題為 |cff89F559Nidhaus Plates|r嗎?\n\n點擊 '|cff00ff00是|r' 將設置你的主題為Nidhaus Plates並且重新載入插件。 \n 點擊 '|cffff0000否|r' 將打開Nidhaus Plates選項。"
 
 L["Yes"] = "是"
 L["Cancel"] = "取消"
 L["No"] = "否"
 
-L["-->>|cffff0000Activate Threat Plates from the Tidy Plates options!|r<<--"] = "-->>|cffff0000從Tidy Plates選項中激活Threat Plates！|r<<--"
-L["|cff89f559Threat Plates:|r Welcome back |cff"] = "|cff89f559Threat Plates:|r歡迎回來 |cff"
+L["-->>|cffff0000Activate Threat Plates from the Tidy Plates options!|r<<--"] = "-->>|cffff0000從Nidhaus Plates選項中激活Nidhaus Plates！|r<<--"
+L["|cff89f559Threat Plates:|r Welcome back |cff"] = "|cff89f559Nidhaus Plates:|r歡迎回來 |cff"
 
-L["|cff89F559Threat Plates|r: Player spec change detected: |cff"] = "|cff89F559Threat Plates|r: 玩家天賦改變檢測： |cff"
+L["|cff89F559Threat Plates|r: Player spec change detected: |cff"] = "|cff89F559Nidhaus Plates|r: 玩家天賦改變檢測： |cff"
 L[")|r, you are now in your |cff89F559"] = ")|r, 你現在啟用了你的 |cff89F559"
 L["|r spec and are now in your "] = "|r 天賦並且角色類型為 "
 L[" role."] = " 角色。"

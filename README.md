@@ -20,6 +20,7 @@ The classic nameplate stack on 3.3.5a was three addons you had to install and ke
 - **Battleground healer marker** — highlights enemy healers in battlegrounds (ported from BattleGroundHealers by Khal).
 - **Extra fonts** registered through LibSharedMedia and selectable from the options: *Accidental Presidency*, *Continuum Medium* and *Domyouji Regular*, alongside the default font.
 - **Simplified options** — the panel trimmed down to the settings that matter.
+- **Hide enemy Mirror Image nameplates** — an option that removes the clones' plates so the real mage stays readable.
 - **Minimap button** to open the configuration without typing commands.
 - Localisation included: `en`, `es`, `de`, `fr`, `ru`, `cn`, `tw`, `kr`.
 
@@ -34,7 +35,7 @@ The classic nameplate stack on 3.3.5a was three addons you had to install and ke
 
 | Command | Action |
 |---|---|
-| `/tidyplates` | Open the main options panel |
+| `/tidyplates` or `/tptp` | Open the main options panel |
 | `/nphealers` or `/bgh` | Battleground healer marker options |
 | `/tptpol` | Toggle nameplate overlap control |
 | `/tptpverbose` | Verbose output for debugging |

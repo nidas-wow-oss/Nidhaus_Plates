@@ -2762,6 +2762,31 @@ local function GetOptions()
 											get = GetBGHflag,
 											set = SetBGHflag,
 											arg = "enabled"
+										},
+										-- TAMBIEN EN ARENAS.
+										--
+										-- El modulo nacio para battlegrounds: la deteccion por
+										-- marcador solo existe ahi. En arena queda la del combat
+										-- log, que alcanza de sobra -- un healer tira su primera
+										-- curacion en los primeros segundos.
+										enableInArena = {
+											name = L["Also mark healers in arenas"] or "Also mark healers in arenas",
+											type = "toggle",
+											desc = L["In arenas only the combat log detection works, which is enough."]
+												or "In arenas only the combat log detection works, which is enough.",
+											descStyle = "inline",
+											width = "double",
+											order = 2,
+											disabled = BGHoff,
+											get = GetBGHflag,
+											set = function(info, value)
+												SetBGHflag(info, value)
+												-- Si ya estas dentro de una arena, que empiece a
+												-- marcar ahora y no al entrar de nuevo.
+												local f = _G["NidhausPlatesHealers"]
+												if f and f.RefreshZoneState then f.RefreshZoneState() end
+											end,
+											arg = "enableInArena"
 										}
 									}
 								},
@@ -2849,7 +2874,11 @@ local function GetOptions()
 											name = L["X Offset"],
 											type = "range",
 											order = 4,
-											min = -40, max = 40, step = 1,
+											-- Rango ampliado a 100 (de fabrica eran 40). El icono
+											-- se posiciona por offset desde su ancla, asi que un
+											-- limite chico impedia sacarlo del todo a un costado
+											-- de la placa.
+											min = -100, max = 100, step = 1,
 											get = GetBGH, set = SetBGH, arg = "iconXoffset"
 										},
 										iconYoffset = {
@@ -5071,6 +5100,188 @@ local function GetIntOptions()
 	return intoptions
 end
 
+-- =========================================================
+-- QUE LA VENTANA SE VEA COMO LA DE NUF
+--
+-- Esta ventana no la dibuja este addon: la arma AceConfigDialog con los
+-- widgets de AceGUI, que traen su propio aspecto -- fondo negro opaco,
+-- cabecera de piedra clara y pestanas con los colores de Blizzard.
+--
+-- POR QUE NO SE TOCA LA LIBRERIA.
+--
+-- Lo evidente seria editar AceGUIContainer-Frame.lua y -TabGroup.lua, que
+-- estan ahi en Libs. Dos razones para no hacerlo:
+--
+--   1. AceGUI se carga por LibStub, que se queda con la PRIMERA version
+--      mas alta que aparezca. Hay otros addons tuyos con su propia copia
+--      (PlateBuffs, RefinedBlizzPlates); si gana la de ellos, mis cambios
+--      no se ejecutan nunca y el sintoma seria "no hizo nada".
+--   2. Si gana la nuestra, le cambio el aspecto a las ventanas de TODOS
+--      los addons que usen esa copia, no solo a esta.
+--
+-- Asi que se repinta desde afuera, sobre los frames ya creados. Cuesta un
+-- poco mas de codigo y a cambio no se le mete la mano a nada compartido.
+--
+-- LOS NUMEROS NO SON INVENTADOS: son los de NUF.
+-- Nidhaus_UnitFrames_Config/ThemeManager.lua, panelBGColor del tema
+-- Classic = {0.06, 0.06, 0.06, 0.85}. Si algun dia alla cambia, aca hay
+-- que venir a mano -- son dos addons distintos y no comparten codigo.
+-- =========================================================
+local SKIN_BG    = { 0.06, 0.06, 0.06, 0.85 };  -- fondo, igual que NUF
+local SKIN_TITLE = { 0.28, 0.28, 0.28, 1 };     -- tinte de la cabecera
+local TAB_ON     = { 1, 0.82, 0 };              -- la elegida, en amarillo
+local TAB_OFF    = { 1, 1, 1 };                 -- las demas, en blanco
+
+-- Blizzard pinta las pestanas AL REVES de lo que queres: PanelTemplates_
+-- SelectTab le pone blanco a la elegida y deja las otras en dorado. Y lo
+-- vuelve a hacer en cada click, asi que no alcanza con pintarlas una vez.
+--
+-- Se envuelve el SetSelected de CADA boton -- no la funcion de la
+-- libreria, que es compartida -- para repintar despues de que Blizzard
+-- haya hecho lo suyo.
+-- =========================================================
+-- TODO LO QUE SE PINTA, Y CADA CUANTO
+--
+-- Tercer intento, y esta vez con el widget leido en vez de supuesto.
+--
+-- En la ventana de AceGUI hay DOS marcos con fondo, no uno:
+--
+--     frame     la ventana entera        SetBackdropColor(0, 0, 0, 1)
+--     statusbg  la barrita de abajo      SetBackdropColor(0.1, 0.1, 0.1)
+--
+-- El segundo no lo estaba tocando, y por eso quedaba una franja de otro
+-- gris abajo: eso es "otra gama de color".
+--
+-- Y el parpadeo del fondo al abrir con doble click es otra cosa: AceGUI
+-- RECICLA los widgets. Al cerrar y volver a abrir te puede devolver un
+-- marco distinto, que nunca pase por mi repintado y venga con el negro que
+-- le puso su constructor. Yo pintaba una sola vez, al abrir, y si el marco
+-- cambiaba despues no me enteraba.
+--
+-- Asi que se pinta TODO en cada cuadro -- fondo, cabecera y pestanas -- y
+-- las referencias se buscan una sola vez por ventana. Si el marco cambia,
+-- se detecta y se vuelven a buscar. Lo que se hace por cuadro es una
+-- decena de llamadas sobre objetos ya resueltos; no se recorre nada.
+-- =========================================================
+local tpTabs    = {};   -- botones de pestana
+local tpHeaders = {};   -- texturas de la cabecera
+local tpPanes   = {};   -- marcos con fondo (la ventana y la barra de estado)
+local tpFrame;          -- la ventana que estamos pintando ahora
+
+local function TP_RecolorTab(tab)
+	if not tab or not tab.text then return end
+	if tab.selected then
+		tab.text:SetTextColor(unpack(TAB_ON))
+	else
+		tab.text:SetTextColor(unpack(TAB_OFF))
+	end
+end
+
+local function TP_HookTab(tab)
+	for i = 1, #tpTabs do
+		if tpTabs[i] == tab then return end
+	end
+	tpTabs[#tpTabs + 1] = tab
+
+	if tab.nufSkinned then return end
+	tab.nufSkinned = true
+	local old = tab.SetSelected
+	if type(old) ~= "function" then return end
+	tab.SetSelected = function(f, selected)
+		old(f, selected)
+		TP_RecolorTab(f)
+	end
+end
+
+-- Las pestanas cuelgan de un marco interno del TabGroup, no de la ventana,
+-- asi que hay que bajar. El tope de profundidad es por las dudas: un ciclo
+-- de padres aca colgaria el cliente.
+local function TP_WalkTabs(f, depth)
+	if not f or depth > 6 then return end
+	for _, child in ipairs({ f:GetChildren() }) do
+		local n = child.GetName and child:GetName()
+		if n and string.find(n, "^AceGUITabGroup%d+Tab%d+$") then
+			TP_HookTab(child)
+		end
+		TP_WalkTabs(child, depth + 1)
+	end
+end
+
+-- Buscar UNA vez por ventana: las referencias no cambian mientras sea la
+-- misma, y recorrer regiones e hijos en cada cuadro seria trabajo al pedo.
+local function TP_Collect(frame)
+	tpFrame = frame
+	for i = #tpTabs, 1, -1    do tpTabs[i]    = nil end
+	for i = #tpHeaders, 1, -1 do tpHeaders[i] = nil end
+	for i = #tpPanes, 1, -1   do tpPanes[i]   = nil end
+	if not frame then return end
+
+	-- La ventana misma.
+	if frame.SetBackdropColor then tpPanes[#tpPanes + 1] = frame end
+
+	-- Y cualquier hijo directo con fondo propio: hoy es la barrita de
+	-- estado de abajo. Se busca por "tiene backdrop" y no por nombre
+	-- porque el widget no la exporta con ninguno.
+	for _, child in ipairs({ frame:GetChildren() }) do
+		if child.GetBackdrop and child:GetBackdrop() and child.SetBackdropColor then
+			tpPanes[#tpPanes + 1] = child
+		end
+	end
+
+	-- La cabecera: el widget solo exporta titletext, content y frame, asi
+	-- que sus texturas se identifican por el archivo que usan.
+	for _, r in ipairs({ frame:GetRegions() }) do
+		if r.GetObjectType and r:GetObjectType() == "Texture" and r.GetTexture then
+			local t = r:GetTexture()
+			if type(t) == "string" and string.find(t, "UI%-DialogBox%-Header") then
+				tpHeaders[#tpHeaders + 1] = r
+			end
+		end
+	end
+
+	TP_WalkTabs(frame, 0)
+end
+
+local function TP_Paint()
+	for i = 1, #tpPanes do
+		tpPanes[i]:SetBackdropColor(unpack(SKIN_BG))
+	end
+	for i = 1, #tpHeaders do
+		tpHeaders[i]:SetVertexColor(unpack(SKIN_TITLE))
+	end
+	for i = 1, #tpTabs do
+		TP_RecolorTab(tpTabs[i])
+	end
+end
+
+local function TP_CurrentFrame()
+	local acd = LibStub and LibStub("AceConfigDialog-3.0", true)
+	local w = acd and acd.OpenFrames and acd.OpenFrames["Tidy Plates: Threat Plates"]
+	return w and w.frame
+end
+
+local function TP_SkinWindow()
+	local frame = TP_CurrentFrame()
+	if not frame then return end
+	TP_Collect(frame)
+	TP_Paint()
+end
+
+local tpSkinTimer = CreateFrame("Frame")
+tpSkinTimer:Hide()
+tpSkinTimer:SetScript("OnUpdate", function(self)
+	local frame = TP_CurrentFrame()
+	-- Ventana cerrada (o soltada por AceGUI): se apaga solo.
+	if not frame or not frame:IsShown() then
+		self:Hide()
+		tpFrame = nil
+		return
+	end
+	-- Te devolvieron OTRO marco del pool: hay que volver a buscar todo.
+	if frame ~= tpFrame then TP_Collect(frame) end
+	TP_Paint()
+end)
+
 function TidyPlatesThreat:OpenOptions()
 	HideUIPanel(InterfaceOptionsFrame)
 	HideUIPanel(GameMenuFrame)
@@ -5078,6 +5289,9 @@ function TidyPlatesThreat:OpenOptions()
 		TidyPlatesThreat:SetUpOptions()
 	end
 	LibStub("AceConfigDialog-3.0"):Open("Tidy Plates: Threat Plates")
+
+	TP_SkinWindow()
+	tpSkinTimer:Show()
 end
 
 function TidyPlatesThreat:ChatCommand(input)
