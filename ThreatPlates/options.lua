@@ -5136,9 +5136,10 @@ local TAB_OFF    = { 1, 1, 1 };                 -- las demas, en blanco
 -- SelectTab le pone blanco a la elegida y deja las otras en dorado. Y lo
 -- vuelve a hacer en cada click, asi que no alcanza con pintarlas una vez.
 --
--- Se envuelve el SetSelected de CADA boton -- no la funcion de la
--- libreria, que es compartida -- para repintar despues de que Blizzard
--- haya hecho lo suyo.
+-- Por eso se repintan en cada cuadro mientras la ventana esta abierta,
+-- y NO envolviendo el SetSelected de cada boton: esos botones salen de
+-- un pool compartido y envolverles un metodo se lo dejaba envuelto al
+-- siguiente addon que los recibiera.
 -- =========================================================
 -- TODO LO QUE SE PINTA, Y CADA CUANTO
 --
@@ -5167,6 +5168,246 @@ local tpTabs    = {};   -- botones de pestana
 local tpHeaders = {};   -- texturas de la cabecera
 local tpPanes   = {};   -- marcos con fondo (la ventana y la barra de estado)
 local tpFrame;          -- la ventana que estamos pintando ahora
+local tpArcane;         -- si la piel Arcane estaba prendida en el ultimo repaso
+
+-- =========================================================
+-- LO QUE PINTAMOS NO ES NUESTRO: HAY QUE DEVOLVERLO.
+--
+-- Esta es la causa de que, despues de abrir estas opciones, PlateBuffs,
+-- SoundAlerter, BankStack y cualquier otro addon con panel aparecieran
+-- con ESTOS colores. No era casualidad ni un choque de addons.
+--
+-- AceGUI mantiene UN pool de widgets, en AceGUI.objPools, y LibStub carga
+-- UNA sola copia de la libreria para todo el juego. O sea que el marco que
+-- te dan al abrir esta ventana es el mismo objeto que despues se le
+-- entrega a otro addon cuando lo suelta.
+--
+-- Y los colores originales se ponen en el CONSTRUCTOR del widget, no en
+-- OnAcquire (AceGUIContainer-Frame.lua: SetBackdropColor(0,0,0,1) en la
+-- linea del constructor, statusbg en 0.1). OnAcquire solo hace SetParent,
+-- strata, titulo, texto de estado y Show. Nadie repone el color.
+--
+-- Conclusion: cada SetBackdropColor que haciamos era PERMANENTE y viajaba
+-- con el widget al siguiente addon.
+--
+-- Peor era el envoltorio de SetSelected en los botones de pestana: eso
+-- reemplazaba un metodo de un objeto compartido, para siempre. Se saco
+-- entero, y ademas no hacia falta -- ya repintamos las pestanas en cada
+-- cuadro mientras la ventana esta abierta.
+--
+-- Ahora: se anota el valor anterior de todo lo que se toca y se repone al
+-- cerrar. Lo que sale del pool sale como entro.
+-- =========================================================
+local tpSaved = {};     -- { {obj=, kind=, r=, g=, b=, a=}, ... }
+
+local function TP_Remember(obj, kind, r, g, b, a)
+	tpSaved[#tpSaved + 1] = { obj = obj, kind = kind, r = r, g = g, b = b, a = a };
+end
+
+local function TP_RestoreAll()
+	for i = #tpSaved, 1, -1 do
+		local s = tpSaved[i];
+		if s.kind == "backdrop" then
+			pcall(s.obj.SetBackdropColor, s.obj, s.r, s.g, s.b, s.a);
+		elseif s.kind == "vertex" then
+			pcall(s.obj.SetVertexColor, s.obj, s.r, s.g, s.b, s.a);
+		elseif s.kind == "text" then
+			pcall(s.obj.SetTextColor, s.obj, s.r, s.g, s.b, s.a);
+		elseif s.kind == "settext" then
+			-- Se le devuelve su propio SetText. Es un campo del objeto, no
+			-- un hook: por suerte esto SI se puede deshacer.
+			s.obj.SetText = s.r;
+			s.obj.nufOldSetText = nil;
+		elseif s.kind == "buildtabs" then
+			-- Idem con BuildTabs: es un campo del widget, se repone.
+			s.obj.BuildTabs = s.r;
+			s.obj.nufOldBuildTabs = nil;
+		end
+		tpSaved[i] = nil;
+	end
+	for i = #tpTabs, 1, -1    do tpTabs[i]    = nil end
+	for i = #tpHeaders, 1, -1 do tpHeaders[i] = nil end
+	for i = #tpPanes, 1, -1   do tpPanes[i]   = nil end
+	tpFrame  = nil;
+	tpArcane = nil;
+end
+
+-- =========================================================
+-- EL ANCHO DE LAS PESTANAS
+--
+-- Sintoma: las seis pestanas salian apiladas, una por fila.
+--
+-- Medido con /nptabs en el cliente: ventana 750, contenedor 714, y las SEIS
+-- pestanas con ancho 716 -- mas que el contenedor -- con el trozo del medio
+-- estirado a 676 en todas, dijera el texto 39 o 104. O sea que el ancho no
+-- salia del texto: se lo forzaban.
+--
+-- De donde sale: AceGUI hace esto al poner el texto de cada pestana
+--
+--     PanelTemplates_TabResize(frame, 0, nil, width)   -- width = 716
+--
+-- y en este cliente ese cuarto argumento es el ancho MINIMO. Resultado:
+-- ninguna pestana puede medir menos que el contenedor y entra una por fila.
+--
+-- NO ES UN BUG DE ESTE ADDON: la copia de AceGUI de Nidhaus_Plates y la de
+-- BigDebuffs son identicas byte a byte, asi que le pasa a todo addon con
+-- pestanas de AceGUI en 3.3.5a.
+--
+-- POR QUE NO SE ARREGLA EN LA LIBRERIA. Es compartida, y ademas la que
+-- termina cargando es la del addon que gane por orden de carga -- tocar la
+-- nuestra no haria nada, y subirle la version se lo impondria a todos.
+--
+-- PERO EL SetText NO ALCANZA. Ese cuarto argumento aparece DOS veces:
+--
+--   1) al poner el texto           PanelTemplates_TabResize(tab, 0, nil, width)
+--   2) al final de BuildTabs       PanelTemplates_TabResize(tab, pad+4, width)
+--
+-- El primero decide como se reparten las filas; el segundo decide el ancho
+-- final. Arreglando solo el primero las filas salen bien (dos en vez de
+-- seis) y despues el segundo vuelve a inflar cada pestana al ancho del
+-- contenedor: por eso quedaban dos filas con huecos enormes, una pestana
+-- cortada contra el borde y otras dos que ni se veian.
+--
+-- Asi que se reemplazan las dos cosas, y las dos son campos de objeto, no
+-- hooks, asi que las dos se pueden devolver al cerrar (ver TP_RestoreAll):
+--
+--   - tab.SetText  -> TP_TabSetText   (mide por el texto)
+--   - widget.BuildTabs -> TP_BuildTabs (copia del original de AceGUI con el
+--     cuarto argumento sacado de la ultima pasada, y nada mas cambiado)
+--
+-- No se toca PanelTemplates_TabResize, que es global de Blizzard: escribirle
+-- encima desde un addon la deja contaminada para todo el resto de la
+-- interfaz y termina en "Interface action failed because of an AddOn".
+-- =========================================================
+local function TP_TabSetText(tab, text)
+	if tab.nufOldSetText then pcall(tab.nufOldSetText, tab, text); end
+	-- Relleno 0, igual que AceGUI. Lo que se saca es el cuarto argumento.
+	-- El relleno de verdad lo reparte BuildTabs despues, por fila.
+	if PanelTemplates_TabResize then pcall(PanelTemplates_TabResize, tab, 0); end
+end
+
+local function TP_FixTabWidth(tab)
+	if tab.nufOldSetText then return end
+	if type(tab.SetText) ~= "function" then return end
+	tpSaved[#tpSaved + 1] = { obj = tab, kind = "settext", r = tab.SetText };
+	tab.nufOldSetText = tab.SetText;
+	tab.SetText = TP_TabSetText;
+end
+
+-- Copia de AceGUIContainer-TabGroup:BuildTabs. La UNICA diferencia esta
+-- marcada abajo con "AQUI". El resto es igual a proposito: si algun dia se
+-- actualiza la libreria, se ve de un vistazo que hay que volver a mirar.
+local tpW, tpRowW, tpRowE = {}, {}, {};
+
+local function TP_Wipe(t)
+	for i = #t, 1, -1 do t[i] = nil end
+end
+
+local function TP_BuildTabs(self)
+	local tablist = self.tablist;
+	if not tablist then return end
+
+	local tabs     = self.tabs;
+	local hastitle = (self.titletext:GetText() and self.titletext:GetText() ~= "");
+	local width    = self.frame.width or self.frame:GetWidth() or 0;
+
+	TP_Wipe(tpW); TP_Wipe(tpRowW); TP_Wipe(tpRowE);
+
+	-- Poner el texto y medir.
+	for i, v in ipairs(tablist) do
+		local tab = tabs[i];
+		if not tab then
+			tab = self:CreateTab(i);
+			tabs[i] = tab;
+			TP_FixTabWidth(tab);   -- pestana nueva: tambien hay que medirla bien
+		end
+		tab:Show();
+		tab:SetText(v.text);
+		tab:SetDisabled(v.disabled);
+		tab.value = v.value;
+		tpW[i] = tab:GetWidth() - 6;
+	end
+
+	for i = #tablist + 1, #tabs do
+		tabs[i]:Hide();
+	end
+
+	-- Cuantas filas hacen falta.
+	local numtabs   = #tablist;
+	local numrows   = 1;
+	local usedwidth = 0;
+	for i = 1, #tablist do
+		if usedwidth ~= 0 and (width - usedwidth - tpW[i]) < 0 then
+			tpRowW[numrows] = usedwidth + 10;
+			tpRowE[numrows] = i - 1;
+			numrows   = numrows + 1;
+			usedwidth = 0;
+		end
+		usedwidth = usedwidth + tpW[i];
+	end
+	tpRowW[numrows] = usedwidth + 10;
+	tpRowE[numrows] = #tablist;
+
+	-- Si la ultima fila queda con una sola pestana, se baja una de arriba.
+	if numrows > 1 and tpRowE[numrows - 1] == numtabs - 1 then
+		if (numrows == 2 and tpRowE[numrows - 1] > 2)
+		   or (tpRowE[numrows] - tpRowE[numrows - 1] > 2) then
+			if (tpRowW[numrows] + tpW[numtabs - 1]) <= width then
+				tpRowE[numrows - 1] = tpRowE[numrows - 1] - 1;
+				tpRowW[numrows]     = tpRowW[numrows]     + tpW[numtabs - 1];
+				tpRowW[numrows - 1] = tpRowW[numrows - 1] - tpW[numtabs - 1];
+			end
+		end
+	end
+
+	-- Anclar las filas y repartir el sobrante entre las pestanas de cada una.
+	local starttab = 1;
+	for row, endtab in ipairs(tpRowE) do
+		local first = true;
+		for tabno = starttab, endtab do
+			local tab = tabs[tabno];
+			tab:ClearAllPoints();
+			if first then
+				tab:SetPoint("TOPLEFT", self.frame, "TOPLEFT", 0,
+					-(hastitle and 14 or 7) - (row - 1) * 20);
+				first = false;
+			else
+				tab:SetPoint("LEFT", tabs[tabno - 1], "RIGHT", -10, 0);
+			end
+		end
+
+		local padding = 0;
+		if not (numrows == 1 and tpRowW[1] < width * 0.75) then
+			padding = (width - tpRowW[row]) / (endtab - starttab + 1);
+		end
+		-- Sin ancho minimo, un reparto negativo achicaria la pestana por
+		-- debajo de su propio texto y lo cortaria. Se corta en 0.
+		if padding < 0 then padding = 0 end
+
+		for i = starttab, endtab do
+			-- AQUI: el original es
+			--     PanelTemplates_TabResize(tabs[i], padding + 4, nil, width)
+			-- y ese "width" es el ancho minimo. Sin el, el ancho sale del
+			-- texto mas el relleno, que es lo que queremos.
+			if PanelTemplates_TabResize then
+				pcall(PanelTemplates_TabResize, tabs[i], padding + 4);
+			end
+		end
+		starttab = endtab + 1;
+	end
+
+	-- El borde del contenido baja segun cuantas filas de pestanas haya.
+	self.borderoffset = (hastitle and 17 or 10) + (numrows * 20);
+	self.border:SetPoint("TOPLEFT", 1, -self.borderoffset);
+end
+
+local function TP_FixBuildTabs(obj)
+	if not obj or obj.nufOldBuildTabs then return end
+	if type(obj.BuildTabs) ~= "function" then return end
+	tpSaved[#tpSaved + 1] = { obj = obj, kind = "buildtabs", r = obj.BuildTabs };
+	obj.nufOldBuildTabs = obj.BuildTabs;
+	obj.BuildTabs = TP_BuildTabs;
+end
 
 local function TP_RecolorTab(tab)
 	if not tab or not tab.text then return end
@@ -5174,22 +5415,6 @@ local function TP_RecolorTab(tab)
 		tab.text:SetTextColor(unpack(TAB_ON))
 	else
 		tab.text:SetTextColor(unpack(TAB_OFF))
-	end
-end
-
-local function TP_HookTab(tab)
-	for i = 1, #tpTabs do
-		if tpTabs[i] == tab then return end
-	end
-	tpTabs[#tpTabs + 1] = tab
-
-	if tab.nufSkinned then return end
-	tab.nufSkinned = true
-	local old = tab.SetSelected
-	if type(old) ~= "function" then return end
-	tab.SetSelected = function(f, selected)
-		old(f, selected)
-		TP_RecolorTab(f)
 	end
 end
 
@@ -5201,7 +5426,17 @@ local function TP_WalkTabs(f, depth)
 	for _, child in ipairs({ f:GetChildren() }) do
 		local n = child.GetName and child:GetName()
 		if n and string.find(n, "^AceGUITabGroup%d+Tab%d+$") then
-			TP_HookTab(child)
+			local dup = false;
+			for i = 1, #tpTabs do
+				if tpTabs[i] == child then dup = true; break end
+			end
+			if not dup then
+				tpTabs[#tpTabs + 1] = child;
+				if child.text then
+					TP_Remember(child.text, "text", child.text:GetTextColor());
+				end
+				TP_FixTabWidth(child);
+			end
 		end
 		TP_WalkTabs(child, depth + 1)
 	end
@@ -5210,21 +5445,25 @@ end
 -- Buscar UNA vez por ventana: las referencias no cambian mientras sea la
 -- misma, y recorrer regiones e hijos en cada cuadro seria trabajo al pedo.
 local function TP_Collect(frame)
+	-- Lo anterior se devuelve ANTES de quedarnos con otra cosa: si nos
+	-- dieron un marco distinto del pool, el viejo ya no es nuestro.
+	TP_RestoreAll();
 	tpFrame = frame
-	for i = #tpTabs, 1, -1    do tpTabs[i]    = nil end
-	for i = #tpHeaders, 1, -1 do tpHeaders[i] = nil end
-	for i = #tpPanes, 1, -1   do tpPanes[i]   = nil end
 	if not frame then return end
 
 	-- La ventana misma.
-	if frame.SetBackdropColor then tpPanes[#tpPanes + 1] = frame end
+	if frame.SetBackdropColor and frame.GetBackdropColor then
+		tpPanes[#tpPanes + 1] = frame
+		TP_Remember(frame, "backdrop", frame:GetBackdropColor());
+	end
 
 	-- Y cualquier hijo directo con fondo propio: hoy es la barrita de
 	-- estado de abajo. Se busca por "tiene backdrop" y no por nombre
 	-- porque el widget no la exporta con ninguno.
 	for _, child in ipairs({ frame:GetChildren() }) do
-		if child.GetBackdrop and child:GetBackdrop() and child.SetBackdropColor then
+		if child.GetBackdrop and child:GetBackdrop() and child.SetBackdropColor and child.GetBackdropColor then
 			tpPanes[#tpPanes + 1] = child
+			TP_Remember(child, "backdrop", child:GetBackdropColor());
 		end
 	end
 
@@ -5235,11 +5474,21 @@ local function TP_Collect(frame)
 			local t = r:GetTexture()
 			if type(t) == "string" and string.find(t, "UI%-DialogBox%-Header") then
 				tpHeaders[#tpHeaders + 1] = r
+				TP_Remember(r, "vertex", r:GetVertexColor());
 			end
 		end
 	end
 
 	TP_WalkTabs(frame, 0)
+
+	-- Con los anchos ya corregidos hay que pedirle a AceGUI que reparta
+	-- las filas de nuevo: el reparto se calculo con los anchos viejos.
+	-- Una sola vez por ventana, no en cada cuadro.
+	local primera = tpTabs[1];
+	if primera and primera.obj then
+		TP_FixBuildTabs(primera.obj);
+		pcall(primera.obj.BuildTabs, primera.obj);
+	end
 end
 
 local function TP_Paint()
@@ -5254,6 +5503,31 @@ local function TP_Paint()
 	end
 end
 
+-- =========================================================
+-- DOS PIELES NO PUEDEN PINTAR LO MISMO
+--
+-- SINTOMA: un parpadeo del fondo y del texto de las pestanas, un par de
+-- veces por segundo.
+--
+-- CAUSA: esta piel gris repinta EN CADA CUADRO (tpSkinTimer, abajo) y la
+-- piel Arcane repinta cada medio segundo. Las dos escriben sobre los
+-- MISMOS objetos -- la ventana, las cabeceras y el texto de las pestanas.
+-- El color queda yendo y viniendo: gris casi siempre, azul en el cuadro
+-- justo en que pasa la otra. Eso es el parpadeo.
+--
+-- Son excluyentes, igual que los estilos de marcos de grupo: manda la que
+-- eligio el usuario. Si Arcane esta prendida, esta se calla.
+--
+-- OJO CON UNA COSA: "callarse" es NO PINTAR, no dejar de trabajar. El
+-- arreglo del ancho de las pestanas tambien vive en TP_Collect y hace
+-- falta siempre, prendas la piel que prendas. Por eso se sigue
+-- recolectando y lo unico que se saltea es TP_Paint.
+-- =========================================================
+local function TP_ArcaneOn()
+	local p = TidyPlatesThreat and TidyPlatesThreat.db and TidyPlatesThreat.db.profile
+	return (p and p.arcaneSkin) and true or false
+end
+
 local function TP_CurrentFrame()
 	local acd = LibStub and LibStub("AceConfigDialog-3.0", true)
 	local w = acd and acd.OpenFrames and acd.OpenFrames["Tidy Plates: Threat Plates"]
@@ -5264,7 +5538,8 @@ local function TP_SkinWindow()
 	local frame = TP_CurrentFrame()
 	if not frame then return end
 	TP_Collect(frame)
-	TP_Paint()
+	tpArcane = TP_ArcaneOn()
+	if not tpArcane then TP_Paint() end
 end
 
 local tpSkinTimer = CreateFrame("Frame")
@@ -5274,12 +5549,22 @@ tpSkinTimer:SetScript("OnUpdate", function(self)
 	-- Ventana cerrada (o soltada por AceGUI): se apaga solo.
 	if not frame or not frame:IsShown() then
 		self:Hide()
-		tpFrame = nil
+		-- Se cerro: los widgets vuelven al pool, asi que se les
+		-- devuelven los colores antes de soltarlos.
+		TP_RestoreAll()
 		return
 	end
 	-- Te devolvieron OTRO marco del pool: hay que volver a buscar todo.
-	if frame ~= tpFrame then TP_Collect(frame) end
-	TP_Paint()
+	--
+	-- Y lo mismo si te prendieron o apagaron Arcane con la ventana abierta:
+	-- TP_Collect empieza devolviendo lo anterior, asi que rehacerlo deja los
+	-- colores originales bien anotados y no se le escapa el gris al pool.
+	local arcane = TP_ArcaneOn()
+	if frame ~= tpFrame or arcane ~= tpArcane then
+		TP_Collect(frame)
+		tpArcane = arcane
+	end
+	if not arcane then TP_Paint() end
 end)
 
 function TidyPlatesThreat:OpenOptions()

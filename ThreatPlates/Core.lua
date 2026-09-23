@@ -165,7 +165,16 @@ function TidyPlatesThreat:OnInitialize()
 		},
 		profile = {
 			cache = {},
-			OldSetting = true,
+			-- ESTE TAMBIEN, Y NO ES UN DUPLICADO AL PEDO.
+			--
+			-- OldSetting es la copia de seguridad de threat.ON: al entrar a
+			-- una arena o BG el addon fuerza threat.ON = false, y al volver
+			-- al mundo lo repone con threat.ON = OldSetting.
+			--
+			-- O sea que si solo apagaramos el de arriba, la primera vez que
+			-- salieras de una BG el sistema de amenaza se volveria a prender
+			-- solo. Un interruptor con dos duenos: hay que dar vuelta los dos.
+			OldSetting = false,
 			verbose = true,
 			blizzFade = {toggle = true, amount = -0.3},
 			healthColorChange = false,
@@ -1007,7 +1016,11 @@ function TidyPlatesThreat:OnInitialize()
 				}
 			},
 			threat = {
-				ON = true,
+				-- APAGADO DE FABRICA. Este addon se usa para PvP y el sistema
+				-- de amenaza recolorea, reescala y cambia la opacidad de las
+				-- placas segun quien lleve la agro: en arena y BG eso es ruido.
+				-- Quien lo quiera para mazmorras lo prende y queda prendido.
+				ON = false,
 				nonCombat = true,
 				hideNonCombat = false,
 				useType = true,
@@ -1096,7 +1109,9 @@ function TidyPlatesThreat:OnInitialize()
 	-----------------------------------------------------------------------------
 	-- v5: se añade hideSnakesFriendly. Los perfiles que ya existen no traen
 	-- ese campo, y sin subir la version se quedarian con las propias visibles.
-	local SIMPLE_LAYOUT_VERSION = 5
+	-- v6: el sistema de amenaza pasa a venir apagado. Cambiar el valor de
+	-- fabrica no alcanza: los perfiles ya guardados traen el suyo propio.
+	local SIMPLE_LAYOUT_VERSION = 6
 	TidyPlatesThreat.ApplySimpleLayout = function()
 		local p = TidyPlatesThreat.db and TidyPlatesThreat.db.profile
 		if not p or p.simpleLayout == SIMPLE_LAYOUT_VERSION then return end
@@ -1114,6 +1129,11 @@ function TidyPlatesThreat:OnInitialize()
 		p.hideSnakes         = true               -- serpientes enemigas
 		p.hideSnakesFriendly = true               -- serpientes propias y aliadas
 		p.hideMirrorImage    = true               -- copias del mago
+
+		-- Sistema de amenaza apagado. Los DOS, por lo que dice el comentario
+		-- de OldSetting alla arriba: si no, al salir de una BG se reactiva.
+		if p.threat then p.threat.ON = false end
+		p.OldSetting = false
 
 		-- Auras / Dual Spec Roles removed: lock the addon to the DPS/Healing scheme.
 		local c = TidyPlatesThreat.db.char

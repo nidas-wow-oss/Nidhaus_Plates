@@ -1,5 +1,6 @@
 ## Interface: 30300
 ## Title: |cffffffffNidhaus|r|cff00ff00_Plates|r
+## Version: 1.0
 ## Notes: Nidhaus Plates - placas de nombre con sistema de amenaza y marcador de sanadores
 ## Author: Nidhaus  |cff808080(base: Binbwen and Friends / Suicidal Katt / Kader backport; sanadores: Khal)|r
 ## SavedVariables: TidyPlatesData, TidyPlatesHubTankCache, TidyPlatesHubDamageCache, ThreatPlatesDB, BGHsettings
