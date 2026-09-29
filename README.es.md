@@ -6,7 +6,7 @@
 
 > **Buscabas TidyPlates?** Estás en el lugar correcto. Nidhaus_Plates es una versión mantenida de **TidyPlates** (con **Threat Plates** ya fusionado adentro) portada y adaptada para 3.3.5a. Instalás una sola carpeta en vez de tres addons separados.
 
-**Autor:** Nidhaus
+**Autor:** Nidhaus · **Versión:** 1.1
 **Basado en:** Tidy Plates de *Binbwen and Friends* / *Suicidal Katt*, backport de *Kader* · Marcador de sanadores portado de *BattleGroundHealers* de *Khal*
 
 ## Por qué existe
@@ -43,6 +43,12 @@ El stack clásico de nameplates en 3.3.5a eran tres addons que había que instal
 > El addon detecta tu rol por los talentos y da vuelta la escala de colores de amenaza solo
 > (y por forma en druidas), así que no hay comandos manuales de tanque/dps que recordar.
 
+
+## Novedades de la 1.1
+
+- Arreglado el error `attempt to index field 'blizzFade'` al salir o recargar mientras una placa estaba casteando.
+- Las barras de casteo de los NPC que no son tu objetivo vuelven a andar con IDs de hechizo que el cliente no conoce (pasa seguido en Warmane): antes se cortaban con un error de Lua.
+- Campos de batalla: las placas aliadas muestran el icono de clase correcto desde el principio, leído del marcador.
 
 ## Créditos
 

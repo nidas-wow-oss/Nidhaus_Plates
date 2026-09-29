@@ -9,3 +9,6 @@ desktop.ini
 *.7z
 *.bak
 *.old
+
+# Copias de respaldo de las ediciones
+*.antes*

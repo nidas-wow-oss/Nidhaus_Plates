@@ -63,9 +63,21 @@ local function OnSpellCast(...)
 	local FoundPlate = nil
 
 	-- Gather Spell Info
-	local spell, _, icon, castTime
-	spell, _, icon, _, _, _, castTime, _, _ = GetSpellInfo(spellid)
-	if castTime <= 0 then
+	--
+	-- GetSpellInfo devuelve NIL ENTERO cuando el cliente no conoce el ID:
+	-- hechizos propios del servidor, o IDs que aparecen en el registro de
+	-- combate pero no estan en la base de datos del cliente. En Warmane pasa
+	-- a menudo. Antes se leia castTime y se comparaba con 0 sin comprobar
+	-- nada, asi que cada vez que casteaba un NPC que no era tu objetivo
+	-- saltaba "attempt to compare nil with number" y la funcion se cortaba
+	-- ahi: por eso no se dibujaba la barra.
+	--
+	-- La comprobacion de castTime no hace falta: SPELL_CAST_START solo se
+	-- dispara con hechizos que tienen tiempo de lanzamiento (los instantaneos
+	-- emiten SPELL_CAST_SUCCESS). Pero la guarda de nil SI hace falta, o se
+	-- dibujaria una barra sin nombre ni icono.
+	local spell, _, icon = GetSpellInfo(spellid)
+	if not spell then
 		return
 	end
 

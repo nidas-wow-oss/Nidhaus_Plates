@@ -6,7 +6,7 @@
 
 > **Looking for TidyPlates?** You are in the right place. Nidhaus_Plates is a maintained version of **TidyPlates** (with **Threat Plates** already merged in) ported and adapted for 3.3.5a. You install one folder instead of three separate addons.
 
-**Author:** Nidhaus
+**Author:** Nidhaus · **Version:** 1.1
 **Based on:** Tidy Plates by *Binbwen and Friends* / *Suicidal Katt*, backport by *Kader* · Healer marker ported from *BattleGroundHealers* by *Khal*
 
 ## Why it exists
@@ -43,6 +43,12 @@ The classic nameplate stack on 3.3.5a was three addons you had to install and ke
 > The addon detects your role from your talents and flips the threat colour scale automatically
 > (and by shapeshift form on druids), so there are no manual tank/dps commands to remember.
 
+
+## What's new in 1.1
+
+- Fixed the error `attempt to index field 'blizzFade'` when logging out or reloading while a nameplate was casting.
+- Cast bars of NPCs that are not your target work again with spell IDs the client does not know (common on Warmane): they used to stop with a Lua error.
+- Battlegrounds: friendly nameplates show the right class icon from the start, read from the scoreboard.
 
 ## Credits
 

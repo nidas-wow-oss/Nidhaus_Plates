@@ -1176,6 +1176,46 @@ function TidyPlatesThreat:OnInitialize()
 	RegisterCallback(self, "OnProfileCopied", "ProfChange")
 	RegisterCallback(self, "OnProfileReset", "ProfChange")
 
+	-----------------------------------------------------------------------------
+	-- AL SALIR (o con /reload), UNA COPIA CONGELADA DEL PERFIL.
+	--
+	-- AceDB, antes de escribir a disco, BORRA del perfil todo lo que vale lo
+	-- mismo que de fabrica: asi el archivo guarda solo lo que cambiaste.
+	-- "blizzFade" es uno de esos: si nunca lo tocaste, desaparece.
+	--
+	-- Pero el juego todavia no termino: despues esconde las placas, y una
+	-- placa que estaba casteando avisa "se escondio la barra de casteo".
+	-- Eso recalcula la transparencia (SetAlpha, en Functions.lua), que lee
+	-- db.profile.blizzFade... que ya no esta. Ese era el error "attempt to
+	-- index field 'blizzFade'": una sola vez, al salir o recargar, con alguien
+	-- casteando en pantalla.
+	--
+	-- AceDB avisa justo ANTES de borrar (OnDatabaseShutdown). Ahi el addon
+	-- pasa a leer una copia completa del perfil. El perfil real -- el que se
+	-- guarda -- no se toca: lo que se escribe a disco es igual que antes.
+	-----------------------------------------------------------------------------
+	local function FrozenCopy(src, seen)
+		if type(src) ~= "table" then return src end
+		seen = seen or {}
+		if seen[src] then return seen[src] end
+		local out = {}
+		seen[src] = out
+		for k, v in pairs(src) do out[k] = FrozenCopy(v, seen) end
+		local mt = getmetatable(src)
+		if mt then setmetatable(out, mt) end
+		return out
+	end
+	RegisterCallback("NidhausPlates_Shutdown", "OnDatabaseShutdown", function(_, which)
+		if which and which ~= db then return end
+		-- Lo mismo que hace el PLAYER_LOGOUT de mas abajo (no guardar el
+		-- cache), pero sobre el perfil REAL, que es el que va a disco.
+		if db.profile then db.profile.cache = {} end
+		TidyPlatesThreat.db = {
+			profile = FrozenCopy(db.profile),
+			char    = FrozenCopy(db.char),
+		}
+	end)
+
 	self:SetUpInitialOptions()
 end
 
