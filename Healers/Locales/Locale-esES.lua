@@ -1,4 +1,3 @@
-
 if GetLocale() ~= "esES" then return end
 
 BattleGroundHealers_Localization:CreateLocaleTable({
@@ -12,7 +11,7 @@ BattleGroundHealers_Localization:CreateLocaleTable({
 	["Print failed (not in BG)"] = "Impresión fallida (no estás en BG)",
 	["Wait %.1f s to print again."] = "Espera %.1f s antes de imprimir denuevo",
 	["Channel:"] = "Canal:",
-	["Self"] = "Propio", 
+	["Self"] = "Propio",
 	["Warsong Gulch"] = "Garganta Grito de Guerra",
 	["Arathi Basin"] = "Cuenca de Arahi",
 	["Alterac Valley"] = "Valle de Alterac",

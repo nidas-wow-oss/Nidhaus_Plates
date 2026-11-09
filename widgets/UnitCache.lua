@@ -41,9 +41,8 @@ end
 function UnitCacheMonitorEvents.UPDATE_MOUSEOVER_UNIT(self, ...)
 	local name, class, level, description, _, unitadded
 
-	-- If a unit is a player...
 	if UnitIsPlayer("mouseover") then
-		-- If a unit is an NPC...
+
 		name = UnitName("mouseover")
 		description = GetGuildInfo("mouseover")
 		class = select(2, UnitClass("mouseover"))

@@ -1,10 +1,6 @@
-------------------------------
--- Debuff and Roster Handler
-------------------------------
 local UnitIds = NidhausPlatesUtility.GroupMembers.UnitId
 local DangerWatcher
 
--- Event Handler
 local function AggroEvents(frame, event, unit)
 	local isUnitInParty = UnitPlayerOrPetInParty(unit)
 	local isUnitInRaid = UnitInRaid(unit)

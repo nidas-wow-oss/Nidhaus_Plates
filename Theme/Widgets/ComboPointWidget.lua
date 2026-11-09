@@ -1,6 +1,3 @@
-------------------------
--- Combo Point Widget --
-------------------------
 local path = "Interface\\AddOns\\Nidhaus_Plates\\Theme\\Widgets\\ComboPointWidget\\"
 local COMBO_ART = {"1", "2", "3", "4", "5"}
 
@@ -67,7 +64,6 @@ local function EnableWatcherFrame(arg)
 	end
 end
 
--- Widget Creation
 local function CreateWidgetFrame(parent)
 	local frame = CreateFrame("Frame", nil, parent)
 	frame:Hide()

@@ -1,20 +1,5 @@
 local L = LibStub("AceLocale-3.0"):NewLocale("NidhausPlatesTheme", "zhTW", false)
 if not L then return end
--- =========================================================
--- EL NOMBRE QUE SE VE EN EL CHAT
---
--- El addon se llama Nidhaus_Plates, pero los mensajes seguian diciendo
--- "Nidhaus Plates" y "Nidhaus Plates", que es de donde viene la base.
---
--- OJO: en AceLocale la CLAVE es el texto en ingles y es lo que busca el
--- codigo. Cambiar la clave rompe la busqueda -- AceLocale tira error al
--- pedir una que no existe. Las claves quedan intactas; lo que cambia es el
--- VALOR, que es lo unico que se imprime.
--- =========================================================
-
-----------------------
---[[ commands.lua ]]--
-----------------------
 
 L["-->>|cffff0000DPS Plates Enabled|r<<--"] = "-->>|cffff0000傷害輸出面板已啟用|r<<--"
 L["|cff89F559Nidhaus Plates|r: DPS switch detected, you are now in your |cff89F559"] = "|cff89F559Nidhaus Plates|r：傷害輸出天賦改變檢測，你現在啟用了你的 |cff89F559"
@@ -29,10 +14,6 @@ L["-->>Nameplate Overlapping is now |cffff0000OFF!|r<<--"] = "-->>姓名板重�
 
 L["-->>Nidhaus Plates verbose is now |cff00ff00ON!|r<<--"] = "-->>Nidhaus Plates聊天框反饋信息現在 |cff00ff00開啟！|r<<--"
 L["-->>Nidhaus Plates verbose is now |cffff0000OFF!|r<<-- shhh!!"] = "-->>Nidhaus Plates聊天框反饋信息現在 |cffff0000關閉！|r<<--噓！！"
-
-------------------------------
---[[ NidhausPlatesTheme.lua ]]--
-------------------------------
 
 L["|cff00ff00tanking|r"] = "|cff00ff00坦克類型|r"
 L["|cffff0000dpsing / healing|r"] = "|cffff0000傷害輸出/治療者類型|r"
@@ -63,7 +44,6 @@ L[")|r, you are now in your |cff89F559"] = ")|r, 你現在啟用了你的 |cff89
 L["|r spec and are now in your "] = "|r 天賦並且角色類型為 "
 L[" role."] = " 角色。"
 
--- Custom Nameplates
 L["Shadow Fiend"] = "暗影惡魔"
 L["Spirit Wolf"] = "幽靈狼"
 L["Ebon Gargoyle"] = "黯黑石像鬼"
@@ -97,10 +77,6 @@ L["Fanged Pit Viper"] = "尖牙深淵毒蛇"
 L["Canal Crab"] = "運河蟹"
 L["Muddy Crawfish"] = "泥濘螯蝦"
 
----------------------
---[[ options.lua ]]--
----------------------
-
 L["None"] = "無"
 L["Outline"] = "輪廓"
 L["Thick Outline"] = "粗輪廓"
@@ -114,9 +90,7 @@ L["White List (Mine)"] = "白名單（我的）"
 L["Black List (Mine)"] = "黑名單（我的）"
 L["All Debuffs"] = "所有減益狀態(Debuffs)"
 L["All Debuffs (Mine)"] = "所有減益狀態(Debuffs)（我的）"
--- L["By Prefix"] = ""
 
--- Tab Titles
 L["Nameplate Settings"] = "姓名板選項"
 L["Threat System"] = "仇恨系統"
 L["Widgets"] = "組件"
@@ -124,9 +98,6 @@ L["Totem Nameplates"] = "圖騰姓名板"
 L["Custom Nameplates"] = "自定義姓名板"
 L["About"] = "關於"
 
-------------------------
--- Nameplate Settings --
-------------------------
 L["General Settings"] = "一般設置"
 L["Hiding"] = "隱藏"
 L["Show Neutral"] = "顯示中立單位"
@@ -149,7 +120,6 @@ L["Show Enemy Totems"] = "顯示敵方圖騰"
 L["Show Enemy Pets"] = "顯示敵方寵物"
 L["Show Enemy Guardians"] = "顯示敵方守衛"
 
-----
 L["Healthbar"] = "血量條"
 L["Textures"] = "材質"
 L["Show Border"] = "顯示邊框"
@@ -159,7 +129,7 @@ L["Elite Border"] = "精英單位邊框"
 L["Mouseover"] = "鼠標指向"
 L["Width"] = "寬度"
 L["Height"] = "高度"
-----
+
 L["Placement"] = "位置"
 L["Changing these settings will alter the placement of the nameplates, however the mouseover area does not follow. |cffff0000Use with caution!|r"] = "改變這些選項將改變姓名板的位置，然而鼠標指向區域卻不會隨之改變。|cffff0000請謹慎使用！|r"
 L["Offset X"] = "X軸偏移"
@@ -167,12 +137,12 @@ L["Offset Y"] = "Y軸偏移"
 L["X"] = "X軸"
 L["Y"] = "Y軸"
 L["Anchor"] = "錨點"
-----
+
 L["Coloring"] = "配色"
 L["Enable Coloring"] = "啟用配色"
 L["Color HP by amount"] = "隨血量值變色"
 L["Changes the HP color depending on the amount of HP the nameplate shows."] = "隨著姓名板顯示的血量數值改變血量顏色。"
-----
+
 L["Class Coloring"] = "職業配色"
 L["Enemy Class Colors"] = "敵方單位職業顏色"
 L["Enable Enemy Class colors"] = "啟用敵方單位職業顏色"
@@ -183,17 +153,17 @@ L["Friendly Caching"] = "友方單位緩存"
 L["This allows you to save friendly player class information between play sessions or nameplates going off the screen.|cffff0000(Uses more memory)"] = "這個選項允許你在遊戲會話或者離開屏幕的姓名板中保存友方玩家職業信息。|cffff0000（更多的內存使用）"
 L["Name Only"] = "僅姓名"
 L["Click Through"] = "點擊穿透"
-----
+
 L["Custom HP Color"] = "自定義血量顏色"
 L["Enable Custom HP colors"] = "啟用自定義血量顏色"
 L["Friendly Color"] = "友方單位顏色"
 L["Neutral Color"] = "中立單位顏色"
 L["Enemy Color"] = "敵方單位顏色"
-----
+
 L["Raid Mark HP Color"] = "團隊標記血量顏色"
 L["Enable Raid Marked HP colors"] = "啟用團隊標記血量顏色"
 L["Colors"] = "顏色"
-----
+
 L["Threat Colors"] = "仇恨顏色"
 L["Show Threat Glow"] = "顯示仇恨色彩"
 L["|cff00ff00Low threat|r"] = "|cff00ff00低仇恨|r"
@@ -205,7 +175,6 @@ L["Low Threat"] = "低仇恨"
 L["Medium Threat"] = "中等仇恨"
 L["High Threat"] = "高仇恨"
 
-----
 L["Castbar"] = "施法條"
 L["Enable"] = "啟用"
 L["Non-Target Castbars"] = "非當前目標施法條"
@@ -214,7 +183,6 @@ L["Interruptable Casts"] = "可打斷的施法"
 L["Shielded Coloring"] = "護盾配色"
 L["Uninterruptable Casts"] = "不可打斷的施法"
 
-----
 L["Alpha"] = "透明度"
 L["Blizzard Target Fading"] = "Blizzard非目標淡出"
 L["Enable Blizzard 'On-Target' Fading"] = "啟用Blizzard非當前目標淡出"
@@ -222,11 +190,9 @@ L["Enabling this will allow you to set the alpha adjustment for non-target namep
 L["Non-Target Alpha"] = "非目標透明度"
 L["Alpha Settings"] = "透明度設置"
 
-----
 L["Scale"] = "縮放"
 L["Scale Settings"] = "縮放設置"
 
-----
 L["Name Text"] = "姓名文字"
 L["Enable Name Text"] = "啟用姓名文字"
 L["Enables the showing of text on nameplates."] = "在姓名板上啟用文字顯示。"
@@ -245,7 +211,6 @@ L["Text Height"] = "文字高度"
 L["Horizontal Align"] = "水平定位"
 L["Vertical Align"] = "垂直定位"
 
-----
 L["Health Text"] = "生命值文字"
 L["Enable Health Text"] = "啟用生命值文字"
 L["Display Settings"] = "顯示設置"
@@ -263,15 +228,12 @@ L["This will format text to show both the maximum hp and current hp."] = "這個
 L["Deficit Text"] = "損失血量文字"
 L["This will format text to show hp as a value the target is missing."] = "這個選項將設置文字格式來顯示目標損失的血量值。"
 
-----
 L["Spell Text"] = "法術文字"
 L["Enable Spell Text"] = "啟用法術文字"
 
-----
 L["Level Text"] = "等級文字"
 L["Enable Level Text"] = "啟用等級文字"
 
-----
 L["Elite Icon"] = "精英圖標"
 L["Enable Elite Icon"] = "啟用精英圖標"
 L["Enables the showing of the elite icon on nameplates."] = "啟用姓名板上精英圖標的顯示。"
@@ -280,28 +242,20 @@ L["Preview"] = "預覽"
 L["Elite Icon Style"] = "精英圖標樣式"
 L["Size"] = "大小"
 
-----
 L["Skull Icon"] = "骷髏等級圖標"
 L["Enable Skull Icon"] = "啟用骷髏等級圖標"
 L["Enables the showing of the skull icon on nameplates."] = "啟用姓名板上骷髏等級圖標的顯示。"
 
-----
 L["Spell Icon"] = "法術圖標"
 L["Enable Spell Icon"] = "啟用法術圖標"
 L["Enables the showing of the spell icon on nameplates."] = "啟用姓名板上法術圖標的顯示。"
 
-----
 L["Raid Marks"] = "團隊標記"
 L["Enable Raid Mark Icon"] = "啟用團隊標記"
 L["Enables the showing of the raid mark icon on nameplates."] = "啟用姓名板上團隊標記圖標的顯示。"
 
--------------------
--- Threat System --
--------------------
-
 L["Enable Threat System"] = "啟用仇恨系統"
 
-----
 L["Additional Toggles"] = "額外切換"
 L["Ignore Non-Combat Threat"] = "忽略非戰鬥目標仇恨"
 L["Disables threat feedback from mobs you're currently not in combat with."] = "禁用當前不在與你戰鬥的怪物的仇恨反饋。"
@@ -314,35 +268,31 @@ L["Disables threat feedback from elite mobs."] = "禁用精英怪物的仇恨反
 L["Show Boss Threat"] = "顯示首領單位仇恨"
 L["Disables threat feedback from boss level mobs."] = "禁用首領級別怪物的仇恨反饋。"
 
-----
 L["Set alpha settings for different threat reaction types."] = "對不同的仇恨反應類型設置透明度。"
 L["Enable Alpha Threat"] = "啟用仇恨透明度"
 L["Enable nameplates to change alpha depending on the levels you set below."] = "依據你在下面所設置的仇恨等級，啟用姓名板透明度改變。"
 L["|cff00ff00Tank|r"] = "|cff00ff00坦克|r"
 L["|cffff0000DPS/Healing|r"] = "|cffff0000傷害輸出/治療者|r"
-----
+
 L["Marked Targets"] = "被標記的目標"
 L["Ignore Marked Targets"] = "忽略被標記的目標"
 L["This will allow you to disabled threat alpha changes on marked targets."] = "這將允許你在被標記的目標上禁用仇恨透明度改變。"
 L["Ignored Alpha"] = "被忽略單位的透明度"
 
-----
 L["Set scale settings for different threat reaction types."] = "對不同的仇恨反應類型設置縮放。"
 L["Enable Scale Threat"] = "啟用仇恨縮放"
 L["Enable nameplates to change scale depending on the levels you set below."] = "依據你在下面所設置的仇恨等級，啟用姓名板縮放改變。"
 L["This will allow you to disabled threat scale changes on marked targets."] = "這將允許你在被標記的目標上禁用仇恨縮放改變。"
 L["Ignored Scaling"] = "被忽略單位的縮放"
-----
+
 L["Additional Adjustments"] = "額外調節"
 L["Enable Adjustments"] = "啟用調節"
 L["This will allow you to add additional scaling changes to specific mob types."] = "這將允許你對特殊的怪物類型增加額外的縮放改變。"
 
-----
 L["Toggles"] = "切換"
 L["Color HP by Threat"] = "仇恨血量顏色"
 L["This allows HP color to be the same as the threat colors you set below."] = "這將允許血量顏色與你在下面所設置的仇恨顏色相同。"
 
-----
 L["Dual Spec Roles"] = "雙天賦角色"
 L["Set the role your primary and secondary spec represent."] = "設置你的主要天賦與第二天賦所代表的角色。"
 L["Primary Spec"] = "主要天賦"
@@ -352,28 +302,21 @@ L["Secondary Spec"] = "第二天賦"
 L["Sets your secondary spec to tanking."] = "設置你的第二天賦為坦克類型。"
 L["Sets your secondary spec to DPS."] = "設置你的第二天賦為傷害輸出類型。"
 
-----
 L["Set threat textures and their coloring options here."] = "在這裡設置仇恨材質與它們的配色選項。"
 L["These options are for the textures shown on nameplates at various threat levels."] = "這些選項用來對不同的仇恨等級設置材質。"
-----
+
 L["Art Options"] = "藝術選項"
 L["Style"] = "樣式"
 L["This will allow you to disabled threat art on marked targets."] = "這將允許你在被標記的目標上禁用仇恨藝術材質。"
-
--------------
--- Widgets --
--------------
 
 L["Class Icons"] = "職業圖標"
 L["This widget will display class icons on nameplate with the settings you set below."] = "這個組件將依據你在下面的設置在姓名板上顯示職業圖標。"
 L["Enable Friendly Icons"] = "啟用友方單位圖標"
 L["Enable the showing of friendly player class icons."] = "啟用友方玩家職業圖標的顯示。"
 
-----
 L["Combo Points"] = "連擊點"
 L["This widget will display combo points on your target nameplate."] = "這個組件將在你的姓名板上顯示連擊點。"
 
-----
 L["Debuffs"] = "減益狀態(Debuffs)"
 L["This widget will display debuffs that match your filtering on your target nameplate and others you recently moused over."] = "這個組件將在你的目標姓名板與你最近鼠標指向過的其他單位姓名板上顯示符合你過濾條件的減益狀態(Debuffs)。"
 L["Sizing"] = "大小"
@@ -381,47 +324,35 @@ L["Filtering"] = "過濾"
 L["Mode"] = "模式"
 L["Filtered Debuffs"] = "濾過的減益狀態(Debuffs)"
 
-----
 L["Social Widget"] = "社交組件"
 L["Enables the showing if indicator icons for friends, guildmates, and BNET Friends"] = "啟用對於好友，公會成員與戰網好友的指示器圖標的顯示。"
 
-----
 L["Threat Line"] = "仇恨線"
 L["This widget will display a small bar that will display your current threat relative to other players on your target nameplate or recently mousedover namplates."] = "這個組件將在你目標姓名板或者最近鼠標指向過的姓名板上顯示一個小條，這個小條將顯示相對於其他玩家你的當前仇恨。"
 
-----
 L["Tanked Targets"] = "坦克組件"
 L["This widget will display a small shield or dagger that will indicate if the nameplate is currently being tanked. |cffff00ffRequires tanking role.|r"] = "這個組件將顯示一個用來指示單位當前是否被坦住的盾或匕首。|cffff00ff需要坦克角色。|r"
 
-----
 L["Target Highlight"] = "目標高亮"
 L["Enables the showing of a texture on your target nameplate"] = "啟用在你當前目標姓名板上一種材質的顯示"
-
-----------------------
--- Totem Nameplates --
-----------------------
 
 L["|cffffffffTotem Settings|r"] = "|cffffffff圖騰設置|r"
 L["Toggling"] = "切換"
 L["Hide Healthbars"] = "隱藏生命條"
-----
+
 L["Icon"] = "圖標"
 L["Icon Size"] = "圖標大小"
 L["Totem Alpha"] = "圖騰透明度"
 L["Totem Scale"] = "圖騰縮放"
-----
+
 L["Show Nameplate"] = "顯示姓名板"
-----
+
 L["Health Coloring"] = "生命值配色"
 L["Enable Custom Colors"] = "啟用自定義顏色"
 
------------------------
--- Custom Nameplates --
------------------------
-
 L["|cffffffffGeneral Settings|r"] = "|cffffffff一般設置|r"
 L["Disabling this will turn off any all icons without harming custom settings per nameplate."] = "禁用此選項將關閉所有圖標，而不會對每個姓名板的自定義設置造成破壞。"
-----
+
 L["Set Name"] = "設置名字"
 L["Use Target's Name"] = "使用目標名字"
 L["No target found."] = "未發現目標。"
@@ -432,45 +363,33 @@ L["Paste"] = "粘貼"
 L["Pasted!"] = "已粘貼！"
 L["Nothing to paste!"] = "無可粘貼內容！"
 L["Restore Defaults"] = "還原默認值"
-----
+
 L["Use Custom Settings"] = "使用自定義設置"
 L["Custom Settings"] = "自定義設置"
-----
+
 L["Disable Custom Alpha"] = "禁用自定義透明度"
 L["Disables the custom alpha setting for this nameplate and instead uses your normal alpha settings."] = "對此姓名板禁用自定義透明度設置，使用正常透明度設置代替"
 L["Custom Alpha"] = "自定義透明度"
-----
+
 L["Disable Custom Scale"] = "禁用自定義縮放"
 L["Disables the custom scale setting for this nameplate and instead uses your normal scale settings."] = "對此姓名板禁用自定義縮放設置，使用正常縮放設置代替"
 L["Custom Scale"] = "自定義縮放"
-----
+
 L["Allow Marked HP Coloring"] = "允許被標記目標的血量配色"
 L["Allow raid marked hp color settings instead of a custom hp setting if the nameplate has a raid mark."] = "如果姓名板有一個團隊標記，那麼允許團隊標記血量顏色設置代替自定義血量設置"
 
-----
 L["Enable the showing of the custom nameplate icon for this nameplate."] = "對此姓名板啟用自定義姓名板圖標的顯示。"
 L["Type direct icon texture path using '\\' to separate directory folders, or use a spellid."] = "直接輸入圖標材質的路徑，使用'\\'來分開目錄文件夾，或使用法術ID。"
 L["Set Icon"] = "設置圖標"
-
------------
--- About --
------------
 
 L["\n\nThank you for supporting my work!\n"] = "\n\n感謝對我工作的支持！\n"
 L["Click to Donate!"] = "點擊以捐贈！"
 L["Clear and easy to use nameplate theme for use with NidhausPlates.\n\nFeel free to email me at |cff00ff00bkader@mail.com|r"] = "NidhausPlates的清晰且易於使用的姓名板主題。\n\n請隨時通過電子郵件聯繫我 |cff00ff00bkader@mail.com|r"
 
---------------------------------
--- Default Game Options Frame --
---------------------------------
-
 L["You can access the "] = "你可以進入"
 L[" options by typing: /tptp"] = "選項通過輸入：/tptp"
 L["Open Config"] = "打開設置"
 
-------------------------
--- Additional Stances --
-------------------------
 L["Presences"] = "領域"
 L["Shapeshifts"] = "形態"
 L["Auras"] = "光環"

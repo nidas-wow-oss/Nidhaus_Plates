@@ -1,10 +1,6 @@
 local NidhausPlatesTheme = NidhausPlatesTheme
 local _
 
--------------------------------------------------------------------------------
--- 1. alpha.lua
---
-
 do
 	local function SetAlpha(unit)
 		local db = NidhausPlatesTheme.db.profile
@@ -70,10 +66,6 @@ do
 
 	NidhausPlatesTheme.SetAlpha = SetAlpha
 end
-
--------------------------------------------------------------------------------
--- 2. scale.lua
---
 
 do
 	local function TypeScale(unit)
@@ -159,10 +151,6 @@ do
 	NidhausPlatesTheme.SetScale = SetScale
 end
 
--------------------------------------------------------------------------------
--- 3. healthtext.lua
---
-
 do
 	local Truncate = function(value)
 		if NidhausPlatesTheme.db.profile.text.truncate then
@@ -242,10 +230,6 @@ do
 
 	NidhausPlatesTheme.SetCustomText = SetCustomText
 end
-
--------------------------------------------------------------------------------
--- 4. healthbarcolor.lua
---
 
 do
 	NidhausPlatesUtility:EnableGroupWatcher()
@@ -408,10 +392,6 @@ do
 	NidhausPlatesTheme.SetHealthbarColor = SetHealthbarColor
 end
 
--------------------------------------------------------------------------------
--- 5. castbarcolor.lua
---
-
 do
 	local c = {r = 1, g = 1, b = 0, a = 1}
 	local function SetCastbarColor(unit)
@@ -427,10 +407,6 @@ do
 
 	NidhausPlatesTheme.SetCastbarColor = SetCastbarColor
 end
-
--------------------------------------------------------------------------------
--- 6. nametextcolor.lua
---
 
 do
 	local IsInGroup = NidhausPlatesUtility.IsInGroup
@@ -480,10 +456,6 @@ do
 	NidhausPlatesTheme.SetNameColor = SetNameColor
 end
 
--------------------------------------------------------------------------------
--- 7. threatcolor.lua
---
-
 do
 	local c = {r = 0, g = 0, b = 0, a = 0}
 
@@ -503,10 +475,6 @@ do
 
 	NidhausPlatesTheme.SetThreatColor = SetThreatColor
 end
-
--------------------------------------------------------------------------------
--- 8. shapeshifts.lua
---
 
 do
 	local _, class = UnitClass("player")

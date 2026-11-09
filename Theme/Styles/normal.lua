@@ -1,6 +1,3 @@
--- Nombre real de la carpeta, tal y como lo pasa el cargador de addons.
--- Estaba escrito a mano como "NidhausPlates" mas abajo; al renombrar el addon
--- esa comparacion dejaba de cumplirse y este archivo no registraba nada.
 local ADDON_NAME = ...
 
 local NidhausPlatesUtility = NidhausPlatesUtility
@@ -90,7 +87,7 @@ local function CreateStyle(self, event, ...)
 			anchor = "CENTER",
 			show = db.castnostop.show
 		}
-		-- Bar Textures
+
 		config.healthbar = {
 			texture = MediaFetch("statusbar", db.healthbar.texture),
 			backdrop = [[Interface\Buttons\WHITE8X8]],
@@ -111,7 +108,6 @@ local function CreateStyle(self, event, ...)
 			anchor = "CENTER",
 			orientation = "HORIZONTAL"
 		}
-		-- TEXT
 
 		config.name = {
 			typeface = MediaFetch("font", db.name.typeface),
@@ -169,7 +165,7 @@ local function CreateStyle(self, event, ...)
 			flags = db.spelltext.flags,
 			show = db.spelltext.show
 		}
-		-- ICONS
+
 		config.skullicon = {
 			width = (db.skullicon.scale),
 			height = (db.skullicon.scale),
@@ -202,7 +198,7 @@ local function CreateStyle(self, event, ...)
 			anchor = (db.raidicon.anchor),
 			show = db.raidicon.show
 		}
-		-- OPTIONS
+
 		local threat = db.normal.threatcolor
 		config.threatcolor = {
 			LOW = {

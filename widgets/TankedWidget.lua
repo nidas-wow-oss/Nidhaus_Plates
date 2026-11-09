@@ -41,17 +41,17 @@ do
 	end
 
 	local function CreateTankedWidget(parent)
-		-- Init Widget
+
 		local frame = CreateFrame("Frame", nil, parent)
 		frame.FadeTime = 0
 		frame:SetWidth(26)
 		frame:SetHeight(26)
-		-- Tank Icon
+
 		frame.icon = frame:CreateTexture(nil, "OVERLAY")
 		frame.icon:SetTexture(artname)
 		frame.icon:SetAllPoints(frame)
 		frame.icon:Hide()
-		-- Update
+
 		frame.HideIn = NidhausPlatesWidgets.HideIn
 		frame.Update = UpdateTankedWidget
 		frame:Hide()

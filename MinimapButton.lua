@@ -7,10 +7,6 @@ if LibStub then
 	LibDataBroker = LibStub("LibDataBroker-1.1", true)
 end
 
-----------------------------------------------------------------------------------------
--- Simplified build: left-click opens the addon options. No quick menu, no middle/right click.
-----------------------------------------------------------------------------------------
-
 local L = NidhausPlates.L
 local ButtonTexture = "Interface\\Addons\\Nidhaus_Plates\\media\\NidhausPlatesIcon"
 
@@ -20,10 +16,6 @@ local function OpenAddonOptions()
 		theme.ShowConfigPanel()
 	end
 end
-
-----------------------------------------------------------------------------------------
--- Standalone Button Creation
-----------------------------------------------------------------------------------------
 
 local function CreateStandaloneIcon()
 	local ButtonFrame = CreateFrame("Button", "NidhausPlatesIconFrame", UIParent)
@@ -102,9 +94,6 @@ local function CreateStandaloneIcon()
 	NidhausPlatesIconFrame = ButtonFrame
 end
 
-----------------------------------------------------------------------------------------
--- LDB Button Creation
-----------------------------------------------------------------------------------------
 local function CreateDataBrokerIcon()
 	local ButtonFrameObject
 	if LibDataBroker then
@@ -139,10 +128,6 @@ local function CreateDataBrokerIcon()
 	LibIcon:Register(addonName, ButtonFrameObject, NidhausPlatesOptions.LDB)
 	NidhausPlatesIconFrame = ButtonFrameObject
 end
-
-----------------------------------------------------------------------------------------
--- Create Button
-----------------------------------------------------------------------------------------
 
 local function CreateMinimapButton()
 	if not NidhausPlatesIconFrame then

@@ -1,11 +1,7 @@
------------------------
--- Target Art Widget --
------------------------
 local NidhausPlatesTheme = NidhausPlatesTheme
 local path = "Interface\\AddOns\\Nidhaus_Plates\\Theme\\Widgets\\TargetArtWidget\\"
 local db
 
--- Target Art
 local function UpdateTargetFrameArt(frame, unit)
 	db = NidhausPlatesTheme.db.profile
 

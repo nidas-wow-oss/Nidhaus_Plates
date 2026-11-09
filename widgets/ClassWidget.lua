@@ -1,6 +1,3 @@
----------------
--- Class Widget
----------------
 local classWidgetPath = "Interface\\Addons\\Nidhaus_Plates\\widgets\\ClassWidget\\"
 
 local function UpdateClassWidget(self, unit, showFriendly)

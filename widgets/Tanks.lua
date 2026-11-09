@@ -1,7 +1,3 @@
-------------------------------
--- Target Tracker
-------------------------------
-
 local TrackedUnits = {}
 local TrackedUnitTargets = {}
 local TrackedUnitTargetHistory = {}
@@ -13,18 +9,15 @@ local function TargetWatcherEvents()
 	local changes = false
 	TrackedUnits = wipe(TrackedUnits)
 
-	-- Store target history
 	for gid, tar in pairs(TrackedUnitTargets) do
 		TrackedUnitTargetHistory[gid] = tar
 		TrackedUnitTargets[gid] = nil
 	end
 
-	-- Reset the Tracking List
 	for gid in pairs(TrackedUnits) do
 		TrackedUnits[gid] = nil
 	end
 
-	-- Build a list of Trackable targets (via target, focus, and raid members)
 	guid = UnitGUID("target")
 	if guid then
 		TrackedUnits[guid] = "target"
@@ -44,7 +37,6 @@ local function TargetWatcherEvents()
 		end
 	end
 
-	-- Build a list of the target's targets and check for changes
 	for gid, unitid in pairs(TrackedUnits) do
 		if unitid then
 			TrackedUnitTargets[gid] = UnitName(unitid .. "target")
@@ -54,15 +46,11 @@ local function TargetWatcherEvents()
 		end
 	end
 
-	-- Call for indicator Update, if needed
 	if changes then
 		NidhausPlates:Update()
 	end
 end
 
----------------
--- Tank Monitor
----------------
 local TankNames = {}
 local TankWatcher
 
@@ -70,9 +58,9 @@ local function IsTankedByAnotherTank(unit)
 	local targetOf
 	if unit.guid then
 		if unit.isTarget then
-			targetOf = UnitName("targettarget") -- Nameplate is a target
+			targetOf = UnitName("targettarget")
 		elseif unit.isMouseover then
-			targetOf = UnitName("mouseovertarget") -- Nameplate is a mouseover
+			targetOf = UnitName("mouseovertarget")
 		else
 			targetOf = TrackedUnitTargets[unit.guid]
 		end

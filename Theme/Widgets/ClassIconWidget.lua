@@ -1,6 +1,3 @@
------------------------
--- Class Icon Widget --
------------------------
 local path = "Interface\\AddOns\\Nidhaus_Plates\\Theme\\Widgets\\ClassIconWidget\\"
 
 local RING = "Interface\\AddOns\\Nidhaus_Plates\\Theme\\Media\\Artwork\\TP_ClassIconRing"
@@ -9,17 +6,6 @@ local function noop()
 	return
 end
 
--- ---------------------------------------------------------------
--- Borde del icono de clase
---
--- Dos formas, porque un marco cuadrado sobre un icono redondo queda mal:
---   * temas cuadrados (default / transparent) -> cuatro tiras de 1px
---   * tema redondo (circle)                   -> un anillo
---
--- El cuadrado se dibuja con tiras y no con una imagen de marco a proposito:
--- una textura de borde estirada se ve borrosa cuando cambias el tamano del
--- icono, y las tiras salen nitidas midan lo que midan.
--- ---------------------------------------------------------------
 local function CrearBorde(frame)
 	frame.BorderLines = {}
 	for i = 1, 4 do
@@ -69,11 +55,6 @@ local function ActualizarBorde(frame, db, unit)
 		return
 	end
 
-	-- Dos colores: el normal y el del objetivo.
-	--
-	-- unit.isTarget lo mantiene el motor de NidhausPlates y se refresca cuando
-	-- cambias de objetivo (es lo mismo que usan el resaltado y la escala del
-	-- objetivo), asi que no hace falta escuchar PLAYER_TARGET_CHANGED aqui.
 	local c
 	if unit and unit.isTarget then
 		c = db.classWidget.borderColorTarget or BLANCO
@@ -84,8 +65,7 @@ local function ActualizarBorde(frame, db, unit)
 
 	if redondo then
 		for i = 1, 4 do frame.BorderLines[i]:Hide() end
-		-- El anillo se sale un pelo del icono para que se vea el trazo
-		-- entero y no quede cortado por el borde del marco.
+
 		frame.BorderRing:ClearAllPoints()
 		frame.BorderRing:SetPoint("TOPLEFT", frame, "TOPLEFT", -1, 1)
 		frame.BorderRing:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", 1, -1)
@@ -93,8 +73,7 @@ local function ActualizarBorde(frame, db, unit)
 		frame.BorderRing:Show()
 	else
 		frame.BorderRing:Hide()
-		-- El grosor se escala con el icono: 1px fijo desaparece en iconos
-		-- grandes y tapa el dibujo en los pequenos.
+
 		local grosor = (db.classWidget.borderThickness or 1)
 			* math.max(1, (frame:GetWidth() or 22) / 22)
 		ColocarLineas(frame, grosor)
@@ -132,7 +111,6 @@ local function UpdateClassIconWidget(frame, unit)
 		ActualizarBorde(frame, db, unit)
 	end
 
-	-- hack to move friendly class icons above names.
 	if frame:IsShown() and unit.reaction == "FRIENDLY" and unit.type == "PLAYER" then
 		if db.friendlyNameOnly then
 			if not frame.moved then

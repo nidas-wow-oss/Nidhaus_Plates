@@ -10,14 +10,9 @@ local RaidTargetReference = {
 	SKULL = 0x08000000
 }
 
--------------------------------------------------------------------------
--- Spell Cast Event Watcher.
--------------------------------------------------------------------------
 local CombatCastEventWatcher
 local CombatEventHandlers = {}
 
--- If you don't define a local reference,
--- the Nidhaus Plates table will get passed to the function.
 local StartCastAnimationOnNameplate = NidhausPlates.StartCastAnimationOnNameplate
 
 local function SearchNameplateByGUID(SearchFor)
@@ -48,34 +43,16 @@ local function SearchNameplateByIcon(UnitFlags)
 	end
 
 	for VisiblePlate in pairs(NidhausPlates.NameplatesByVisible) do
-		if VisiblePlate.extended.unit.isMarked and (VisiblePlate.extended.unit.raidIcon == UnitIcon) then -- BY Icon
+		if VisiblePlate.extended.unit.isMarked and (VisiblePlate.extended.unit.raidIcon == UnitIcon) then
 			return VisiblePlate
 		end
 	end
 end
 
---------------------------------------
--- OnSpellCast
--- Sends cast event to an available nameplate
---------------------------------------
 local function OnSpellCast(...)
 	local sourceGUID, sourceName, sourceFlags, spellid, spellname = ...
 	local FoundPlate = nil
 
-	-- Gather Spell Info
-	--
-	-- GetSpellInfo devuelve NIL ENTERO cuando el cliente no conoce el ID:
-	-- hechizos propios del servidor, o IDs que aparecen en el registro de
-	-- combate pero no estan en la base de datos del cliente. En Warmane pasa
-	-- a menudo. Antes se leia castTime y se comparaba con 0 sin comprobar
-	-- nada, asi que cada vez que casteaba un NPC que no era tu objetivo
-	-- saltaba "attempt to compare nil with number" y la funcion se cortaba
-	-- ahi: por eso no se dibujaba la barra.
-	--
-	-- La comprobacion de castTime no hace falta: SPELL_CAST_START solo se
-	-- dispara con hechizos que tienen tiempo de lanzamiento (los instantaneos
-	-- emiten SPELL_CAST_SUCCESS). Pero la guarda de nil SI hace falta, o se
-	-- dibujaria una barra sin nombre ni icono.
 	local spell, _, icon = GetSpellInfo(spellid)
 	if not spell then
 		return
@@ -83,10 +60,10 @@ local function OnSpellCast(...)
 
 	if bit.band(sourceFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0 then
 		if bit.band(sourceFlags, COMBATLOG_OBJECT_CONTROL_PLAYER) > 0 then
-			--	destination plate, by name
+
 			FoundPlate = SearchNameplateByName(sourceName)
 		elseif bit.band(sourceFlags, COMBATLOG_OBJECT_CONTROL_NPC) > 0 then
-			--	destination plate, by GUID
+
 			FoundPlate = SearchNameplateByGUID(sourceGUID)
 			if not FoundPlate then
 				FoundPlate = SearchNameplateByIcon(sourceFlags)
@@ -98,7 +75,6 @@ local function OnSpellCast(...)
 		return
 	end
 
-	-- If the unit's nameplate is visible, show the cast bar
 	if FoundPlate then
 		local FoundPlateUnit = FoundPlate.extended.unit
 		if not FoundPlateUnit.isTarget then
@@ -111,15 +87,6 @@ function CombatEventHandlers.SPELL_CAST_START(...)
 	OnSpellCast(...)
 end
 
---------------------------------------
--- Casteos de aliados: party, raid y sus mascotas
---
--- OnSpellCast (registro de combate) solo atiende a los HOSTILES, asi que los
--- casteos de tu grupo nunca llegaban a su placa. Para ellos hay algo mejor
--- que el registro de combate: tienen unitID (party1, partypet1...), asi que
--- UnitCastingInfo da el hechizo con su inicio y su final exactos, y los
--- eventos UNIT_SPELLCAST_* avisan tambien de cortes y retrasos.
---------------------------------------
 local function EsUnidadDeGrupo(unit)
 	return unit == "pet"
 		or unit:find("^party%d$") or unit:find("^partypet%d$")
@@ -127,15 +94,13 @@ local function EsUnidadDeGrupo(unit)
 end
 
 local function BuscarPlacaAliada(unit)
-	-- Primero por GUID, que es exacto; el motor lo conoce si la placa ya fue
-	-- objetivo o paso el mouse por encima.
+
 	local guid = UnitGUID(unit)
 	local plate = guid and NidhausPlates.NameplatesByGUID[guid]
 	if plate and NidhausPlates.NameplatesByVisible[plate] then
 		return plate
 	end
-	-- Si no, por nombre, y solo entre placas aliadas: un enemigo con el mismo
-	-- nombre no se tiene que llevar la barra.
+
 	local name = UnitName(unit)
 	if not name then return end
 	for VisiblePlate in pairs(NidhausPlates.NameplatesByVisible) do
@@ -148,7 +113,7 @@ end
 
 local function OnGroupSpellCast(unit)
 	if not unit or not EsUnidadDeGrupo(unit) then return end
-	-- El objetivo ya lo maneja el motor con su propia barra.
+
 	if UnitIsUnit(unit, "target") then return end
 	local plate = BuscarPlacaAliada(unit)
 	if not plate then return end
@@ -174,10 +139,6 @@ local GroupCastEvents = {
 	"UNIT_SPELLCAST_NOT_INTERRUPTIBLE",
 }
 
---------------------------------------
--- Watch Combat Log Events
---------------------------------------
-
 local function OnCombatEvent(self, event, ...)
 	if event ~= "COMBAT_LOG_EVENT_UNFILTERED" then
 		OnGroupSpellCast((...))
@@ -188,10 +149,6 @@ local function OnCombatEvent(self, event, ...)
 		CombatEventHandlers[combatevent](sourceGUID, sourceName, sourceFlags, spellid, spellname)
 	end
 end
-
------------------------------------
--- External control functions
------------------------------------
 
 local function StartSpellCastWatcher()
 	if not CombatCastEventWatcher then
@@ -215,14 +172,11 @@ end
 NidhausPlates.StartSpellCastWatcher = StartSpellCastWatcher
 NidhausPlates.StopSpellCastWatcher = StopSpellCastWatcher
 
--- The spell ID number of Fireball is 133
--- To test spell cast: /run TestNidhausPlatesCastBar("Boognish", 133, true)
 function NidhausPlates.TestCastBar(SearchFor, SpellID, Shielded, ForceChanneled)
 	local FoundPlate
 	local spell, _, icon = GetSpellInfo(SpellID)
 	local channel
 
-	-- Search for the nameplate, by name (you could also search by GUID)
 	for VisiblePlate in pairs(NidhausPlates.NameplatesByVisible) do
 		if VisiblePlate.extended.unit.name == SearchFor or VisiblePlate.extended.unit.guid == SearchFor then
 			FoundPlate = VisiblePlate
@@ -230,7 +184,6 @@ function NidhausPlates.TestCastBar(SearchFor, SpellID, Shielded, ForceChanneled)
 		end
 	end
 
-	-- If found, display the cast bar
 	if FoundPlate then
 		print("Testing Spell Cast on", SearchFor, "(no cast animation)")
 		StartCastAnimationOnNameplate(FoundPlate, spell, spell, icon, Shielded, ForceChanneled)

@@ -4,7 +4,6 @@ local GetSpellInfo = GetSpellInfo
 local PolledHideIn = NidhausPlatesWidgets.PolledHideIn
 local AuraMonitor = CreateFrame("Frame")
 
--- TODO: keep an eye on weak tables.
 local WidgetList = setmetatable({}, {__mode = "kv"})
 local weaktable = NidhausPlatesUtility.weaktable
 local WidgetGUID = setmetatable({}, weaktable)
@@ -66,7 +65,6 @@ local RaidIconIndex = {
 	"SKULL"
 }
 
--- TODO: keep an eye on weak tables.
 local ByRaidIcon = setmetatable({}, weaktable)
 local ByName = setmetatable({}, weaktable)
 
@@ -88,16 +86,9 @@ local function CanPlayerDispel(debuffType)
 	return PlayerDispelCapabilities[debuffType or ""]
 end
 
------------------------------------------------------
--- Default Filter
------------------------------------------------------
 local function DefaultFilterFunction(debuff)
 	return (debuff.duration < 600)
 end
-
------------------------------------------------------
--- Update Via Search
------------------------------------------------------
 
 local function FindWidgetByGUID(guid)
 	return WidgetGUID[guid]
@@ -139,9 +130,6 @@ local function CallForWidgetUpdate(guid, raidicon, name)
 	end
 end
 
------------------------------------------------------
--- Aura Durations
------------------------------------------------------
 NidhausPlatesData = NidhausPlatesData or {}
 NidhausPlatesData.CachedAuraDurations = {}
 
@@ -157,15 +145,10 @@ local function SetSpellDuration(spellid, duration)
 	end
 end
 
------------------------------------------------------
--- Aura Instances
------------------------------------------------------
-
--- TODO: keep an eye on weak tables.
 local newTable = NidhausPlatesUtility.NewTable
 local delTable = NidhausPlatesUtility.DelTable
 
-local Aura_List = setmetatable({}, weaktable) -- Two Dimensional
+local Aura_List = setmetatable({}, weaktable)
 local Aura_Spellid = {}
 local Aura_Expiration = {}
 local Aura_Stacks = {}
@@ -274,12 +257,8 @@ local function CleanAuraLists()
 	end
 end
 
------------------------------------------------------
--- Aura Updating Via UnitID (Via UnitDebuff API function and UNIT_AURA events)
------------------------------------------------------
-
 local function UpdateAurasByUnitID(unitid)
-	-- Limit to enemies, for now
+
 	local unitType
 	if UnitIsFriend("player", unitid) then
 		unitType = AURA_TARGET_FRIENDLY
@@ -288,13 +267,12 @@ local function UpdateAurasByUnitID(unitid)
 	end
 	if unitType == AURA_TARGET_FRIENDLY then
 		return
-	end -- Filter
+	end
 
-	-- Check the UnitIDs Debuffs
 	local guid = UnitGUID(unitid)
-	-- Reset Auras for a guid
+
 	WipeAuraList(guid)
-	-- Debuffs
+
 	for index = 1, 32 do
 		local name, _, texture, count, dispelType, duration, expirationTime, unitCaster, _, _, spellid =
 			UnitDebuff(unitid, index)
@@ -305,7 +283,6 @@ local function UpdateAurasByUnitID(unitid)
 		SetAuraInstance(guid, spellid, expirationTime, count, UnitGUID(unitCaster or ""), duration, texture, AURA_TYPE[dispelType or "Debuff"], unitType)
 	end
 
-	-- Buffs (Only for friendly units)
 	if unitType == AURA_TARGET_FRIENDLY then
 		for index = 1, 32 do
 			local name, _, texture, count, dispelType, duration, expirationTime, unitCaster, _, _, spellid =
@@ -347,10 +324,6 @@ local function UpdateAuraByLookup(guid)
 	return false
 end
 
------------------------------------------------------
--- Aura Updating Via Combat Log
------------------------------------------------------
-
 local function CombatLog_ApplyAura(...)
 	local timestamp, sourceGUID, destGUID, destName, spellid = ...
 	local duration = GetSpellDuration(spellid)
@@ -369,10 +342,6 @@ local function CombatLog_UpdateAuraStacks(...)
 	local _, _, texture = GetSpellInfo(spellid)
 	SetAuraInstance(destGUID, spellid, GetTime() + (duration or 0), stackCount, sourceGUID, duration, texture, AURA_TYPE_DEBUFF, AURA_TARGET_HOSTILE)
 end
-
------------------------------------------------------
--- General Events
------------------------------------------------------
 
 local function EventUnitTarget()
 	wipe(TargetOfGroupMembers)
@@ -399,18 +368,15 @@ local function EventUnitAura(unitid)
 	end
 end
 
------------------------------------------------------
--- Function Reference Lists
------------------------------------------------------
 local CombatLogEvents = {
-	-- Refresh Expire Time
+
 	["SPELL_AURA_APPLIED"] = CombatLog_ApplyAura,
 	["SPELL_AURA_REFRESH"] = CombatLog_ApplyAura,
-	-- Add a stack
+
 	["SPELL_AURA_APPLIED_DOSE"] = CombatLog_UpdateAuraStacks,
-	-- Remove a stack
+
 	["SPELL_AURA_REMOVED_DOSE"] = CombatLog_UpdateAuraStacks,
-	-- Expires Aura
+
 	["SPELL_AURA_BROKEN"] = CombatLog_RemoveAura,
 	["SPELL_AURA_BROKEN_SPELL"] = CombatLog_RemoveAura,
 	["SPELL_AURA_REMOVED"] = CombatLog_RemoveAura
@@ -431,7 +397,7 @@ local function GetCombatEventResults(...)
 end
 
 local function CombatEventHandler(frame, event, ...)
-	-- General Events, Passthrough
+
 	if event ~= "COMBAT_LOG_EVENT_UNFILTERED" then
 		if GeneralEvents[event] then
 			GeneralEvents[event](...)
@@ -439,32 +405,28 @@ local function CombatEventHandler(frame, event, ...)
 		return
 	end
 
-	-- Combat Log Unfiltered
 	local timestamp, combatevent, sourceGUID, destGUID, destName, destFlags, destRaidFlag, auraType, spellid, stackCount = GetCombatEventResults(...)
 
-	-- Evaluate only for enemy units, for now
-	if (bit.band(destFlags, COMBATLOG_OBJECT_REACTION_FRIENDLY) == 0) then -- FILTER: ENEMY UNIT
+	if (bit.band(destFlags, COMBATLOG_OBJECT_REACTION_FRIENDLY) == 0) then
 		local CombatLogUpdateFunction = CombatLogEvents[combatevent]
-		-- Evaluate only for certain combat log events
+
 		if CombatLogUpdateFunction then
-			-- Evaluate only for debuffs
-			if auraType == "DEBUFF" then -- FILTER: DEBUFF
-				-- Update Auras via API/UnitID Search
+
+			if auraType == "DEBUFF" then
+
 				if not UpdateAuraByLookup(destGUID) then
-					-- Update Auras via Combat Log
+
 					CombatLogUpdateFunction(timestamp, sourceGUID, destGUID, destName, spellid, stackCount)
 				end
-				-- To Do: Need to write something to detect when a change was made to the destID
-				-- Return values on functions?
 
 				local name, raidicon
-				-- Cache Unit Name for alternative lookup strategy
+
 				if bit.band(destFlags, COMBATLOG_OBJECT_CONTROL_PLAYER) > 0 then
-					local rawName = strsplit("-", destName) -- Strip server name from players
+					local rawName = strsplit("-", destName)
 					ByName[rawName] = destGUID
 					name = rawName
 				end
-				-- Cache Raid Icon Data for alternative lookup strategy
+
 				for iconname, bitmask in pairs(RaidIconBit) do
 					if bit.band(destRaidFlag, bitmask) > 0 then
 						ByRaidIcon[iconname] = destGUID
@@ -479,9 +441,6 @@ local function CombatEventHandler(frame, event, ...)
 	end
 end
 
--------------------------------------------------------------
--- Widget Object Functions
--------------------------------------------------------------
 local function UpdateWidgetTime(frame, expiration)
 	local timeleft = ceil(expiration - GetTime())
 	if timeleft > 60 then
@@ -493,17 +452,15 @@ end
 
 local function UpdateIcon(frame, texture, expiration, stacks)
 	if frame and texture and expiration then
-		-- Icon
+
 		frame.Icon:SetTexture(texture)
 
-		-- Stacks
 		if stacks > 1 then
 			frame.Stacks:SetText(stacks)
 		else
 			frame.Stacks:SetText("")
 		end
 
-		-- Expiration
 		UpdateWidgetTime(frame, expiration)
 		frame:Show()
 		PolledHideIn(frame, expiration)
@@ -529,7 +486,6 @@ local function UpdateIconGrid(frame, guid)
 	wipe(DebuffCache)
 	local debuffCount = 0
 
-	-- Cache displayable debuffs
 	if AurasOnUnit then
 		frame:Show()
 		for instanceid in pairs(AurasOnUnit) do
@@ -541,11 +497,9 @@ local function UpdateIconGrid(frame, guid)
 				aura.name = GetSpellInfo(tonumber(aura.spellid))
 				aura.unit = frame.unit
 
-				-- Call Filter Function
 				local show, priority = frame.Filter(aura)
 				aura.priority = priority or 10
 
-				-- Get Order/Priority
 				if show and aura.expiration > GetTime() then
 					debuffCount = debuffCount + 1
 					DebuffCache[debuffCount] = aura
@@ -554,7 +508,6 @@ local function UpdateIconGrid(frame, guid)
 		end
 	end
 
-	-- Display Auras
 	if debuffCount > 0 then
 		sort(DebuffCache, debuffSort)
 		for index = 1, #DebuffCache do
@@ -569,7 +522,6 @@ local function UpdateIconGrid(frame, guid)
 		end
 	end
 
-	-- Clear Extra Slots
 	for index = AuraSlotIndex, MaximumDisplayableDebuffs do
 		UpdateIcon(AuraIconFrames[index])
 	end
@@ -578,12 +530,12 @@ local function UpdateIconGrid(frame, guid)
 end
 
 function UpdateWidget(frame)
-	-- Check for ID
+
 	local unit = frame.unit
 	local guid = unit.guid
 
 	if not guid then
-		-- Attempt to ID widget via Name or Raid Icon
+
 		if unit.type == "PLAYER" then
 			guid = ByName[unit.name]
 		elseif unit.isMarked then
@@ -591,7 +543,7 @@ function UpdateWidget(frame)
 		end
 
 		if guid then
-			unit.guid = guid -- Feed data back into unit table		-- Testing
+			unit.guid = guid
 		else
 			frame:Hide()
 			return
@@ -599,14 +551,13 @@ function UpdateWidget(frame)
 	end
 
 	UpdateIconGrid(frame, guid)
-	NidhausPlates:RequestDelegateUpdate() -- Delegate Update, For Debuff Widget-Controlled Scale and Opacity Functions
+	NidhausPlates:RequestDelegateUpdate()
 end
 
 local function UpdateWidgetTarget(frame)
 	UpdateIconGrid(frame, UnitGUID("target"))
 end
 
--- Context Update (mouseover, target change)
 local function UpdateWidgetContext(frame, unit)
 	local guid = unit.guid
 	frame.unit = unit
@@ -645,12 +596,9 @@ local function ClearWidgetContext(frame)
 	WidgetList[frame] = nil
 end
 
--------------------------------------------------------------
--- Widget Frames
--------------------------------------------------------------
-local AuraBorderArt = "Interface\\AddOns\\NidhausPlatesWidgets\\Aura\\AuraFrame" -- FINISH ART
+local AuraBorderArt = "Interface\\AddOns\\NidhausPlatesWidgets\\Aura\\AuraFrame"
 local AuraGlowArt = "Interface\\AddOns\\NidhausPlatesWidgets\\Aura\\AuraGlow"
-local AuraHighlightArt = "Interface\\AddOns\\NidhausPlatesWidgets\\Aura\\CCBorder" -- AuraBorderArt, AuraHighlightArt
+local AuraHighlightArt = "Interface\\AddOns\\NidhausPlatesWidgets\\Aura\\CCBorder"
 local AuraTestArt = ""
 local AuraFont = "Interface\\Addons\\Nidhaus_Plates\\Media\\DefaultFont.ttf"
 
@@ -671,29 +619,28 @@ end
 local function Disable()
 	AuraMonitor:SetScript("OnEvent", nil)
 	AuraMonitor:UnregisterAllEvents()
-	--NidhausPlatesUtility:DisableGroupWatcher()
+
 end
 
--- Create an Aura Icon
 local function CreateAuraIconFrame(parent)
 	local frame = CreateFrame("Frame", nil, parent)
 	frame:SetWidth(26)
 	frame:SetHeight(14)
-	-- Icon
+
 	frame.Icon = frame:CreateTexture(nil, "BACKGROUND")
 	frame.Icon:SetAllPoints(frame)
-	frame.Icon:SetTexCoord(.07, 1 - .07, .23, 1 - .23) -- obj:SetTexCoord(left,right,top,bottom)
-	-- Border
+	frame.Icon:SetTexCoord(.07, 1 - .07, .23, 1 - .23)
+
 	frame.Border = frame:CreateTexture(nil, "ARTWORK")
 	frame.Border:SetWidth(32)
 	frame.Border:SetHeight(32)
 	frame.Border:SetPoint("CENTER", 1, -2)
 	frame.Border:SetTexture(AuraBorderArt)
-	-- Glow
+
 	frame.Glow = frame:CreateTexture(nil, "ARTWORK")
 	frame.Glow:SetAllPoints(frame.Border)
 	frame.Glow:SetTexture(AuraGlowArt)
-	--  Time Text
+
 	frame.TimeLeft = frame:CreateFontString(nil, "OVERLAY")
 	frame.TimeLeft:SetFont(AuraFont, 9, "OUTLINE")
 	frame.TimeLeft:SetShadowOffset(1, -1)
@@ -702,7 +649,7 @@ local function CreateAuraIconFrame(parent)
 	frame.TimeLeft:SetWidth(26)
 	frame.TimeLeft:SetHeight(16)
 	frame.TimeLeft:SetJustifyH("RIGHT")
-	--  Stacks
+
 	frame.Stacks = frame:CreateFontString(nil, "OVERLAY")
 	frame.Stacks:SetFont(AuraFont, 10, "OUTLINE")
 	frame.Stacks:SetShadowOffset(1, -1)
@@ -711,22 +658,21 @@ local function CreateAuraIconFrame(parent)
 	frame.Stacks:SetWidth(26)
 	frame.Stacks:SetHeight(16)
 	frame.Stacks:SetJustifyH("RIGHT")
-	-- Information about the currently displayed aura
+
 	frame.AuraInfo = {Name = "", Icon = "", Stacks = 0, Expiration = 0, Type = ""}
-	--frame.Poll = UpdateWidgetTime
+
 	frame.Poll = parent.PollFunction
 	frame:Hide()
 	return frame
 end
 
--- Create the Main Widget Body and Icon Array
 local function CreateAuraWidget(parent)
-	-- Create Base frame
+
 	local frame = CreateFrame("Frame", nil, parent)
 	frame:SetWidth(128)
 	frame:SetHeight(32)
 	frame:Show()
-	-- Create Icon Array
+
 	frame.PollFunction = UpdateWidgetTime
 	frame.AuraIconFrames = {}
 	local AuraIconFrames = frame.AuraIconFrames
@@ -735,7 +681,7 @@ local function CreateAuraWidget(parent)
 		AuraIconFrames[index] = CreateAuraIconFrame(frame)
 	end
 	local FirstRowCount = min(MaximumDisplayableDebuffs / 2)
-	-- Set Anchors
+
 	AuraIconFrames[1]:SetPoint("LEFT", frame)
 	for index = 2, FirstRowCount do
 		AuraIconFrames[index]:SetPoint("LEFT", AuraIconFrames[index - 1], "RIGHT", 5, 0)
@@ -744,7 +690,7 @@ local function CreateAuraWidget(parent)
 	for index = (FirstRowCount + 2), MaximumDisplayableDebuffs do
 		AuraIconFrames[index]:SetPoint("LEFT", AuraIconFrames[index - 1], "RIGHT", 5, 0)
 	end
-	-- Functions
+
 	frame._Hide = frame.Hide
 	frame.Hide = function()
 		ClearWidgetContext(frame)
@@ -762,9 +708,6 @@ local function CreateAuraWidget(parent)
 	return frame
 end
 
------------------------------------------------------
--- External
------------------------------------------------------
 NidhausPlatesWidgets.GetAuraWidgetByGUID = GetAuraWidgetByGUID
 NidhausPlatesWidgets.IsAuraShown = IsAuraShown
 NidhausPlatesWidgets.CanPlayerDispel = CanPlayerDispel
@@ -775,111 +718,107 @@ NidhausPlatesWidgets.DisableAuraWatcher = Disable
 
 do
 	local CCSpells = {
-		-- general
-		[GetSpellInfo(118)] = true, -- Polymorph
-		[GetSpellInfo(3355)] = true, -- Freezing Trap Effect
-		[GetSpellInfo(6770)] = true, -- Sap
-		[GetSpellInfo(6358)] = true, -- Seduction (succubus)
-		[GetSpellInfo(60210)] = true, -- Freezing Arrow
-		[GetSpellInfo(45524)] = true, -- Chains of Ice
-		[GetSpellInfo(33786)] = true, -- Cyclone
-		[GetSpellInfo(53308)] = true, -- Entangling Roots
-		[GetSpellInfo(2637)] = true, -- Hibernate
-		[GetSpellInfo(20066)] = true, -- Repentance
-		[GetSpellInfo(9484)] = true, -- Shackle Undead
-		[GetSpellInfo(51722)] = true, -- Dismantle
-		[GetSpellInfo(710)] = true, -- Banish
-		[GetSpellInfo(12809)] = true, -- Concussion Blow
-		[GetSpellInfo(676)] = true, -- Disarm
-		-- Death Knight
-		[GetSpellInfo(47476)] = true, -- Strangulate
-		[GetSpellInfo(49203)] = true, -- Hungering Cold
-		[GetSpellInfo(47481)] = true, -- Gnaw
-		[GetSpellInfo(49560)] = true, -- Death Grip
-		-- Druid
-		[GetSpellInfo(339)] = true, -- Entangling Roots
-		[GetSpellInfo(8983)] = true, -- Bash
-		[GetSpellInfo(16979)] = true, -- Feral Charge - Bear
-		[GetSpellInfo(45334)] = true, -- Feral Charge Effect
-		[GetSpellInfo(22570)] = true, -- Maim
-		[GetSpellInfo(49803)] = true, -- Pounce
-		-- Hunter
-		[GetSpellInfo(5116)] = true, -- Concussive Shot
-		[GetSpellInfo(19503)] = true, -- Scatter Shot
-		[GetSpellInfo(19386)] = true, -- Wyvern Sting
-		[GetSpellInfo(53548)] = true, -- Pin (Crab)
-		[GetSpellInfo(4167)] = true, -- Web (Spider)
-		[GetSpellInfo(55509)] = true, -- Venom Web Spray (Silithid)
-		[GetSpellInfo(24394)] = true, -- Intimidation
-		[GetSpellInfo(19577)] = true, -- Intimidation (stun)
-		[GetSpellInfo(53568)] = true, -- Sonic Blast (Bat)
-		[GetSpellInfo(53543)] = true, -- Snatch (Bird of Prey)
-		[GetSpellInfo(50541)] = true, -- Clench (Scorpid)
-		[GetSpellInfo(55492)] = true, -- Froststorm Breath (Chimaera)
-		[GetSpellInfo(26090)] = true, -- Pummel (Gorilla)
-		[GetSpellInfo(53575)] = true, -- Tendon Rip (Hyena)
-		[GetSpellInfo(53589)] = true, -- Nether Shock (Nether Ray)
-		[GetSpellInfo(53562)] = true, -- Ravage (Ravager)
-		[GetSpellInfo(1513)] = true, -- Scare Beast
-		[GetSpellInfo(64803)] = true, -- Entrapment
-		-- Mage
-		[GetSpellInfo(31661)] = true, -- Dragon's Breath
-		[GetSpellInfo(44572)] = true, -- Deep Freeze
-		[GetSpellInfo(122)] = true, -- Frost Nova
-		[GetSpellInfo(33395)] = true, -- Freeze (Frost Water Elemental)
-		[GetSpellInfo(55021)] = true, -- Silenced - Improved Counterspell
-		-- Paladin
-		[GetSpellInfo(853)] = true, -- Hammer of Justice
-		[GetSpellInfo(10326)] = true, -- Turn Evil
-		[GetSpellInfo(2812)] = true, -- Holy Wrath
-		[GetSpellInfo(31935)] = true, -- Avengers Shield
-		-- Priest
-		[GetSpellInfo(8122)] = true, -- Psychic Scream
-		[GetSpellInfo(605)] = true, -- Dominate Mind (Mind Control)
-		[GetSpellInfo(15487)] = true, -- Silence
-		[GetSpellInfo(64044)] = true, -- Psychic Horror
-		-- Rogue
-		[GetSpellInfo(408)] = true, -- Kidney Shot
-		[GetSpellInfo(2094)] = true, -- Blind
-		[GetSpellInfo(1833)] = true, -- Cheap Shot
-		[GetSpellInfo(1776)] = true, -- Gouge
-		[GetSpellInfo(1330)] = true, -- Garrote - Silence
-		-- Shaman
-		[GetSpellInfo(51514)] = true, -- Hex
-		[GetSpellInfo(8056)] = true, -- Frost Shock
-		[GetSpellInfo(64695)] = true, -- Earthgrab (Earthbind Totem with Storm, Earth and Fire talent)
-		[GetSpellInfo(3600)] = true, -- Earthbind (Earthbind Totem)
-		[GetSpellInfo(39796)] = true, -- Stoneclaw Stun (Stoneclaw Totem)
-		[GetSpellInfo(8034)] = true, -- Frostbrand Weapon
-		-- Warlock
-		[GetSpellInfo(6215)] = true, -- Fear
-		[GetSpellInfo(5484)] = true, -- Howl of Terror
-		[GetSpellInfo(30283)] = true, -- Shadowfury
-		[GetSpellInfo(22703)] = true, -- Infernal Awakening
-		[GetSpellInfo(6789)] = true, -- Death Coil
-		[GetSpellInfo(24259)] = true, -- Spell Lock
-		-- Warrior
-		[GetSpellInfo(5246)] = true, -- Initmidating Shout
-		[GetSpellInfo(46968)] = true, -- Shockwave
-		[GetSpellInfo(6552)] = true, -- Pummel
-		[GetSpellInfo(58357)] = true, -- Heroic Throw silence
-		[GetSpellInfo(7922)] = true, -- Charge
-		[GetSpellInfo(47995)] = true, -- Intercept (Stun)
-		[GetSpellInfo(12323)] = true, -- Piercing Howl
-		-- Racials
-		[GetSpellInfo(20549)] = true, -- War Stomp (Tauren)
-		[GetSpellInfo(28730)] = true, -- Arcane Torrent (Bloodelf)
-		[GetSpellInfo(47779)] = true, -- Arcane Torrent (Bloodelf)
-		[GetSpellInfo(50613)] = true, -- Arcane Torrent (Bloodelf)
-		-- Engineering
-		[GetSpellInfo(67890)] = true -- Cobalt Frag Bomb
+
+		[GetSpellInfo(118)] = true,
+		[GetSpellInfo(3355)] = true,
+		[GetSpellInfo(6770)] = true,
+		[GetSpellInfo(6358)] = true,
+		[GetSpellInfo(60210)] = true,
+		[GetSpellInfo(45524)] = true,
+		[GetSpellInfo(33786)] = true,
+		[GetSpellInfo(53308)] = true,
+		[GetSpellInfo(2637)] = true,
+		[GetSpellInfo(20066)] = true,
+		[GetSpellInfo(9484)] = true,
+		[GetSpellInfo(51722)] = true,
+		[GetSpellInfo(710)] = true,
+		[GetSpellInfo(12809)] = true,
+		[GetSpellInfo(676)] = true,
+
+		[GetSpellInfo(47476)] = true,
+		[GetSpellInfo(49203)] = true,
+		[GetSpellInfo(47481)] = true,
+		[GetSpellInfo(49560)] = true,
+
+		[GetSpellInfo(339)] = true,
+		[GetSpellInfo(8983)] = true,
+		[GetSpellInfo(16979)] = true,
+		[GetSpellInfo(45334)] = true,
+		[GetSpellInfo(22570)] = true,
+		[GetSpellInfo(49803)] = true,
+
+		[GetSpellInfo(5116)] = true,
+		[GetSpellInfo(19503)] = true,
+		[GetSpellInfo(19386)] = true,
+		[GetSpellInfo(53548)] = true,
+		[GetSpellInfo(4167)] = true,
+		[GetSpellInfo(55509)] = true,
+		[GetSpellInfo(24394)] = true,
+		[GetSpellInfo(19577)] = true,
+		[GetSpellInfo(53568)] = true,
+		[GetSpellInfo(53543)] = true,
+		[GetSpellInfo(50541)] = true,
+		[GetSpellInfo(55492)] = true,
+		[GetSpellInfo(26090)] = true,
+		[GetSpellInfo(53575)] = true,
+		[GetSpellInfo(53589)] = true,
+		[GetSpellInfo(53562)] = true,
+		[GetSpellInfo(1513)] = true,
+		[GetSpellInfo(64803)] = true,
+
+		[GetSpellInfo(31661)] = true,
+		[GetSpellInfo(44572)] = true,
+		[GetSpellInfo(122)] = true,
+		[GetSpellInfo(33395)] = true,
+		[GetSpellInfo(55021)] = true,
+
+		[GetSpellInfo(853)] = true,
+		[GetSpellInfo(10326)] = true,
+		[GetSpellInfo(2812)] = true,
+		[GetSpellInfo(31935)] = true,
+
+		[GetSpellInfo(8122)] = true,
+		[GetSpellInfo(605)] = true,
+		[GetSpellInfo(15487)] = true,
+		[GetSpellInfo(64044)] = true,
+
+		[GetSpellInfo(408)] = true,
+		[GetSpellInfo(2094)] = true,
+		[GetSpellInfo(1833)] = true,
+		[GetSpellInfo(1776)] = true,
+		[GetSpellInfo(1330)] = true,
+
+		[GetSpellInfo(51514)] = true,
+		[GetSpellInfo(8056)] = true,
+		[GetSpellInfo(64695)] = true,
+		[GetSpellInfo(3600)] = true,
+		[GetSpellInfo(39796)] = true,
+		[GetSpellInfo(8034)] = true,
+
+		[GetSpellInfo(6215)] = true,
+		[GetSpellInfo(5484)] = true,
+		[GetSpellInfo(30283)] = true,
+		[GetSpellInfo(22703)] = true,
+		[GetSpellInfo(6789)] = true,
+		[GetSpellInfo(24259)] = true,
+
+		[GetSpellInfo(5246)] = true,
+		[GetSpellInfo(46968)] = true,
+		[GetSpellInfo(6552)] = true,
+		[GetSpellInfo(58357)] = true,
+		[GetSpellInfo(7922)] = true,
+		[GetSpellInfo(47995)] = true,
+		[GetSpellInfo(12323)] = true,
+
+		[GetSpellInfo(20549)] = true,
+		[GetSpellInfo(28730)] = true,
+		[GetSpellInfo(47779)] = true,
+		[GetSpellInfo(50613)] = true,
+
+		[GetSpellInfo(67890)] = true
 	}
 	NidhausPlatesWidgets.CCSpells = CCSpells
 end
-
------------------------------------------------------
--- Debuff Library
------------------------------------------------------
 
 function DynamicHashTableSize(entries)
 	if (entries == 0) then

@@ -1,7 +1,3 @@
----------------
--- Target Widget
----------------
-
 local function UpdateSelectionWidget(self, unit)
 	if unit.isTarget then
 		self:Show()

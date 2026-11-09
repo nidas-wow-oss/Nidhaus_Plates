@@ -1,6 +1,3 @@
---------------------
--- Totem Icon Widget
---------------------
 local classWidgetPath = "Interface\\Addons\\Nidhaus_Plates\\widgets\\ClassWidget\\"
 
 local function TotemName(SpellID, suffix)
@@ -16,7 +13,7 @@ local function TotemIcon(SpellID)
 end
 
 local Totem_InfoTable = {
-	--Air Totems
+
 	[TotemName(8177)] = {TotemIcon(8177), 1, "Grounding Totem"},
 	[TotemName(10595, "I")] = {TotemIcon(10595), 1, "Nature Resistance Totem I"},
 	[TotemName(10600, "II")] = {TotemIcon(10600), 1, "Nature Resistance Totem II"},
@@ -27,7 +24,7 @@ local Totem_InfoTable = {
 	[TotemName(6495)] = {TotemIcon(6495), 1, "Sentry Totem"},
 	[TotemName(8512)] = {TotemIcon(8512), 1, "Windfury Totem"},
 	[TotemName(3738)] = {TotemIcon(3738), 1, "Wrath of Air Totem"},
-	--Earth Totems
+
 	[TotemName(2062)] = {TotemIcon(2062), 2, "Earth Elemental Totem"},
 	[TotemName(2484)] = {TotemIcon(2484), 2, "Earthbind Totem"},
 	[TotemName(5730, "I")] = {TotemIcon(5730), 2, "Stoneclaw Totem I"},
@@ -59,7 +56,7 @@ local Totem_InfoTable = {
 	[TotemName(57622, "VII")] = {TotemIcon(57622), 2, "Strength of Earth Totem VII"},
 	[TotemName(58643, "VIII")] = {TotemIcon(58643), 2, "Strength of Earth Totem VIII"},
 	[TotemName(8143)] = {TotemIcon(8143), 2},
-	--Fire Totems
+
 	[TotemName(2894)] = {TotemIcon(2894), 3, "Fire Elemental Totem"},
 	[TotemName(8227, "I")] = {TotemIcon(8227), 3, "Flametongue Totem I"},
 	[TotemName(8249, "II")] = {TotemIcon(8249), 3, "Flametongue Totem II"},
@@ -96,7 +93,7 @@ local Totem_InfoTable = {
 	[TotemName(57720, "II")] = {TotemIcon(57720), 3, "Totem of Wrath II"},
 	[TotemName(57721, "III")] = {TotemIcon(57721), 3, "Totem of Wrath III"},
 	[TotemName(57722, "IV")] = {TotemIcon(57722), 3, "Totem of Wrath IV"},
-	--Water Totems
+
 	[TotemName(8170)] = {TotemIcon(8170), 4, "Cleansing Totem"},
 	[TotemName(8184, "I")] = {TotemIcon(8184), 4, "Fire Resistance Totem I"},
 	[TotemName(10537, "II")] = {TotemIcon(10537), 4, "Fire Resistance Totem II"},
@@ -169,7 +166,7 @@ local function CreateTotemIconWidget(parent)
 
 	frame.Icon = frame:CreateTexture(nil, "ARTWORK")
 	frame.Icon:SetPoint("CENTER", frame)
-	frame.Icon:SetTexCoord(.07, 1 - .07, .07, 1 - .07) -- obj:SetTexCoord(left,right,top,bottom)
+	frame.Icon:SetTexCoord(.07, 1 - .07, .07, 1 - .07)
 	frame.Icon:SetAllPoints(frame)
 
 	frame:Hide()

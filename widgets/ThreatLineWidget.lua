@@ -1,12 +1,9 @@
 local GetRelativeThreat = NidhausPlatesUtility.GetRelativeThreat
 
-----------------------
--- FadeLater() - Registers a callback, which hides the specified frame in X seconds
-----------------------
 local FadeLater
 do
-	-- table constructions cause heap allocation; reuse tables
-	local Framelist = {} -- Key = Frame, Value = Expiration Time
+
+	local Framelist = {}
 	local Watcherframe = CreateFrame("Frame")
 	local WatcherframeActive = false
 	local select = select
@@ -21,7 +18,7 @@ do
 
 		local framecount, alpha, timeRemains = 0, 0, 0
 		nextScheduledUpdate = curTime + updateInterval
-		-- Cycle through the watchlist, hiding frames which are timed-out
+
 		for frame, expiration in pairs(Framelist) do
 			timeRemains = expiration - curTime
 			if frame:IsShown() then
@@ -38,7 +35,7 @@ do
 				Framelist[frame] = nil
 			end
 		end
-		-- If no more frames to watch, unregister the OnUpdate script
+
 		if framecount == 0 then
 			Watcherframe:SetScript("OnUpdate", nil)
 			WatcherframeActive = false
@@ -47,9 +44,9 @@ do
 
 	function FadeLater(frame, expiration)
 		frame:SetAlpha(1)
-		-- Register Frame
+
 		Framelist[frame] = expiration
-		-- Init Watchframe
+
 		if WatcherframeActive then
 			return
 		else
@@ -59,7 +56,6 @@ do
 	end
 end
 
----------------------------------------------------------------------
 local font = "FONTS\\ARIALN.ttf"
 local art = "Interface\\Addons\\Nidhaus_Plates\\widgets\\ThreatLine\\ThreatLineUnified"
 local artCoordinates = {
@@ -69,13 +65,10 @@ local artCoordinates = {
 }
 local threatcolor
 
----------------------------------------------------------------------
-
 local WidgetList = {}
 
 local testMode = false
 
--- Graphics Update
 local function UpdateThreatLine(frame, unitid)
 	local maxwitdth = frame:GetWidth() / 2
 	local leaderThreat, leaderThreatDelta, leaderThreatPct
@@ -102,14 +95,14 @@ local function UpdateThreatLine(frame, unitid)
 		end
 
 		frame.Line:ClearAllPoints()
-		-- Get Positions and Size
+
 		if leaderThreat > 100 then
-			-- While tanking
+
 			frame.Line:SetWidth(maxwitdth * ((leaderThreat - 100) / 100))
 			threatcolor = frame._HighColor
 			frame.Line:SetPoint("LEFT", frame, "CENTER")
 		else
-			-- While NOT tanking
+
 			frame.Line:SetWidth(maxwitdth * ((100 - leaderThreat) / 100))
 			threatcolor = frame._LowColor
 			frame.Line:SetPoint("RIGHT", frame, "CENTER")
@@ -120,17 +113,16 @@ local function UpdateThreatLine(frame, unitid)
 				threatcolor = frame._TankedColor
 			end
 
-			--if frame.ShowText then
-			frame.TargetText:SetText(UnitName(leaderUnitId)) -- TP 6.1
-			frame.TargetText:SetTextColor(threatcolor.r, threatcolor.g, threatcolor.b) -- TP 6.1
+			frame.TargetText:SetText(UnitName(leaderUnitId))
+			frame.TargetText:SetTextColor(threatcolor.r, threatcolor.g, threatcolor.b)
 		else
 			frame.TargetText:SetText("")
 		end
-		-- Set Colors
+
 		frame.Left:SetVertexColor(threatcolor.r, threatcolor.g, threatcolor.b)
 		frame.Line:SetVertexColor(threatcolor.r, threatcolor.g, threatcolor.b)
 		frame.Right:SetVertexColor(threatcolor.r, threatcolor.g, threatcolor.b)
-		-- Set Fading
+
 		frame:Show()
 		frame.FadeTime = GetTime() + 2
 		frame:FadeLater(frame.FadeTime)
@@ -147,9 +139,8 @@ local function UpdateWidgetTarget(frame)
 	end
 end
 
--- Context Update (mouseover, target change)
 local function UpdateWidgetContext(frame, unit)
-	-- Filter
+
 	if testMode then
 		UpdateThreatLine(frame)
 		return
@@ -159,7 +150,6 @@ local function UpdateWidgetContext(frame, unit)
 		return
 	end
 
-	-- Context Update
 	local guid = unit.guid
 	if guid then
 		WidgetList[guid] = frame
@@ -167,7 +157,6 @@ local function UpdateWidgetContext(frame, unit)
 	frame.guid = guid
 	frame.unit = unit
 
-	-- Update threat *now*, depending on context
 	if unit.isTarget then
 		UpdateThreatLine(frame, "target")
 	elseif unit.isMouseover then
@@ -184,13 +173,11 @@ local function ClearWidgetContext(frame)
 	end
 end
 
--- Watcher Frame
 local WatcherFrame = CreateFrame("Frame", nil, WorldFrame)
 local isEnabled = false
 WatcherFrame:RegisterEvent("UNIT_THREAT_LIST_UPDATE")
 WatcherFrame:RegisterEvent("UNIT_THREAT_SITUATION_UPDATE")
 
--- GUID/UnitID Lookup List
 local TargetList = {}
 local updateCap = 1
 local lastUpdate = 0
@@ -201,12 +188,11 @@ local function WatcherFrameHandler(frame, event)
 	end
 
 	local widget
-	-- Reset the GUID/UnitID Lookup List
+
 	for guid in pairs(TargetList) do
 		TargetList[guid] = nil
 	end
 
-	-- Build a list of links to Target GUIDs
 	guid = UnitGUID("target")
 	if guid then
 		TargetList[guid] = "target"
@@ -217,7 +203,6 @@ local function WatcherFrameHandler(frame, event)
 		TargetList[guid] = "focus"
 	end
 
-	-- This code enables full raid target watching
 	local raidsize = GetNumRaidMembers() - 1
 	for index = 1, raidsize do
 		local unitid = "raid" .. index .. "target"
@@ -227,7 +212,6 @@ local function WatcherFrameHandler(frame, event)
 		end
 	end
 
-	-- Reference the list of GUIDs to active widgets (with GUIDs and Hostile)
 	for guid, unitid in pairs(TargetList) do
 		widget = WidgetList[guid]
 		if widget then
@@ -248,28 +232,26 @@ local function EnableWatcherFrame(arg)
 	end
 end
 
--- Widget Creation
 local function CreateWidgetFrame(parent)
-	-- Required Widget Code
+
 	local frame = CreateFrame("Frame", nil, parent)
 	frame:Hide()
 
-	-- Custom Code
 	frame:SetWidth(100)
 	frame:SetHeight(24)
-	-- Threat Line
+
 	frame.Line = frame:CreateTexture(nil, "OVERLAY")
 	frame.Line:SetTexture(art)
 	frame.Line:SetTexCoord(unpack(artCoordinates["Line"]))
 	frame.Line:SetHeight(32)
-	-- Left
+
 	frame.Left = frame:CreateTexture(nil, "OVERLAY")
 	frame.Left:SetTexture(art)
 	frame.Left:SetTexCoord(unpack(artCoordinates["Left"]))
 	frame.Left:SetPoint("RIGHT", frame.Line, "LEFT")
 	frame.Left:SetWidth(32)
 	frame.Left:SetHeight(32)
-	-- Right
+
 	frame.Right = frame:CreateTexture(nil, "OVERLAY")
 	frame.Right:SetTexture(art)
 	frame.Right:SetTexCoord(unpack(artCoordinates["Right"]))
@@ -277,29 +259,24 @@ local function CreateWidgetFrame(parent)
 	frame.Right:SetWidth(32)
 	frame.Right:SetHeight(32)
 
-	-- Target-Of Text
 	frame.TargetText = frame:CreateFontString(nil, "OVERLAY")
 	frame.TargetText:SetFont(font, 8, "OUTLINE")
-	--frame.TargetText:SetShadowOffset(1, -1)
-	--frame.TargetText:SetShadowColor(0,0,0,1)
+
 	frame.TargetText:SetWidth(50)
 	frame.TargetText:SetHeight(20)
 	frame.TargetText:SetJustifyH("RIGHT")
 	frame.TargetText:SetPoint("RIGHT", frame.Line, "LEFT", -5, 2)
-	-- Mechanics/Setup
+
 	frame.FadeLater = FadeLater
 	frame.FadeTime = 0
 	frame:Hide()
 	frame.ThreatMax, frame.ThreatMin, frame.UseRawValues = 1, 0, false
 
-	-- Customization
 	frame._LowColor = {r = .14, g = .75, b = 1}
 	frame._TankedColor = {r = 0, g = .9, b = .1}
 	frame._HighColor = {r = 1, g = .67, b = .14}
 	frame._ShowTargetOf = true
-	-- End Custom Code
 
-	-- Required Widget Code
 	frame.UpdateContext = UpdateWidgetContext
 	frame.Update = UpdateWidgetTarget
 	frame._Hide = frame.Hide

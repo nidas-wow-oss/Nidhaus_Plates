@@ -1,20 +1,5 @@
 local L = LibStub("AceLocale-3.0"):NewLocale("NidhausPlatesTheme", "deDE", false)
 if not L then return end
--- =========================================================
--- EL NOMBRE QUE SE VE EN EL CHAT
---
--- El addon se llama Nidhaus_Plates, pero los mensajes seguian diciendo
--- "Nidhaus Plates" y "Nidhaus Plates", que es de donde viene la base.
---
--- OJO: en AceLocale la CLAVE es el texto en ingles y es lo que busca el
--- codigo. Cambiar la clave rompe la busqueda -- AceLocale tira error al
--- pedir una que no existe. Las claves quedan intactas; lo que cambia es el
--- VALOR, que es lo unico que se imprime.
--- =========================================================
-
-----------------------
---[[ commands.lua ]]--
-----------------------
 
 L["-->>|cffff0000DPS Plates Enabled|r<<--"] = "-->>|cffff0000DPS Plaketten eingeschaltet|r<<--"
 L["|cff89F559Nidhaus Plates|r: DPS switch detected, you are now in your |cff89F559"] = "|cff89F559Nidhaus Plates|r: Wechsel auf DPS festgestellt, Du bist jetzt in Deiner |cff89F559"
@@ -29,10 +14,6 @@ L["-->>Nameplate Overlapping is now |cffff0000OFF!|r<<--"] = "-->>Namensplakette
 
 L["-->>Nidhaus Plates verbose is now |cff00ff00ON!|r<<--"] = "-->>Nidhaus Plates-Meldungen sind nun |cff00ff00ON!|r<<--"
 L["-->>Nidhaus Plates verbose is now |cffff0000OFF!|r<<-- shhh!!"] = "-->>Nidhaus Plates-Meldungen sind nun |cffff0000OFF!|r<<-- psst!!"
-
-------------------------------
---[[ NidhausPlatesTheme.lua ]]--
-------------------------------
 
 L["|cff00ff00tanking|r"] = "|cff00ff00Tank|r"
 L["|cffff0000dpsing / healing|r"] = "|cffff0000DPS/Heiler|r"
@@ -63,7 +44,6 @@ L[")|r, you are now in your |cff89F559"] = ")|r, Du bist jetzt in Deiner |cff89F
 L["|r spec and are now in your "] = "|r -Skillung und nun in Deiner "
 L[" role."] = " -Rolle."
 
--- Custom Nameplates
 L["Shadow Fiend"] = "Schattengeist"
 L["Spirit Wolf"] = "Geisterwolf"
 L["Ebon Gargoyle"] = "Schwarzer Gargoyle"
@@ -97,10 +77,6 @@ L["Fanged Pit Viper"] = "Bissige Grubenotter"
 L["Canal Crab"] = "Kanalkrebs"
 L["Muddy Crawfish"] = "Schlammiger Flusskrebs"
 
----------------------
---[[ options.lua ]]--
----------------------
-
 L["None"] = "Keine"
 L["Outline"] = "Rahmenlinie"
 L["Thick Outline"] = "Dicke Rahmenlinie"
@@ -114,9 +90,7 @@ L["White List (Mine)"] = "White-List (eigene)"
 L["Black List (Mine)"] = "Black-List (eigene)"
 L["All Debuffs"] = "Alle Debuffs"
 L["All Debuffs (Mine)"] = "Alle Debuffs (eigene)"
--- L["By Prefix"] = ""
 
--- Tab Titles
 L["Nameplate Settings"] = "Einstellungen Namensplaketten"
 L["Threat System"] = "Bedrohungs-System"
 L["Widgets"] = "Widgets"
@@ -124,9 +98,6 @@ L["Totem Nameplates"] = "Totem-Namensplaketten"
 L["Custom Nameplates"] = "Benutzerdefinierte Namensplaketten"
 L["About"] = "Über"
 
-------------------------
--- Nameplate Settings --
-------------------------
 L["General Settings"] = "Allgemeine Einstellungen"
 L["Hiding"] = "Versteckt"
 L["Show Neutral"] = "Neutrale Gegner anzeigen"
@@ -149,7 +120,6 @@ L["Show Enemy Totems"] = "Feindliche Totems anzeigen"
 L["Show Enemy Pets"] = "Feindliche Begleiter anzeigen"
 L["Show Enemy Guardians"] = "Feindliche Wachen anzeigen"
 
-----
 L["Healthbar"] = "HP-Leiste"
 L["Textures"] = "Texturen"
 L["Show Border"] = "Rand anzeigen"
@@ -159,7 +129,7 @@ L["Elite Border"] = "Elite-Markierung"
 L["Mouseover"] = "Mouseover"
 L["Width"] = "Breite"
 L["Height"] = "Höhe"
-----
+
 L["Placement"] = "Platzierung"
 L["Changing these settings will alter the placement of the nameplates, however the mouseover area does not follow. |cffff0000Use with caution!|r"] = "Änderungen an dieser Einstellung wird die Platzierung der Namensplatten verschieben, die Mouseover-Informationen werden dem aber nicht folgen. |cffff0000Vorsicht im Gebrauch!|r"
 L["Offset X"] = "Offset X"
@@ -167,12 +137,12 @@ L["Offset Y"] = "Offset Y"
 L["X"] = "X"
 L["Y"] = "Y"
 L["Anchor"] = "Verankerung"
-----
+
 L["Coloring"] = "Farben"
 L["Enable Coloring"] = "Farbcodierung einschalten"
 L["Color HP by amount"] = "Lebenspunkte basierend auf Menge einfärben"
 L["Changes the HP color depending on the amount of HP the nameplate shows."] = "Verändert die Farbe der HP-Leiste basierend auf der Menge an Lebenspunkten, die die Plakette anzeigt."
-----
+
 L["Class Coloring"] = "Farbcodierung nach Klassen"
 L["Enemy Class Colors"] = "Feindliche Klassenfarben"
 L["Enable Enemy Class colors"] = "Feindliche Klassenfarben anzeigen"
@@ -184,17 +154,17 @@ L["This allows you to save friendly player class information between play sessio
 L["Name Only"] = "Nur Name"
 L["Show only names above friendly units."] = "Show only names above friendly units."
 L["Click Through"] = "Klicke hindurch"
-----
+
 L["Custom HP Color"] = "Benutzerdefinierte Farben des HP-Balkens"
 L["Enable Custom HP colors"] = "Benutzerdefinierte HP-Balkenfarben anzeigen"
 L["Friendly Color"] = "Farbe für freundliche Einheiten"
 L["Neutral Color"] = "Farbe für neutrale Einheiten"
 L["Enemy Color"] = "Farbe für gegnerische Einheiten"
-----
+
 L["Raid Mark HP Color"] = "Raidmarkierungsfarbe für HP-Balken"
 L["Enable Raid Marked HP colors"] = "Raidmarkierungsfarbe für HP-Balken einschalten"
 L["Colors"] = "Farben"
-----
+
 L["Threat Colors"] = "Bedrohungsfarben"
 L["Show Threat Glow"] = "Zeige Glühen bei Bedrohung"
 L["|cff00ff00Low threat|r"] = "|cff00ff00Niedrige Bedrohung|r"
@@ -206,7 +176,6 @@ L["Low Threat"] = "Niedrige Bedrohung"
 L["Medium Threat"] = "Mittlere Bedrohung"
 L["High Threat"] = "Hohe Bedrohung"
 
-----
 L["Castbar"] = "Zauberleiste"
 L["Enable"] = "einschalten"
 L["Non-Target Castbars"] = "Zauberleisten für Nicht-Ziele"
@@ -215,7 +184,6 @@ L["Interruptable Casts"] = "Unterbrechbare Zauber"
 L["Shielded Coloring"] = "Gesicherte Farbcodierung"
 L["Uninterruptable Casts"] = "Nicht unterbrechbare Zauber"
 
-----
 L["Alpha"] = "Alpha"
 L["Blizzard Target Fading"] = "Blizzards Ziel-Verblassen"
 L["Enable Blizzard 'On-Target' Fading"] = "Blizzards 'Am-Ziel'-Verblassen einschalten"
@@ -223,11 +191,9 @@ L["Enabling this will allow you to set the alpha adjustment for non-target namep
 L["Non-Target Alpha"] = "Nicht-Ziel-Alphawert"
 L["Alpha Settings"] = "Alpha-Einstellungen"
 
-----
 L["Scale"] = "Skalierung"
 L["Scale Settings"] = "Skalierungs-Einstellungen"
 
-----
 L["Name Text"] = "Namenstext"
 L["Enable Name Text"] = "Namenstext einschalten"
 L["Enables the showing of text on nameplates."] = "Ermöglicht die Anzeige von Text in Namensplaketten."
@@ -246,7 +212,6 @@ L["Text Height"] = "Texthöhe"
 L["Horizontal Align"] = "Horizontale Ausrichtung"
 L["Vertical Align"] = "Vertikale Ausrichtung"
 
-----
 L["Health Text"] = "Lebenspunkte-Text"
 L["Enable Health Text"] = "Lebenspunkte-Text einschalten"
 L["Display Settings"] = "Einstellungen für Darstellung"
@@ -264,15 +229,12 @@ L["This will format text to show both the maximum hp and current hp."] = "Hierdu
 L["Deficit Text"] = "Defizit-Text"
 L["This will format text to show hp as a value the target is missing."] = "Hierdurch werden die fehlenden Lebenspunkte als Wert angezeigt."
 
-----
 L["Spell Text"] = "Zauber-Text"
 L["Enable Spell Text"] = "Zauber-Text einschalten"
 
-----
 L["Level Text"] = "Stufen-Text"
 L["Enable Level Text"] = "Stufen-Text einschalten"
 
-----
 L["Elite Icon"] = "Elite-Symbol"
 L["Enable Elite Icon"] = "Elite-Symbol einschalten"
 L["Enables the showing of the elite icon on nameplates."] = "Ermöglicht die Darstellung des Elite-Symbols an Plaketten."
@@ -281,28 +243,20 @@ L["Preview"] = "Vorschau"
 L["Elite Icon Style"] = "Elite-Symbol-Style"
 L["Size"] = "Größe"
 
-----
 L["Skull Icon"] = "Totenkopf"
 L["Enable Skull Icon"] = "Zeigt den Totenkopf an"
 L["Enables the showing of the skull icon on nameplates."] = "Ermöglicht die Anzeige des Totenkopfs an Plaketten."
 
-----
 L["Spell Icon"] = "Zaubersymbol"
 L["Enable Spell Icon"] = "Zaubersymbol"
 L["Enables the showing of the spell icon on nameplates."] = "Ermöglicht die Anzeige des Zaubersymbols an Plaketten."
 
-----
 L["Raid Marks"] = "Raidmarkierungen"
 L["Enable Raid Mark Icon"] = "Raidmarkierungssymbole"
 L["Enables the showing of the raid mark icon on nameplates."] = "Ermöglicht die Anzeige von Raidmarkierungssymbolen an Plaketten."
 
--------------------
--- Threat System --
--------------------
-
 L["Enable Threat System"] = "Bedrohungs-System einschalten"
 
-----
 L["Additional Toggles"] = "Weitere Optionen"
 L["Ignore Non-Combat Threat"] = "Kampffreie Bedrohung ignorieren"
 L["Disables threat feedback from mobs you're currently not in combat with."] = "Schaltet Bedrohungs-Feedback von Gegnern aus, mit denen Du derzeit nicht im Kampf bist."
@@ -315,35 +269,31 @@ L["Disables threat feedback from elite mobs."] = "Schaltet Bedrohungs-Feedback v
 L["Show Boss Threat"] = "Boss-Bedrohung anzeigen"
 L["Disables threat feedback from boss level mobs."] = "Schaltet Bedrohungs-Feedback von Boss-Gegnern aus."
 
-----
 L["Set alpha settings for different threat reaction types."] = "Alpha-Einstellungen für verschiedene Bedrohungs-Reaktionsarten einstellen."
 L["Enable Alpha Threat"] = "Enable Alpha Threat"
 L["Enable nameplates to change alpha depending on the levels you set below."] = "Ermöglicht es, dass der Alphawert der Plaketten sich basierend auf den nachfolgenden Einstellungen verändert."
 L["|cff00ff00Tank|r"] = "|cff00ff00Tank|r"
 L["|cffff0000DPS/Healing|r"] = "|cffff0000DPS/Heiler|r"
-----
+
 L["Marked Targets"] = "Markierte Ziele"
 L["Ignore Marked Targets"] = "Markierte Ziele ignorieren"
 L["This will allow you to disabled threat alpha changes on marked targets."] = "Schaltet Alpha-Wert-Veränderungen durch Bedrohung auf markierten Zielen aus."
 L["Ignored Alpha"] = "Alpha ignoriert"
 
-----
 L["Set scale settings for different threat reaction types."] = "Skalierungseinstellungen für verschiedene Bedrohungsreaktionen bearbeiten."
 L["Enable Scale Threat"] = "Skalierung bei Bedrohung einschalten"
 L["Enable nameplates to change scale depending on the levels you set below."] = "Ermöglicht es, dass Plaketten basierend auf den nachstehenden Einstellungen die Skalierung ändern."
 L["This will allow you to disabled threat scale changes on marked targets."] = "Schaltet Skalierungs-Veränderungen durch Bedrohung auf markierten Zielen aus."
 L["Ignored Scaling"] = "Skalierung ignoriert"
-----
+
 L["Additional Adjustments"] = "Zusätzliche Anpassungen"
 L["Enable Adjustments"] = "Anpassungen einschalten"
 L["This will allow you to add additional scaling changes to specific mob types."] = "Ermöglicht weitere Skalierungs-Veränderungen für bestimmte Gegnerarten."
 
-----
 L["Toggles"] = "Umschalter"
 L["Color HP by Threat"] = "HP-Balken nach Bedrohung einfärben"
 L["This allows HP color to be the same as the threat colors you set below."] = "Ermöglicht die Einfärbung des HP-Balkens gemäß den nachstehend festgelegten Einstellungen für die Bedrohung."
 
-----
 L["Dual Spec Roles"] = "Rollen der dualen Talentverteilung"
 L["Set the role your primary and secondary spec represent."] = "Stellt die Rollen der ersten und zweiten Talentverteilung ein."
 L["Primary Spec"] = "Erste Talentverteilung"
@@ -353,28 +303,21 @@ L["Secondary Spec"] = "Zweite Talentverteilung"
 L["Sets your secondary spec to tanking."] = "Legt die zweite Talentverteilung auf Tank fest."
 L["Sets your secondary spec to DPS."] = "Legt die zweite Talentverteilung auf Schadensausteiler fest."
 
-----
 L["Set threat textures and their coloring options here."] = "Bedrohungs-Texturen und ihre Farboptionen können hier eingestellt werden."
 L["These options are for the textures shown on nameplates at various threat levels."] = "Diese Optionen beziehen sich auf die Texturen, die bei den verschiedenen Bedrohungsstufen an Plaketten angezeigt werden."
-----
+
 L["Art Options"] = "Design-Optionen"
 L["Style"] = "Style"
 L["This will allow you to disabled threat art on marked targets."] = "Schaltet Design-Optionen bei markierten Zielen aus."
-
--------------
--- Widgets --
--------------
 
 L["Class Icons"] = "Klassen-Symbole"
 L["This widget will display class icons on nameplate with the settings you set below."] = "Zeigt die Klassensymbole an Plaketten an basierend auf den nachfolgenden Einstellungen."
 L["Enable Friendly Icons"] = "Symbole für freundliche Einheiten anzeigen"
 L["Enable the showing of friendly player class icons."] = "Ermöglicht die Anzeige von Klassensymbolen für freundliche Spieler."
 
-----
 L["Combo Points"] = "Combo-Punkte"
 L["This widget will display combo points on your target nameplate."] = "Ermöglicht die Anzeige von Combo-Punkten an der Plakette des Ziels."
 
-----
 L["Debuffs"] = "Debuffs"
 L["This widget will display debuffs that match your filtering on your target nameplate and others you recently moused over."] = "Hiermit werden Debuffs gemäß des eingestellten Filters auf der Plakette des Ziels sowie auf Zielen, über die kurz zuvor mit der Maus gegangen wurde, angezeigt."
 L["Sizing"] = "Größe"
@@ -382,47 +325,35 @@ L["Filtering"] = "Filter"
 L["Mode"] = "Modus"
 L["Filtered Debuffs"] = "Gefilterte Debuffs"
 
-----
 L["Social Widget"] = "Soziale Widgets"
 L["Enables the showing if indicator icons for friends, guildmates, and BNET Friends"] = "Ermöglicht eine Anzeige von Icons für Freunde, Gildenmitgliedern und Battlenet-Freunden"
 
-----
 L["Threat Line"] = "Bedrohungslinie"
 L["This widget will display a small bar that will display your current threat relative to other players on your target nameplate or recently mousedover namplates."] = "Ermöglicht die Anzeige einer schmalen Leiste, die in Relation zu anderen Spielern Deine aktuelle Bedrohung an der Namensplakette Deines Ziels oder Gegnern, über die Du kürzlich mit der Maus gefahren bist, anzeigt."
 
-----
 L["Tanked Targets"] = "Getankte Ziele"
 L["This widget will display a small shield or dagger that will indicate if the nameplate is currently being tanked. |cffff00ffRequires tanking role.|r"] = "Ermöglicht die Anzeige eines kleinen Schilds oder Dolches an der Namensplakette zur Anzeige, ob das Ziel derzeit getankt wird. |cffff00ffBenötigt Tank-Rolle.|r"
 
-----
 L["Target Highlight"] = "Ziel-Highlight"
 L["Enables the showing of a texture on your target nameplate"] = "Ermöglicht die Anzeige einer Textur an der Plakette des Ziels"
-
-----------------------
--- Totem Nameplates --
-----------------------
 
 L["|cffffffffTotem Settings|r"] = "|cffffffffTotem-Einstellungen|r"
 L["Toggling"] = "Umschalten"
 L["Hide Healthbars"] = "HP-Balken verstecken"
-----
+
 L["Icon"] = "Icon"
 L["Icon Size"] = "Icon-Größe"
 L["Totem Alpha"] = "Totem-Alpha"
 L["Totem Scale"] = "Totem-Skalierung"
-----
+
 L["Show Nameplate"] = "Plakette zeigen"
-----
+
 L["Health Coloring"] = "Gesundheits-Farbcodierung"
 L["Enable Custom Colors"] = "Eigene Farbwahl aktivieren"
 
------------------------
--- Custom Nameplates --
------------------------
-
 L["|cffffffffGeneral Settings|r"] = "|cffffffffAllgemeine Einstellungen|r"
 L["Disabling this will turn off any all icons without harming custom settings per nameplate."] = "Das Abschalten dieser Funktion schaltet alle Icons aus, ohne die benutzerdefinierten Einstellungen für Plaketten zu verändern."
-----
+
 L["Set Name"] = "Namen festlegen"
 L["Use Target's Name"] = "Benutze Name des Ziels"
 L["No target found."] = "Kein Ziel gefunden."
@@ -433,45 +364,33 @@ L["Paste"] = "Einfügen"
 L["Pasted!"] = "-Eingefügt!"
 L["Nothing to paste!"] = "Nichts zum einfügen!"
 L["Restore Defaults"] = "Standardeinstellungen wiederherstellen"
-----
+
 L["Use Custom Settings"] = "Benutzerdefinierte Einstellungen benutzen"
 L["Custom Settings"] = "Benutzerdefinierte Einstellungen"
-----
+
 L["Disable Custom Alpha"] = "Benutzerdefinierte Alphaeinstellungen ausschalten"
 L["Disables the custom alpha setting for this nameplate and instead uses your normal alpha settings."] = "Schaltet die aktuellen benutzerdefinierten Alphaeinstellungen für diese Plakette ab und benutzt stattdessen die normalen Alphaeinstellungen."
 L["Custom Alpha"] = "Benutzerdefinierte Alphaeinstellungen"
-----
+
 L["Disable Custom Scale"] = "Benutzerdefinierte Skalierungseinstellungen ausschalten"
 L["Disables the custom scale setting for this nameplate and instead uses your normal scale settings."] = "Schaltet die benutzerdefinierten Skalierungseinstellungen für diese Plakette ab und benutzt stattdessen die normalen Skalierungseinstellungen."
 L["Custom Scale"] = "Benutzerdefinierte Skalierungseinstellungen"
-----
+
 L["Allow Marked HP Coloring"] = "Lebenspunktebalken-Einfärbung auf markierten Zielen erlauben"
 L["Allow raid marked hp color settings instead of a custom hp setting if the nameplate has a raid mark."] = "Erlaubt die HP-Balken-Einfärbung gemäß Raidmarkierung statt eigenen Einstellungen für HP-Balken, wenn das Ziel eine Markierung hat."
 
-----
 L["Enable the showing of the custom nameplate icon for this nameplate."] = "Ermöglicht die Anzeige eines benutzerdefinierten Icons für diese Plakette."
 L["Type direct icon texture path using '\\' to separate directory folders, or use a spellid."] = "Gib den direkten Dateipfad zur Textur ein. Benutze '\\' zur Separierung von Ordnerstrukturen oder eine Zauber-ID."
 L["Set Icon"] = "Icon festlegen"
-
------------
--- About --
------------
 
 L["\n\nThank you for supporting my work!\n"] = "\n\nDanke, dass Du meine Arbeit unterstützt!\n"
 L["Click to Donate!"] = "Hier klicken, um eine Spende abzugeben!"
 L["Clear and easy to use nameplate theme for use with NidhausPlates.\n\nFeel free to email me at |cff00ff00bkader@mail.com|r"] = "Sauberes und leicht zu verwendendes Plakettendesign zur Benutzung mit NidhausPlates.\n\nDu kannst mich gerne per E-Mail erreichen unter |cff00ff00bkader@mail.com|r"
 
---------------------------------
--- Default Game Options Frame --
---------------------------------
-
 L["You can access the "] = "Die Einstellungen können für "
 L[" options by typing: /tptp"] = " über die Eingabe von /tptp erreicht werden"
 L["Open Config"] = "Konfiguration öffnen"
 
-------------------------
--- Additional Stances --
-------------------------
 L["Presences"] = "Präsenzen"
 L["Shapeshifts"] = "Gestaltwandlungen"
 L["Auras"] = "Auren"

@@ -1,12 +1,3 @@
---[[
-		UnitInRange: 40
-		2: ~9
-		3: 7.5-8
-		4: 28
-		Item6450:15
-		Dismiss Pet: 10 yds
-		Melee Range: 4
---]]
 local RangesCache = {}
 local Ranges = {}
 local RangeWatcher = CreateFrame("Frame")
@@ -40,7 +31,6 @@ local function CheckRanges(self)
 	local group, size, inRange
 	local estRange = nil
 
-	-- Check Group Type
 	if UnitInRaid("player") then
 		group = "raid"
 		size = GetNumRaidMembers() - 1
@@ -51,7 +41,6 @@ local function CheckRanges(self)
 		group = nil
 	end
 
-	-- Cycle through Group
 	if group then
 		for index = 1, size do
 			local unitid = group .. index
@@ -59,7 +48,6 @@ local function CheckRanges(self)
 		end
 	end
 
-	-- Check Cache
 	for name, range in pairs(Ranges) do
 		if range ~= RangesCache[name] then
 			RangesCache[name] = range
@@ -86,9 +74,6 @@ RangeWatcher:RegisterEvent("RAID_ROSTER_UPDATE")
 RangeWatcher:RegisterEvent("PARTY_MEMBERS_CHANGED")
 RangeWatcher:RegisterEvent("PARTY_CONVERTED_TO_RAID")
 
----------------------------------------------------------------------------
-
--- Widget
 local art = "Interface\\Addons\\Nidhaus_Plates\\widgets\\RangeWidget\\RangeWidget"
 
 local function UpdateRangeWidget(self, unit, range)
@@ -98,7 +83,7 @@ local function UpdateRangeWidget(self, unit, range)
 		unitrange = Ranges[unit.name] or 100
 		if unitrange <= saferange then
 			self.Texture:Show()
-			self.Texture:SetVertexColor(1, .25, 0, .50) -- Red
+			self.Texture:SetVertexColor(1, .25, 0, .50)
 		else
 			self.Texture:Hide()
 		end
@@ -116,13 +101,13 @@ local function CreateRangeWidget(parent)
 	local frame = CreateFrame("Frame", nil, parent)
 	frame:SetWidth(16)
 	frame:SetHeight(16)
-	-- Image
+
 	frame.Texture = frame:CreateTexture(nil, "OVERLAY")
 	frame.Texture:SetTexture(art)
 	frame.Texture:SetPoint("CENTER")
 	frame.Texture:SetWidth(128)
 	frame.Texture:SetHeight(128)
-	-- Vars and Mech
+
 	frame.Range = 15
 	frame:Hide()
 	frame.Update = UpdateRangeWidget

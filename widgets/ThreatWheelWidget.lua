@@ -1,7 +1,5 @@
 local threatfont = "FONTS\\ARIALN.ttf"
----------------
--- General Functions
----------------
+
 local function SetFade(frame)
 	if GetTime() > frame.FadeTime then
 		frame:Hide()
@@ -18,9 +16,6 @@ local function IsRaidTank(unitid)
 	return RaidTankList[UnitName(unitid)]
 end
 
----------------
--- Threat Functions
----------------
 local function GetThreatSegment(threat)
 	if not threat then
 		return nil
@@ -42,9 +37,6 @@ end
 
 local GetRelativeThreat = NidhausPlatesUtility.GetRelativeThreat
 
----------------
--- Roster Monitor
----------------
 do
 	local function UpdateRoster()
 		if UnitInRaid("player") then
@@ -72,9 +64,6 @@ do
 	RosterMonitor:SetScript("OnEvent", UpdateRoster)
 end
 
----------------
--- Threat Circle Widget
----------------
 do
 	local threatSpinnerWidgetArt = "Interface\\Addons\\Nidhaus_Plates\\widgets\\ThreatSpinner\\SpinnerArt"
 
@@ -104,7 +93,7 @@ do
 			local threat, topholder = GetRelativeThreat(unitid)
 			local threatsegment = GetThreatSegment(threat)
 			if threatsegment then
-				-- Set Indicator
+
 				frame:Show()
 				frame.ThreatIcon:SetTexCoord(unpack(THREATWIDGET_SEGMENT_COORD[threatsegment]))
 				frame.ThreatText:SetText(floor(threat))
@@ -113,7 +102,7 @@ do
 				else
 					frame.TargetText:SetText("")
 				end
-				-- Set Fading
+
 				frame:Show()
 				frame.FadeTime = GetTime() + 3
 				frame:HideIn(frame.FadeTime)
@@ -129,17 +118,17 @@ do
 		local frame = CreateFrame("Frame", nil, parent)
 		frame:SetWidth(64)
 		frame:SetHeight(64)
-		-- Icon
+
 		frame.ThreatIcon = frame:CreateTexture(nil, "OVERLAY")
 		frame.ThreatIcon:SetAllPoints(frame)
 		frame.ThreatIcon:SetTexture(threatSpinnerWidgetArt)
-		-- Threat Text
+
 		frame.ThreatText = frame:CreateFontString(nil, "OVERLAY")
 		frame.ThreatText:SetFont(threatfont, 8, "NONE")
 		frame.ThreatText:SetPoint("CENTER", frame.ThreatIcon, "CENTER", -1, 0)
 		frame.ThreatText:SetWidth(20)
 		frame.ThreatText:SetHeight(20)
-		-- Target Text
+
 		frame.TargetText = frame:CreateFontString(nil, "OVERLAY")
 		frame.TargetText:SetFont(threatfont, 8, "NONE")
 		frame.TargetText:SetShadowOffset(1, -1)
@@ -147,7 +136,7 @@ do
 		frame.TargetText:SetPoint("BOTTOM", frame, "TOP", 1, -25)
 		frame.TargetText:SetWidth(50)
 		frame.TargetText:SetHeight(20)
-		-- Setup
+
 		frame.HideIn = NidhausPlatesWidgets.HideIn
 		frame.FadeTime = 0
 		frame:Hide()

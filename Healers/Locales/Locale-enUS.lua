@@ -1,4 +1,3 @@
-
 BattleGroundHealers_Localization = {
 	["Healer Detection Methods"] = true,
 	["Track Healers via Combat Log"] = true,

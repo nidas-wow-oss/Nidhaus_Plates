@@ -1,6 +1,3 @@
-------------------------------
--- Elite Art Overlay Widget --
-------------------------------
 local path = "Interface\\AddOns\\Nidhaus_Plates\\Theme\\Media\\Artwork\\"
 local DB
 

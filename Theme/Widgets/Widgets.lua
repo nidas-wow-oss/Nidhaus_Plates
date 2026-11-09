@@ -1,9 +1,5 @@
--- Nombre real de la carpeta, tal y como lo pasa el cargador de addons.
--- Estaba escrito a mano como "NidhausPlates" mas abajo; al renombrar el addon
--- esa comparacion dejaba de cumplirse y este archivo no registraba nada.
 local ADDON_NAME = ...
 
--- Set Global Table
 NidhausPlatesThemeWidgets = NidhausPlatesThemeWidgets or {}
 local db
 local _
@@ -19,13 +15,10 @@ local PlayerGUID = DebuffHelpers.PlayerGUID
 
 local DebuffFilterModes = {}
 
--- All
 DebuffFilterModes.all = function(debuff, list) return true end
 
--- All mine
 DebuffFilterModes.allMine = function(debuff, list) return (debuff.caster == PlayerGUID()) end
 
--- Whitelist
 DebuffFilterModes.whitelist = function(debuff, list)
 	for _, name in ipairs(list) do
 		if name == debuff.name or tonumber(name) == debuff.spellid then
@@ -34,13 +27,11 @@ DebuffFilterModes.whitelist = function(debuff, list)
 	end
 end
 
--- whitelist mine
 DebuffFilterModes.whitelistMine = function(debuff, list)
 	local found = DebuffFilterModes.whitelist(debuff, list)
 	return (found and debuff.caster == PlayerGUID())
 end
 
--- blacklist
 DebuffFilterModes.blacklist = function(debuff, list)
 	for _, name in ipairs(list) do
 		if name == debuff.name or tonumber(name) == debuff.spellid then
@@ -50,16 +41,14 @@ DebuffFilterModes.blacklist = function(debuff, list)
 	return true
 end
 
-	-- blacklist mine
 DebuffFilterModes.blacklistMine = function(debuff, list)
 	local found = DebuffFilterModes.blacklist(debuff, list)
 	return (found == true and debuff.caster == PlayerGUID())
 end
 
--- prefix
 local ParseDebuffString = nil
 DebuffFilterModes.prefix = function(debuff, list)
-	-- we generate the func only if used
+
 	if ParseDebuffString == nil then
 		ParseDebuffString = function(str)
 			local func = nil
@@ -82,7 +71,7 @@ DebuffFilterModes.prefix = function(debuff, list)
 	end
 
 	for _, deb in ipairs(list) do
-		-- no filter?
+
 		if deb == debuff.name or tonumber(deb) == debuff.spellid then
 			return true
 		end
@@ -94,23 +83,20 @@ DebuffFilterModes.prefix = function(debuff, list)
 	end
 end
 
---DebuffFilterFunction
 local function DebuffFilter(debuff)
-	-- Debuffs on Friendly Units
-	if debuff.target == 2 then -- AURA_TARGET_FRIENDLY
+
+	if debuff.target == 2 then
 		return false
 	end
 
 	db = NidhausPlatesTheme.db.profile
 	return DebuffFilterModes[db.debuffWidget.mode](debuff, db.debuffWidget.filter)
 end
-----------------
--- INITIALIZE --
-----------------
+
 local function OnInitialize(plate)
 	db = NidhausPlatesTheme.db.profile
 	local w = plate.widgets
-	-- Debuff Widget
+
 	if db.debuffWidget.ON then
 		if not w.WidgetDebuff then
 			local widget = NidhausPlatesWidgets.CreateAuraWidget(plate)
@@ -125,7 +111,6 @@ local function OnInitialize(plate)
 		w.WidgetDebuff = nil
 	end
 
-	-- Arena / Party ID
 	if db.arenaPartyIDWidget and db.arenaPartyIDWidget.ON then
 		if not w.ArenaPartyID then
 			local widget = NidhausPlatesThemeWidgets.CreateArenaPartyIDWidget(plate)
@@ -138,7 +123,6 @@ local function OnInitialize(plate)
 		w.ArenaPartyID = nil
 	end
 
-	-- Social Widget
 	if db.socialWidget.ON then
 		if not w.SocialArt then
 			local widget = NidhausPlatesThemeWidgets.CreateSocialWidget(plate)
@@ -153,7 +137,6 @@ local function OnInitialize(plate)
 		w.SocialArt = nil
 	end
 
-	-- Totem Widget
 	if db.totemWidget.ON then
 		if not w.TotemIconWidget then
 			local widget = NidhausPlatesThemeWidgets.CreateTotemIconWidget(plate)
@@ -168,7 +151,6 @@ local function OnInitialize(plate)
 		w.TotemIconWidget = nil
 	end
 
-	-- Unique Widget
 	if db.uniqueWidget.ON then
 		if not w.UniqueIconWidget then
 			local widget = NidhausPlatesThemeWidgets.CreateUniqueIconWidget(plate)
@@ -183,7 +165,6 @@ local function OnInitialize(plate)
 		w.UniqueIconWidget = nil
 	end
 
-	-- Target Widget
 	if db.targetWidget.ON then
 		if not w.TargetArt then
 			local widget = NidhausPlatesThemeWidgets.CreateTargetFrameArt(plate)
@@ -195,7 +176,6 @@ local function OnInitialize(plate)
 		w.TargetArt = nil
 	end
 
-	-- Class Icon Widget
 	if db.classWidget.ON then
 		if not w.ClassIconWidget then
 			local widget = NidhausPlatesThemeWidgets.CreateClassIconWidget(plate)
@@ -209,7 +189,6 @@ local function OnInitialize(plate)
 		w.ClassIconWidget = nil
 	end
 
-	-- Elite Overlay Widget
 	if db.settings.elitehealthborder.show then
 		if not w.EliteOverlay then
 			local widget = NidhausPlatesThemeWidgets.CreateEliteFrameArtOverlay(plate)
@@ -221,7 +200,6 @@ local function OnInitialize(plate)
 		w.EliteOverlay = nil
 	end
 
-	-- Threat Graphic Widget
 	if db.threat.art.ON and db.threat.ON then
 		if not w.ThreatArtWidget then
 			local widget = NidhausPlatesThemeWidgets.CreateThreatArtWidget(plate)
@@ -233,7 +211,6 @@ local function OnInitialize(plate)
 		w.ThreatArtWidget = nil
 	end
 
-	-- Threat Line Widget
 	if db.threatWidget.ON then
 		if not w.ThreatLineWidget then
 			local widget = NidhausPlatesWidgets.CreateThreatLineWidget(plate)
@@ -246,7 +223,6 @@ local function OnInitialize(plate)
 		w.ThreatLineWidget = nil
 	end
 
-	-- Combo Point Widget
 	if db.comboWidget.ON then
 		if not w.ComboPoints then
 			local widget = NidhausPlatesThemeWidgets.CreateComboPointWidget(plate)
@@ -258,13 +234,11 @@ local function OnInitialize(plate)
 		w.ComboPoints = nil
 	end
 end
---------------------
--- CONTEXT UPDATE --
---------------------
+
 local function OnContextUpdate(plate, unit)
 	db = NidhausPlatesTheme.db.profile
 	local w = plate.widgets
-	-- Debuff Widget
+
 	if db.debuffWidget.ON then
 		if not w.WidgetDebuff then
 			OnInitialize(plate)
@@ -274,7 +248,6 @@ local function OnContextUpdate(plate, unit)
 		w.WidgetDebuff:UpdateContext(unit)
 	end
 
-	-- Combo Point Widget
 	if db.comboWidget.ON then
 		if not w.ComboPoints then
 			OnInitialize(plate)
@@ -283,7 +256,6 @@ local function OnContextUpdate(plate, unit)
 		w.ComboPoints:UpdateContext(unit)
 	end
 
-	--Threat Line Widget
 	if db.threatWidget.ON and unit.class == "UNKNOWN" then
 		if not w.ThreatLineWidget then
 			OnInitialize(plate)
@@ -292,13 +264,11 @@ local function OnContextUpdate(plate, unit)
 		w.ThreatLineWidget:UpdateContext(unit)
 	end
 end
--------------------
--- NORMAL UPDATE --
--------------------
+
 local function OnUpdate(plate, unit)
 	db = NidhausPlatesTheme.db.profile
 	local w = plate.widgets
-	-- Target Art
+
 	if db.targetWidget.ON then
 		if not w.TargetArt then
 			OnInitialize(plate)
@@ -306,7 +276,6 @@ local function OnUpdate(plate, unit)
 		w.TargetArt:Update(unit)
 	end
 
-	-- Elite Overlay
 	if db.settings.elitehealthborder.show then
 		if not w.EliteOverlay then
 			OnInitialize(plate)
@@ -314,7 +283,6 @@ local function OnUpdate(plate, unit)
 		w.EliteOverlay:Update(unit)
 	end
 
-	-- Arena / Party ID
 	if db.arenaPartyIDWidget and db.arenaPartyIDWidget.ON then
 		if not w.ArenaPartyID then
 			OnInitialize(plate)
@@ -322,7 +290,6 @@ local function OnUpdate(plate, unit)
 		w.ArenaPartyID:Update(unit)
 	end
 
-	-- Social Widget Textures
 	if db.socialWidget.ON then
 		if not w.SocialArt then
 			OnInitialize(plate)
@@ -332,7 +299,7 @@ local function OnUpdate(plate, unit)
 		w.SocialArt:SetPoint("CENTER", plate, db.socialWidget.anchor, db.socialWidget.x, db.socialWidget.y)
 		w.SocialArt:Update(unit)
 	end
-	-- Class Icons
+
 	if db.classWidget.ON then
 		if not w.ClassIconWidget then
 			OnInitialize(plate)
@@ -342,17 +309,17 @@ local function OnUpdate(plate, unit)
 		w.ClassIconWidget:SetPoint((db.classWidget.anchor), plate, (db.classWidget.x), (db.classWidget.y))
 		w.ClassIconWidget:Update(unit)
 	end
-	-- Totem Icons
+
 	if db.totemWidget.ON then
 		if not w.TotemIconWidget then
 			OnInitialize(plate)
 		end
 		w.TotemIconWidget:SetHeight(db.totemWidget.scale)
 		w.TotemIconWidget:SetWidth(db.totemWidget.scale)
-		-- La posicion la pone Update: depende de si la barra esta oculta.
+
 		w.TotemIconWidget:Update(unit)
 	end
-	-- Unique Icons
+
 	if db.uniqueWidget.ON then
 		if not w.UniqueIconWidget then
 			OnInitialize(plate)
@@ -362,7 +329,7 @@ local function OnUpdate(plate, unit)
 		w.UniqueIconWidget:SetPoint(db.uniqueWidget.anchor, plate, (db.uniqueWidget.x), (db.uniqueWidget.y))
 		w.UniqueIconWidget:Update(unit)
 	end
-	-- Threat Widget
+
 	if db.threat.ON and db.threat.art.ON then
 		if not w.ThreatArtWidget then
 			OnInitialize(plate)

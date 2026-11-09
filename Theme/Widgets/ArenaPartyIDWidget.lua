@@ -1,29 +1,10 @@
--- =========================================================
--- ArenaPartyIDWidget.lua
---
--- Pinta sobre la placa el numero de la unidad:
---   * rivales de arena  -> 1 a 5   (arena1 .. arena5)
---   * miembros de grupo -> 1 a 4   (party1 .. party4)
---
--- Portado de RefinedBlizzPlates (de Khal), que resuelve esto de la forma
--- correcta para 3.3.5: no hay manera de preguntarle a una placa a que unidad
--- pertenece, asi que se construye un mapa NOMBRE -> NUMERO recorriendo las
--- unidades conocidas, y despues cada placa busca su propio nombre ahi.
---
--- El mapa se rehace solo cuando cambia el grupo o aparecen rivales, no en
--- cada refresco de placa: son como mucho nueve unidades, pero el update de
--- placas corre muchas veces por segundo y no hay por que repetirlo.
--- =========================================================
-
-local ArenaID = {}   -- nombre -> "1".."5"
-local PartyID = {}   -- nombre -> "1".."4"
+local ArenaID = {}
+local PartyID = {}
 
 local wipe, tostring = wipe, tostring
 local UnitName, UnitExists = UnitName, UnitExists
 local GetNumPartyMembers = GetNumPartyMembers
 
--- Los nombres de otros reinos llegan como "Nombre-Reino"; las placas solo
--- muestran la parte de delante, asi que se recorta para que casen.
 local function ShortName(name)
 	if not name then return nil end
 	return name:match("([^%-]+).*") or name
@@ -39,8 +20,7 @@ end
 
 local function UpdateArenaID()
 	wipe(ArenaID)
-	-- GetNumArenaOpponents no existe en todos los clientes 3.3.5; se recorre
-	-- arena1..5 a mano, que funciona igual y no depende de esa API.
+
 	for i = 1, 5 do
 		local unidad = "arena" .. i
 		if UnitExists(unidad) then
@@ -50,7 +30,6 @@ local function UpdateArenaID()
 	end
 end
 
--- Expuesto para poder probarlo y para que el panel refresque al vuelo.
 NidhausPlatesThemeWidgets = NidhausPlatesThemeWidgets or {}
 NidhausPlatesThemeWidgets.ArenaPartyID_Refresh = function()
 	UpdatePartyID()
@@ -92,8 +71,7 @@ end
 
 local function AplicarFuente(frame, db)
 	local fuente = "Fonts\\FRIZQT__.TTF"
-	-- Si LibSharedMedia esta cargada se respeta la fuente elegida; si no,
-	-- se usa la de Blizzard en vez de quedarse sin texto.
+
 	local LSM = LibStub and LibStub("LibSharedMedia-3.0", true)
 	if LSM and db.font then
 		fuente = LSM:Fetch("font", db.font) or fuente

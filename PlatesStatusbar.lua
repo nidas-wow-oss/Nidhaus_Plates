@@ -20,7 +20,7 @@ local function barPrototype_Update(self, sizeChanged, width, height)
 	height = height or self:GetHeight()
 
 	if self.ORIENTATION == "HORIZONTAL" then
-		xprogress = width * progress -- progress horizontally
+		xprogress = width * progress
 		if self.FILLSTYLE == "CENTER" then
 			align1, align2 = "TOP", "BOTTOM"
 		elseif self.REVERSE or self.FILLSTYLE == "REVERSE" then
@@ -29,7 +29,7 @@ local function barPrototype_Update(self, sizeChanged, width, height)
 			align1, align2 = "TOPLEFT", "BOTTOMLEFT"
 		end
 	elseif self.ORIENTATION == "VERTICAL" then
-		yprogress = height * progress -- progress vertically
+		yprogress = height * progress
 		if self.FILLSTYLE == "CENTER" then
 			align1, align2 = "LEFT", "RIGHT"
 		elseif self.REVERSE or self.FILLSTYLE == "REVERSE" then
@@ -258,13 +258,12 @@ local barPrototype = setmetatable({
 local barPrototype_mt = {__index = barPrototype}
 
 CreateNidhausPlatesStatusbar = function(parent, name)
-	-- create the bar and its elements.
+
 	local bar = setmetatable(CreateFrame("Frame", name, parent), barPrototype_mt)
 	bar.fg = bar.fg or bar:CreateTexture(name and "$parent.Texture", "ARTWORK")
 	bar.bg = bar.bg or bar:CreateTexture(name and "$parent.Background", "BACKGROUND")
 	bar.bg:Hide()
 
-	-- do some stuff then return it.
 	bar:HookScript("OnSizeChanged", barPrototype_OnSizeChanged)
 	bar:SetRotatesTexture(false)
 	return bar

@@ -1,7 +1,3 @@
--- Nidhaus Plates - Dedicated to the loves-of-my-life..
---------------------------------------------------------------------------------------------------------------
--- I. Variables and Functions
---------------------------------------------------------------------------------------------------------------
 local addonName, NidhausPlates = ...
 _G.NidhausPlates = NidhausPlates
 
@@ -13,7 +9,6 @@ local activetheme = {}
 
 local weaktable = {__mode = "k"}
 
--- TODO: keep an eye on weaktable and revert if they cause issues
 local massQueue = setmetatable({}, weaktable)
 local functionQueue = setmetatable({}, weaktable)
 local targetQueue = setmetatable({}, weaktable)
@@ -21,25 +16,6 @@ local targetQueue = setmetatable({}, weaktable)
 local ForEachPlate
 local EMPTY_TEXTURE = "Interface\\Addons\\Nidhaus_Plates\\Media\\Empty"
 
--- ---------------------------------------------------------
--- BORDE LIGHT  (Nidhaus)
---
--- El mismo marco fino que lleva el minimapa: Border_Light, de KkthnxUI.
--- Rodea la barra de vida, la de casteo y el icono del hechizo.
---
--- Es un Frame con backdrop y no una textura mas del tema a proposito. Las
--- del tema son un .tga que se estira al ancho de la placa, asi que el filo
--- se engorda o se afina segun el tamaño; un backdrop con edgeSize fijo
--- mantiene el mismo grosor mida lo que mida la barra.
---
--- Los tres van ANCLADOS a su objeto, no posicionados a mano: siguen solos
--- cualquier cambio de ancho, alto o posicion que haga el tema, asi que en
--- cada actualizacion solo hay que mostrarlos u ocultarlos.
---
--- Y REEMPLAZA a los bordes del tema, no se suma. Rodean el mismo perimetro
--- y quedarian uno encima del otro; la misma leccion que dio el borde del
--- minimapa cuando convivia con el cuadrado.
--- ---------------------------------------------------------
 local ART = "Interface\\AddOns\\Nidhaus_Plates\\Theme\\Media\\Artwork\\"
 
 local LIGHT_BACKDROP = {
@@ -48,21 +24,15 @@ local LIGHT_BACKDROP = {
 	insets = { left = 2, right = 2, top = 2, bottom = 2 },
 }
 
--- Border_Rounded se genera a partir de Border_Light: mismos cuatro lados
--- rectos, byte por byte, y solo las cuatro esquinas redibujadas como un
--- arco. Por eso empalman exacto y el trazo tiene el mismo grosor.
 local ROUND_BACKDROP = {
 	edgeFile = ART .. "Border_Rounded",
 	edgeSize = 8,
 	insets = { left = 2, right = 2, top = 2, bottom = 2 },
 }
 
--- Tres banderas y no una: cada barra elige su borde en su propia seccion
--- del panel. El icono del hechizo viaja con la barra de casteo, que es de
--- donde cuelga y con la que aparece y desaparece.
-NidhausPlates_LightBorder = false   -- barra de vida
-NidhausPlates_LightCast   = false   -- barra de casteo + icono del hechizo
-NidhausPlates_RoundTarget = false   -- resalte del objetivo
+NidhausPlates_LightBorder = false
+NidhausPlates_LightCast   = false
+NidhausPlates_RoundTarget = false
 
 function NidhausPlates_RefreshLightBorder()
 	local t = _G.NidhausPlatesTheme
@@ -72,8 +42,6 @@ function NidhausPlates_RefreshLightBorder()
 	NidhausPlates_RoundTarget = (prof and prof.roundTarget) and true or false
 end
 
--- Un marco de borde pegado a su objeto. El inset negativo lo saca un par de
--- pixeles hacia afuera para que el filo no se coma la barra.
 local function CreateLightBorder(parent, target, pad, backdrop)
 	local f = CreateFrame("Frame", nil, parent)
 	f:SetFrameLevel(parent:GetFrameLevel() + 1)
@@ -87,7 +55,6 @@ end
 local select, pairs, tostring = select, pairs, tostring
 local CreateNidhausPlatesStatusbar = CreateNidhausPlatesStatusbar
 
--- TODO: keep an eye on weaktable and revert if they cause issues
 local Plates = setmetatable({}, weaktable)
 local PlatesVisible = setmetatable({}, weaktable)
 local PlatesFading = setmetatable({}, weaktable)
@@ -101,10 +68,6 @@ local PlateSetAlpha, PlateGetAlpha
 local InCombat, HasTarget = false, false
 NidhausPlates.InCombat = InCombat
 
-----------------------------
--- Internal Functions
-----------------------------
--- Simple Functions
 local function ClearIndices(t)
 	if t then
 		for i, v in pairs(t) do
@@ -132,27 +95,19 @@ local function SetFunctionQueue(func)
 	end
 end
 
--- Indicator Functions
 local UpdateIndicator_CustomScaleText, UpdateIndicator_Standard, UpdateIndicator_CustomAlpha
 local UpdateIndicator_Level, UpdateIndicator_ThreatGlow, UpdateIndicator_Target, UpdateIndicator_RaidIcon, UpdateIndicator_EliteIcon, UpdateIndicator_UnitColor, UpdateIndicator_Name
 local UpdateIndicator_HealthBar, UpdateHitboxShape
 
--- Data and Condition Functions
 local OnNewNameplate, OnShowNameplate, OnHideNameplate, OnUpdateNameplate, OnResetNameplate, OnEchoNewNameplate
 local OnUpdateHealth, OnUpdateLevel, OnUpdateThreatSituation, OnUpdateRaidIcon, OnUpdateHealthRange
 local OnMouseoverNameplate, OnRequestWidgetUpdate, OnRequestDelegateUpdate
 local OnShowCastbar, OnHideCastbar, OnValueChangedCastbar
 
--- Spell Casting
 local StartCastAnimation, StopCastAnimation, OnUpdateTargetCastbar
 
--- Main Loop
 local OnUpdate
 local ApplyPlateExtension
-
---------------------------------------------------------------------------------------------------------------
--- II. Frame/Layer Appearance Functions:  These functions set the appearance of specific object types
---------------------------------------------------------------------------------------------------------------
 
 local function SetObjectShape(object, width, height)
 	object:SetWidth(width)
@@ -186,20 +141,17 @@ local function SetObjectBartexture(obj, tex, ori, crop)
 	obj:SetOrientation(ori)
 end
 
--- SetFontGroupObject
 local function SetFontGroupObject(object, objectstyle)
 	SetObjectFont(object, objectstyle.typeface, objectstyle.size, objectstyle.flags)
 	SetObjectJustify(object, objectstyle.align, objectstyle.vertical)
 	SetObjectShadow(object, objectstyle.shadow)
 end
 
--- SetAnchorGroupObject
 local function SetAnchorGroupObject(object, objectstyle, anchorTo)
-	SetObjectShape(object, objectstyle.width, objectstyle.height) --end
+	SetObjectShape(object, objectstyle.width, objectstyle.height)
 	SetObjectAnchor(object, objectstyle.anchor, anchorTo, objectstyle.x, objectstyle.y)
 end
 
--- SetBarGroupObject
 local backdropTable = {}
 local function SetBarGroupObject(object, objectstyle, anchorTo)
 	SetObjectShape(object, objectstyle.width, objectstyle.height)
@@ -219,21 +171,18 @@ local function MatchTextWidth()
 	extended:SetWidth(stringwidth + style.frame.width)
 end
 
---------------------------------------------------------------------------------------------------------------
--- III. Nameplate Style: These functions request updates for the appearance of the various graphical objects
---------------------------------------------------------------------------------------------------------------
 local UpdateStyle
 do
-	-- Style Property Groups
+
 	local fontgroup = {"name", "level", "spelltext", "customtext"}
 	local anchorgroup = {"healthborder", "threatborder", "castborder", "castnostop", "name", "spelltext", "customtext", "level", "customart", "spellicon", "raidicon", "skullicon", "eliteicon", "target"}
 	local bargroup = {"castbar", "healthbar"}
 	local texturegroup = {"castborder", "castnostop", "healthborder", "threatborder", "eliteicon", "skullicon", "highlight", "target"}
-	-- UpdateStyle:
+
 	function UpdateStyle()
-		-- Frame
+
 		SetAnchorGroupObject(extended, style.frame, nameplate)
-		-- Anchorgroup
+
 		for index = 1, #anchorgroup do
 			local objectname = anchorgroup[index]
 			SetAnchorGroupObject(visual[objectname], style[objectname], extended)
@@ -243,22 +192,22 @@ do
 				visual[objectname]:Hide()
 			end
 		end
-		-- Bars
+
 		for index = 1, #bargroup do
 			local objectname = bargroup[index]
 			SetBarGroupObject(bars[objectname], style[objectname], extended)
 		end
-		-- Texture
+
 		for index = 1, #texturegroup do
 			local objectname = texturegroup[index]
 			SetObjectTexture(visual[objectname], style[objectname].texture)
 		end
-		-- Font Group
+
 		for index = 1, #fontgroup do
 			local objectname = fontgroup[index]
 			SetFontGroupObject(visual[objectname], style[objectname])
 		end
-		-- Hide Stuff
+
 		if unit.isElite then
 			visual.eliteicon:Hide()
 		else
@@ -280,11 +229,6 @@ do
 			MatchTextWidth()
 		end
 
-		-- Borde Light. Como esta anclado, alcanza con prenderlo o apagarlo;
-		-- y cuando esta puesto se apagan los bordes del tema, que rodean
-		-- exactamente lo mismo.
-		-- Cada uno respeta el "mostrar" que ya tenia su objeto en el tema: si
-		-- el borde de vida esta apagado, el modo Light tampoco lo dibuja.
 		local light = NidhausPlates_LightBorder
 		if visual.lightHealth then
 			if light and style.healthborder.show then
@@ -311,22 +255,19 @@ do
 		end
 	end
 end
---------------------------------------------------------------------------------------------------------------
--- IV. Indicators: These functions update the actual data shown on the graphical objects
---------------------------------------------------------------------------------------------------------------
 
 do
 	local color = {}
 	local threatborder, alpha, forcealpha, scale
-	-- UpdateIndicator_HealthBar: Updates the value on the health bar
+
 	function UpdateIndicator_HealthBar()
 		bars.healthbar:SetMinMaxValues(bars.health:GetMinMaxValues())
 		bars.healthbar:SetValue(bars.health:GetValue())
 	end
-	-- UpdateIndicator_Name:
+
 	function UpdateIndicator_Name()
 		visual.name:SetText(unit.name)
-		-- Name Color
+
 		if activetheme.SetNameColor then
 			visual.name:SetTextColor(activetheme.SetNameColor(unit))
 		else
@@ -336,13 +277,13 @@ do
 			MatchTextWidth()
 		end
 	end
-	-- UpdateIndicator_Level:
+
 	function UpdateIndicator_Level()
 		visual.level:SetText(unit.level)
 		local tr, tg, tb = regions.level:GetTextColor()
 		visual.level:SetTextColor(tr, tg, tb)
 	end
-	-- UpdateIndicator_ThreatGlow: Updates the aggro glow
+
 	function UpdateIndicator_ThreatGlow()
 		if not style.threatborder.show then
 			return
@@ -363,10 +304,9 @@ do
 			end
 		end
 	end
-	-- UpdateIndicator_Target
+
 	function UpdateIndicator_Target()
-		-- El resalte del objetivo tiene dos formas: la textura cuadrada del
-		-- tema, o el marco de esquinas redondeadas. Nunca las dos.
+
 		local round = NidhausPlates_RoundTarget
 		local on = unit.isTarget and style.target.show
 		if visual.roundTarget then
@@ -378,7 +318,7 @@ do
 			visual.target:Hide()
 		end
 	end
-	-- UpdateIndicator_RaidIcon
+
 	function UpdateIndicator_RaidIcon()
 		if unit.isMarked and style.raidicon.show then
 			visual.raidicon:Show()
@@ -387,7 +327,7 @@ do
 			visual.raidicon:Hide()
 		end
 	end
-	-- UpdateIndicator_EliteIcon: Updates the border overlay art and threat glow to Elite or Non-Elite art
+
 	function UpdateIndicator_EliteIcon()
 		threatborder = visual.threatborder
 		if unit.isElite and style.eliteicon.show then
@@ -396,23 +336,23 @@ do
 			visual.eliteicon:Hide()
 		end
 	end
-	-- UpdateIndicator_UnitColor: Update the health bar coloring, if needed
+
 	function UpdateIndicator_UnitColor()
-		-- Set Health Bar
+
 		if activetheme.SetHealthbarColor then
-			--bars.healthbar:SetForegroundColor(activetheme.SetHealthbarColor(unit))
-			bars.healthbar:SetStatusBarSmartGradient(activetheme.SetHealthbarColor(unit)) -- Testing Gradient
+
+			bars.healthbar:SetStatusBarSmartGradient(activetheme.SetHealthbarColor(unit))
 		else
 			bars.healthbar:SetForegroundColor(bars.health:GetStatusBarColor())
 		end
-		-- Name Color
+
 		if activetheme.SetNameColor then
 			visual.name:SetTextColor(activetheme.SetNameColor(unit))
 		else
 			visual.name:SetTextColor(1, 1, 1, 1)
 		end
 	end
-	-- UpdateIndicator_Standard: Updates Non-Delegate Indicators
+
 	function UpdateIndicator_Standard()
 		if IsPlateShown(nameplate) then
 			if unitcache.name ~= unit.name then
@@ -427,7 +367,7 @@ do
 			end
 		end
 	end
-	-- UpdateIndicator_CustomAlpha: Calls the alpha delegate to get the requested alpha
+
 	function UpdateIndicator_CustomAlpha()
 		if activetheme.SetAlpha then
 			local previousAlpha = extended.requestedAlpha
@@ -440,21 +380,20 @@ do
 			extended:SetAlpha(extended.requestedAlpha)
 		end
 	end
-	-- UpdateIndicator_CustomScaleText: Updates the custom indicators (text, image, alpha, scale)
+
 	function UpdateIndicator_CustomScaleText()
 		threatborder = visual.threatborder
 
 		if unit.health and (extended.requestedAlpha > 0) then
-			-- Scale
+
 			if activetheme.SetScale then
 				scale = activetheme.SetScale(unit)
 				if scale then
 					extended:SetScale(math.max(0.0001, scale))
-					UpdateHitboxShape() -- la escala cambia tamano/posicion de la barra
+					UpdateHitboxShape()
 				end
 			end
 
-			-- Set Special-Case Regions
 			if style.customtext.show then
 				if activetheme.SetCustomText then
 					local text, r, g, b, a = activetheme.SetCustomText(unit)
@@ -474,26 +413,17 @@ do
 			UpdateIndicator_UnitColor()
 		end
 	end
-	-- UpdateHitboxShape: el area clickeable es el mismo rectangulo que la barra de vida
-	-- (mismo tamano y misma posicion: offset X/Y del frame, de la barra y escala).
-	-- La placa de Blizzard no se puede mover, asi que se deja con su tamano base y se
-	-- recorta/desplaza el area de click con SetHitRectInsets.
+
 	function UpdateHitboxShape()
-		-- EN COMBATE NO SE TOCA LA PLACA DE BLIZZARD.
-		-- La placa es un marco protegido: SetWidth, SetHeight y SetHitRectInsets
-		-- en combate los bloquea el juego (el cartel amarillo y el taint de
-		-- Nidhaus_Plates en TaintFixer). Se deja para despues: al salir de combate
-		-- PLAYER_REGEN_ENABLED actualiza todas las placas y esto vuelve a correr;
-		-- como el cache de abajo no se toco, aplica lo que haya quedado pendiente.
+
 		if InCombatLockdown() then return end
 		local box, hb, fr = style.hitbox, style.healthbar, style.frame
-		local pw, ph = box.width, box.height -- tamano base de la placa
+		local pw, ph = box.width, box.height
 		local s = extended:GetScale() or 1
 
 		local w, h = pw, ph
 		local cx, cy = (fr.x or 0), (fr.y or 0)
-		-- El tema puede pedir otra area de click (por ejemplo, solo el
-		-- icono de un totem cuando la barra esta oculta). Centrada en la placa.
+
 		local ow, oh
 		if activetheme.HitboxOverride then
 			ow, oh = activetheme.HitboxOverride(unit, extended.stylename)
@@ -501,13 +431,12 @@ do
 		if ow and oh then
 			w, h = ow, oh
 		elseif hb and hb.show ~= false then
-			-- tamano real de la barra (incluye el ajuste por ancho de texto si lo hay)
+
 			w, h = bars.healthbar:GetWidth(), bars.healthbar:GetHeight()
 			cx, cy = cx + (hb.x or 0), cy + (hb.y or 0)
 		end
 		w, h, cx, cy = w * s, h * s, cx * s, cy * s
 
-		-- Evita llamadas repetidas si nada cambio
 		if nameplate.hitPW == pw and nameplate.hitPH == ph and nameplate.hitW == w
 			and nameplate.hitH == h and nameplate.hitCX == cx and nameplate.hitCY == cy then
 			return
@@ -516,31 +445,25 @@ do
 		nameplate.hitCX, nameplate.hitCY = cx, cy
 
 		SetObjectShape(nameplate, pw, ph)
-		-- Insets relativos al centro de la placa (positivo = achica, negativo = agranda)
+
 		nameplate:SetHitRectInsets(
-			cx - w / 2 + pw / 2, -- izquierda
-			pw / 2 - cx - w / 2, -- derecha
-			ph / 2 - cy - h / 2, -- arriba
-			cy - h / 2 + ph / 2  -- abajo
+			cx - w / 2 + pw / 2,
+			pw / 2 - cx - w / 2,
+			ph / 2 - cy - h / 2,
+			cy - h / 2 + ph / 2
 		)
 	end
 end
 
---------------------------------------------------------------------------------------------------------------
--- V. Data Gather: Gathers Information about the unit and requests updates, if needed
---------------------------------------------------------------------------------------------------------------
 local UpdateReferences
 do
-	--------------------------------
-	-- References and Cache
-	--------------------------------
-	-- UpdateUnitCache
+
 	local function UpdateUnitCache()
 		for key, value in pairs(unit) do
 			unitcache[key] = value
 		end
 	end
-	-- UpdateReferences
+
 	function UpdateReferences(plate)
 		nameplate = plate
 		extended = plate.extended
@@ -551,24 +474,23 @@ do
 		visual = extended.visual
 		style = extended.style
 	end
-	--------------------------------
-	-- Data Conversion Functions
+
 	local ClassReference = {}
-	-- ColorToString: Converts a color to a string with a C- prefix
+
 	local function ColorToString(r, g, b)
 		return "C" .. math.floor((100 * r) + 0.5) .. math.floor((100 * g) + 0.5) .. math.floor((100 * b) + 0.5)
 	end
-	-- GetUnitCombatStatus: Determines if a unit is in combat by checking the name text color
+
 	local function GetUnitCombatStatus(r, g, b)
 		return (r > .5 and g < .5)
 	end
-	-- GetUnitAggroStatus: Determines if a unit is attacking, by looking at aggro glow region
+
 	local GetUnitAggroStatus
 	do
 		local shown
 		local red, green, blue
 		function GetUnitAggroStatus(region)
-			-- High = 1, 0, 0	-- Medium High = 1, .6, 0  -- Medium Low = 1, 1, .47
+
 			shown = region:IsShown()
 			if not shown then
 				return "LOW", 0
@@ -585,7 +507,7 @@ do
 			end
 		end
 	end
-	-- GetUnitReaction: Determines the reaction, and type of unit from the health bar color
+
 	local function GetUnitReaction(red, green, blue)
 		if red < .01 and blue < .01 and green > .99 then
 			return "FRIENDLY", "NPC"
@@ -599,38 +521,35 @@ do
 			return "HOSTILE", "PLAYER"
 		end
 	end
-	-- Raid Icon Lookup table
+
 	local ux, uy
 	local RaidIconCoordinate = {
-		--from GetTexCoord. input is ULx and ULy (first 2 values).
+
 		[0] = {[0] = "STAR", [0.25] = "MOON"},
 		[0.25] = {[0] = "CIRCLE", [0.25] = "SQUARE"},
 		[0.5] = {[0] = "DIAMOND", [0.25] = "CROSS"},
 		[0.75] = {[0] = "TRIANGLE", [0.25] = "SKULL"}
 	}
 
-	-- Populates the class color lookup table
 	for classname, color in pairs(RAID_CLASS_COLORS) do
 		ClassReference[ColorToString(color.r, color.g, color.b)] = classname
 	end
-	--------------------------------
-	-- Mass Gather Functions
-	--------------------------------
+
 	local function GatherData_Alpha(plate)
 		if HasTarget then
 			unit.alpha = plate.alpha
 		else
 			unit.alpha = 1
-		end -- Active Alpha
+		end
 
 		unit.isTarget = HasTarget and unit.alpha == 1
 		unit.isMouseover = regions.highlight:IsShown()
-		-- GUID
+
 		if unit.isTarget then
 			currentTarget = plate
 			OnUpdateTargetCastbar(plate)
 			if not unit.guid then
-				-- UpdateCurrentGUID
+
 				unit.guid = UnitGUID("target")
 				if unit.guid then
 					GUID[unit.guid] = plate
@@ -647,7 +566,6 @@ do
 		end
 	end
 
-	-- GatherData_BasicInfo: Updates Unit Variables
 	local function GatherData_BasicInfo()
 		unit.name = regions.name:GetText()
 		unit.isBoss = regions.skullicon:IsShown()
@@ -686,10 +604,6 @@ do
 		end
 	end
 
-	--------------------------------
-	-- Graphical Updates
-	--------------------------------
-	-- CheckNameplateStyle
 	local function CheckNameplateStyle()
 		if activetheme.SetStyle then
 			stylename = activetheme.SetStyle(unit)
@@ -707,9 +621,8 @@ do
 		UpdateHitboxShape()
 	end
 
-	-- ProcessUnitChanges
 	local function ProcessUnitChanges()
-		-- Unit Cache
+
 		unitchanged = false
 		for key, value in pairs(unit) do
 			if unitcache[key] ~= value then
@@ -717,31 +630,24 @@ do
 			end
 		end
 
-		-- Update Style/Indicators
 		if unitchanged then
 			CheckNameplateStyle()
 			UpdateIndicator_Standard()
 			UpdateIndicator_HealthBar()
 		end
 
-		-- Update Widgets
 		if activetheme.OnUpdate then
 			activetheme.OnUpdate(extended, unit)
 		end
 
-		-- Update Delegates
 		UpdateIndicator_Target()
 		UpdateIndicator_ThreatGlow()
 		UpdateIndicator_CustomAlpha()
 		UpdateIndicator_CustomScaleText()
 
-		-- Cache the old unit information
 		UpdateUnitCache()
 	end
 
-	--------------------------------
-	-- Setup
-	--------------------------------
 	local function PrepareNameplate(plate)
 		GatherData_BasicInfo()
 		unit.frame = extended
@@ -751,28 +657,21 @@ do
 		extended.unitcache = ClearIndices(extended.unitcache)
 		extended.stylename = ""
 
-		-- For Fading In
 		PlatesFading[plate] = true
 		extended.requestedAlpha = 0
 		extended.visibleAlpha = 0
 		extended:SetAlpha(0)
 
-		-- Graphics
 		unit.isCasting = false
 		bars.castbar:Hide()
 		visual.highlight:Hide()
 		regions.highlight:Hide()
 
-		-- Widgets/Extensions
 		if activetheme.OnInitialize then
 			activetheme.OnInitialize(extended)
 		end
 	end
 
-	--------------------------------
-	-- Individual Gather/Entry-Point Functions
-	--------------------------------
-	-- OnHideNameplate
 	function OnHideNameplate(source)
 		local plate = source.parentPlate
 		UpdateReferences(plate)
@@ -795,28 +694,25 @@ do
 		end
 	end
 
-	-- OnEchoNewNameplate: Intended to reduce CPU by bypassing the full update, and only checking the alpha value
 	function OnEchoNewNameplate(plate)
 		if not plate:IsShown() then
 			return
 		end
-		-- Gather Information
+
 		UpdateReferences(plate)
 		GatherData_Alpha(plate)
 		ProcessUnitChanges()
 	end
-	-- OnNewNameplate: When a new nameplate is generated, this function hooks the appropriate functions
+
 	function OnNewNameplate(plate)
 		local health, cast = plate:GetChildren()
 		UpdateReferences(plate)
 		PrepareNameplate(plate)
 		GatherData_BasicInfo()
 
-		-- Alternative to reduce initial CPU load
 		CheckNameplateStyle()
 		UpdateIndicator_CustomAlpha()
 
-		-- Hook for Updates
 		health:HookScript("OnShow", OnShowNameplate)
 		health:HookScript("OnHide", OnHideNameplate)
 		health:HookScript("OnValueChanged", OnUpdateHealth)
@@ -826,15 +722,13 @@ do
 		cast:HookScript("OnHide", OnHideCastbar)
 		cast:HookScript("OnValueChanged", OnValueChangedCastbar)
 
-		-- Activates nameplate visibility
 		PlatesVisible[plate] = true
-		SetTargetQueue(plate, OnEchoNewNameplate) -- Echo for a partial update (alpha only)
+		SetTargetQueue(plate, OnEchoNewNameplate)
 	end
 
-	-- OnShowNameplate
 	function OnShowNameplate(source)
 		local plate = source.parentPlate
-		-- Activate Plate
+
 		PlatesVisible[plate] = true
 		UpdateReferences(plate)
 		PrepareNameplate(plate)
@@ -844,7 +738,7 @@ do
 		UpdateIndicator_CustomAlpha()
 		UpdateHitboxShape()
 
-		SetTargetQueue(plate, OnUpdateNameplate) -- Echo for a full update
+		SetTargetQueue(plate, OnUpdateNameplate)
 	end
 
 	function OnShowCastbar(cast)
@@ -859,18 +753,17 @@ do
 		cast.castbar:SetValue(value)
 	end
 
-	-- OnUpdateNameplate
 	function OnUpdateNameplate(plate)
 		if not plate:IsShown() then
 			return
 		end
-		-- Gather Information
+
 		UpdateReferences(plate)
 		GatherData_Alpha(plate)
 		GatherData_BasicInfo()
 		ProcessUnitChanges()
 	end
-	-- OnUpdateLevel
+
 	function OnUpdateLevel(plate)
 		if not IsPlateShown(plate) then
 			return
@@ -884,7 +777,6 @@ do
 		UpdateIndicator_Level()
 	end
 
-	-- OnUpdateThreatSituation
 	function OnUpdateThreatSituation(plate)
 		if not IsPlateShown(plate) then
 			return
@@ -905,7 +797,6 @@ do
 		UpdateIndicator_CustomScaleText()
 	end
 
-	-- OnUpdateRaidIcon
 	function OnUpdateRaidIcon(plate)
 		if not IsPlateShown(plate) then
 			return
@@ -922,7 +813,6 @@ do
 		UpdateIndicator_UnitColor()
 	end
 
-	-- OnUpdateReaction
 	function OnUpdateReaction(plate)
 		if not IsPlateShown(plate) then
 			return
@@ -934,7 +824,6 @@ do
 		UpdateIndicator_CustomScaleText()
 	end
 
-	-- OnMouseoverNameplate
 	function OnMouseoverNameplate(plate)
 		if not IsPlateShown(plate) then
 			return
@@ -954,7 +843,7 @@ do
 			visual.highlight:Hide()
 		end
 
-		OnUpdateThreatSituation(plate) -- This updates a bunch of properties
+		OnUpdateThreatSituation(plate)
 		if activetheme.OnContextUpdate then
 			activetheme.OnContextUpdate(extended, unit)
 		end
@@ -963,7 +852,6 @@ do
 		end
 	end
 
-	-- OnRequestWidgetUpdate: Updates just the widgets
 	function OnRequestWidgetUpdate(plate)
 		if not IsPlateShown(plate) then
 			return
@@ -977,7 +865,6 @@ do
 		end
 	end
 
-	-- OnRequestDelegateUpdate: Updates just the delegate function indicators (excluding Style?)
 	function OnRequestDelegateUpdate(plate)
 		if not IsPlateShown(plate) then
 			return
@@ -988,7 +875,6 @@ do
 		UpdateIndicator_CustomScaleText()
 	end
 
-	-- OnUpdateHealth
 	function OnUpdateHealth(source)
 		local plate = source.parentPlate
 		if not IsPlateShown(plate) then
@@ -1002,14 +888,11 @@ do
 		UpdateIndicator_CustomScaleText()
 	end
 
-	-- OnUpdateHealthRange
 	function OnUpdateHealthRange(source)
 		local plate = source.parentPlate
 		OnUpdateNameplate(plate)
 	end
 
-	-- Reloj propio de la barra, para cuando el tiempo viene de UnitCastingInfo
-	-- y no de la barra nativa de Blizzard (ver StartCastAnimation).
 	local function OnUpdateTimedCast(castbar)
 		local minval, maxval = castbar:GetMinMaxValues()
 		local now = GetTime()
@@ -1017,7 +900,7 @@ do
 			StopCastAnimation(castbar.parentPlate)
 			return
 		end
-		-- Canalizado: la barra se vacia, como en Blizzard.
+
 		if castbar.timedChannel then
 			castbar:SetValue(minval + maxval - now)
 		else
@@ -1025,14 +908,6 @@ do
 		end
 	end
 
-	-- Shows the Cast Animation (requires references)
-	--
-	-- startMS / endMS son opcionales (milisegundos, como los da
-	-- UnitCastingInfo). Sin ellos la barra copia a la nativa de Blizzard, que
-	-- es lo que pasa con el objetivo y con los enemigos. Con ellos la barra
-	-- corre sola: hace falta para los aliados (party y sus mascotas), porque
-	-- el cliente no siempre anima la barra nativa de una placa aliada y antes
-	-- el casteo se descartaba por "barra sin rango".
 	function StartCastAnimation(plate, spell, spellid, icon, notInterruptible, channel, startMS, endMS)
 		UpdateReferences(plate)
 		if (tonumber(GetCVar("showVKeyCastbar")) == 1) and spell then
@@ -1071,9 +946,7 @@ do
 
 			visual.spellicon:SetTexture(icon)
 			if NidhausPlates_LightCast then
-				-- Con el borde Light los dos overlays del tema quedan fuera, y
-				-- el aviso de "no se puede interrumpir" pasa al color del
-				-- filo: rojo en vez de blanco. Si no, se perderia el dato.
+
 				visual.castnostop:Hide()
 				visual.castborder:Hide()
 				if visual.lightCast then
@@ -1098,7 +971,6 @@ do
 		end
 	end
 
-	-- Hides the Cast Animation (requires references)
 	function StopCastAnimation(plate)
 		UpdateReferences(plate)
 		bars.castbar:SetScript("OnUpdate", nil)
@@ -1108,7 +980,6 @@ do
 		UpdateIndicator_CustomAlpha()
 	end
 
-	-- OnUpdateTargetCastbar: Called from hooking into the original nameplate castbar's "OnValueChanged"
 	function OnUpdateTargetCastbar(source)
 		if not source then
 			return
@@ -1121,7 +992,7 @@ do
 		end
 
 		if plate and plate.extended.unit.isTarget then
-			-- Grabs the target's casting information
+
 			local spell, icon, nonInt, channel, spellid
 
 			spell, _, _, icon, _, _, _, spellid, nonInt = UnitCastingInfo("target")
@@ -1139,7 +1010,6 @@ do
 		end
 	end
 
-	-- OnResetNameplate
 	function OnResetNameplate(plate)
 		local extended = plate.extended
 		extended.unitcache = ClearIndices(extended.unitcache)
@@ -1148,12 +1018,8 @@ do
 	end
 end
 
---------------------------------------------------------------------------------------------------------------
--- VI. Nameplate Extension: Applies scripts, hooks, and adds additional frame variables and elements
---------------------------------------------------------------------------------------------------------------
-
 do
-	-- local bars, regions, health, castbar, healthbar, visual
+
 	local castbar, healthbar, region
 	local platelevels = 125
 
@@ -1180,10 +1046,8 @@ do
 		bars.health, bars.cast = plate:GetChildren()
 		extended.stylename = ""
 
-		-- Set Frame Levels and Parent
 		GetNameplateRegions(plate, regions, bars.cast)
 
-		-- This block makes the Blizz nameplate invisible
 		regions.threatglow:SetTexCoord(0, 0, 0, 0)
 		regions.healthborder:SetTexCoord(0, 0, 0, 0)
 		regions.castborder:SetTexCoord(0, 0, 0, 0)
@@ -1199,7 +1063,6 @@ do
 		bars.health:SetStatusBarTexture(EMPTY_TEXTURE)
 		bars.cast:SetStatusBarTexture(EMPTY_TEXTURE)
 
-		-- Create Statusbars
 		bars.healthbar = CreateNidhausPlatesStatusbar(extended)
 		bars.castbar = CreateNidhausPlatesStatusbar(extended)
 		local health, cast, healthbar, castbar = bars.health, bars.cast, bars.healthbar, bars.castbar
@@ -1208,17 +1071,14 @@ do
 		cast.parentPlate = plate
 		castbar.parentPlate = plate
 
-		-- reference to each other
 		cast.castbar = castbar
 		castbar.cast = cast
 
-		-- Visible Bars
 		healthbar:SetFrameLevel(platelevels - 1)
 		castbar:Hide()
 		castbar:SetFrameLevel(platelevels)
 		castbar:SetForegroundColor(1, .8, 0)
 
-		-- Visual Regions
 		visual = extended.visual
 		visual.customart = extended:CreateTexture(nil, "OVERLAY")
 		visual.target = extended:CreateTexture(nil, "ARTWORK")
@@ -1239,13 +1099,10 @@ do
 			v:SetNonBlocking(true)
 		end
 
-		-- Los bordes Light van DESPUES del bucle de SetNonBlocking: ese metodo
-		-- es de Texture y sobre un Frame revienta.
 		visual.lightHealth = CreateLightBorder(healthbar, healthbar, 2)
 		visual.lightCast   = CreateLightBorder(castbar, castbar, 2)
 		visual.lightIcon   = CreateLightBorder(castbar, visual.spellicon, 2)
-		-- El marco redondo del objetivo va un pelo mas afuera para no comerse
-		-- el borde normal de la barra, que puede seguir puesto.
+
 		visual.roundTarget = CreateLightBorder(healthbar, healthbar, 3, ROUND_BACKDROP)
 
 		visual.customtext = extended:CreateFontString(nil, "OVERLAY")
@@ -1264,24 +1121,16 @@ do
 	end
 end
 
---------------------------------------------------------------------------------------------------------------
--- VII. World Update Functions: Refers new plates to 'ApplyPlateExtension()', and watches for Alpha/Transparency
--- and Highlight/Mouseover changes, and sends those changes to the appropriate handler.
--- Also processes the update queue (ie. echos)
---------------------------------------------------------------------------------------------------------------
-
 do
 	local plate, curChildren
 	local WorldGetNumChildren, WorldGetChildren = WorldFrame.GetNumChildren, WorldFrame.GetChildren
 
-	-- IsFrameNameplate: Checks to see if the frame is a Blizz nameplate
 	local function IsFrameNameplate(frame)
 		local threatRegion, borderRegion = frame:GetRegions()
 		return borderRegion and borderRegion:GetObjectType() == "Texture" and
 			borderRegion:GetTexture() == "Interface\\Tooltips\\Nameplate-Border"
 	end
 
-	-- OnWorldFrameChange: Checks for new Blizz Plates
 	local function OnWorldFrameChange(...)
 		for index = 1, select("#", ...) do
 			plate = select(index, ...)
@@ -1291,21 +1140,19 @@ do
 		end
 	end
 
-	-- ForEachPlate
 	function ForEachPlate(functionToRun, ...)
 		for plate in pairs(PlatesVisible) do
-			if plate.extended:IsShown() then -- Plate and extended frame both explicitly visible
+			if plate.extended:IsShown() then
 				functionToRun(plate, ...)
 			end
 		end
 	end
 
-	-- Nameplate Fade-In
 	local visibleAlpha, requestedAlpha
 	local fadeInRate, fadeOutRate = .07, .2
 	local function UpdateNameplateFade(plate)
 		extended = plate.extended
-		--if extended then
+
 		visibleAlpha = extended.visibleAlpha
 		requestedAlpha = extended.requestedAlpha
 		if visibleAlpha < requestedAlpha then
@@ -1317,10 +1164,9 @@ do
 			extendedSetAlpha(extended, visibleAlpha)
 			PlatesFading[plate] = nil
 		end
-		--end
+
 	end
 
-	-- OnUpdate: This function is processed every frame!
 	local queuedFunction
 	local HasMouseover, LastMouseover, CurrentMouseover
 	local PollTime, PollIndex = 0, 0
@@ -1328,15 +1174,13 @@ do
 	function OnUpdate(self)
 		HasMouseover = false
 
-		-- Alpha - Highlight - Poll Loop
 		for plate in pairs(PlatesVisible) do
-			-- Alpha
+
 			if (HasTarget) then
 				plate.alpha = PlateGetAlpha(plate)
 				PlateSetAlpha(plate, 1)
 			end
 
-			-- Highlight: CURSOR_UPDATE events are unreliable for GUID updates.  This provides a much better experience.
 			highlightRegion = plate.extended.regions.highlight
 			if HighlightIsShown(highlightRegion) then
 				HasMouseover = true
@@ -1344,24 +1188,22 @@ do
 			end
 		end
 
-		-- Fade-In Loop
 		for plate in pairs(PlatesFading) do
 			UpdateNameplateFade(plate)
 		end
 
-		-- Process the Update Request Queues
 		if massQueue[OnResetNameplate] then
 			ForEachPlate(OnResetNameplate)
 			for queuedFunction in pairs(massQueue) do
 				massQueue[queuedFunction] = nil
 			end
 		else
-			-- Function Queue: Runs the specified function
+
 			for queuedFunction, run in pairs(functionQueue) do
 				queuedFunction()
 				functionQueue[queuedFunction] = nil
 			end
-			-- Mass Update Queue: Run the specified function on ALL visible plates
+
 			if massQueue[OnUpdateNameplate] then
 				for queuedFunction in pairs(massQueue) do
 					massQueue[queuedFunction] = nil
@@ -1373,14 +1215,13 @@ do
 					ForEachPlate(queuedFunction)
 				end
 			end
-			-- Spefific Nameplate Function Queue: Runs the function on a specific plate
+
 			for plate, queuedFunction in pairs(targetQueue) do
 				targetQueue[plate] = nil
 				queuedFunction(plate)
 			end
 		end
 
-		-- Process Mouseover
 		if HasMouseover then
 			if LastMouseover ~= CurrentMouseover then
 				if LastMouseover then
@@ -1394,7 +1235,6 @@ do
 			LastMouseover = nil
 		end
 
-		-- Detect New Nameplates
 		curChildren = WorldGetNumChildren(WorldFrame)
 		if (curChildren ~= numChildren) then
 			numChildren = curChildren
@@ -1402,19 +1242,16 @@ do
 		end
 	end
 end
---------------------------------------------------------------------------------------------------------------
--- VIII. Event Handlers: sends event-driven changes to  the appropriate gather/update handler.
---------------------------------------------------------------------------------------------------------------
+
 do
 	local events = {}
 	local function EventHandler(self, event, ...)
 		events[event](event, ...)
 	end
 	local PlateHandler = CreateFrame("Frame", nil, WorldFrame)
-	PlateHandler:SetFrameStrata("TOOLTIP") -- When parented to WorldFrame, causes OnUpdate handler to run close to last
+	PlateHandler:SetFrameStrata("TOOLTIP")
 	PlateHandler:SetScript("OnEvent", EventHandler)
 
-	-- Events
 	function events:PLAYER_ENTERING_WORLD()
 		PlateHandler:SetScript("OnUpdate", OnUpdate)
 	end
@@ -1428,11 +1265,11 @@ do
 	end
 
 	function events:PLAYER_TARGET_CHANGED()
-		HasTarget = UnitExists("target") == 1 -- Must be bool, never nil!
+		HasTarget = UnitExists("target") == 1
 		if (not HasTarget) then
 			currentTarget = nil
 		end
-		SetMassQueue(OnUpdateNameplate) -- Could be "SetMassQueue(UpdateTarget), someday...  :-o
+		SetMassQueue(OnUpdateNameplate)
 	end
 
 	function events:RAID_TARGET_UPDATE()
@@ -1440,7 +1277,7 @@ do
 	end
 	function events:UNIT_THREAT_SITUATION_UPDATE()
 		SetMassQueue(OnUpdateThreatSituation)
-	end -- Only fired when a target changes
+	end
 	function events:UNIT_LEVEL()
 		ForEachPlate(OnUpdateLevel)
 	end
@@ -1465,16 +1302,11 @@ do
 	events.UNIT_SPELLCAST_CHANNEL_STOP = events.UNIT_SPELLCAST_START
 	events.UNIT_SPELLCAST_FAILED_QUIET = events.UNIT_SPELLCAST_START
 
-	-- Registration of Blizzard Events
 	for eventname in pairs(events) do
 		PlateHandler:RegisterEvent(eventname)
 	end
 end
 
---------------------------------------------------------------------------------------------------------------
--- IX. External Commands: Allows widgets and themes to request updates to the plates.
--- Useful to make a theme respond to externally-captured data (such as the combat log)
---------------------------------------------------------------------------------------------------------------
 function NidhausPlates:ForceUpdate()
 	SetMassQueue(OnResetNameplate)
 end

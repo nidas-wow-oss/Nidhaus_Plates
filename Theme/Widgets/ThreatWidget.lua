@@ -1,11 +1,7 @@
--------==------------
--- Threat Widget --
--------------------
 local NidhausPlatesTheme = NidhausPlatesTheme
 local path = "Interface\\AddOns\\Nidhaus_Plates\\Theme\\Widgets\\ThreatWidget\\"
 local db
 
--- Threat Widget
 local function UpdateThreatWidget(frame, unit)
 	db = NidhausPlatesTheme.db.profile
 	local threatLevel

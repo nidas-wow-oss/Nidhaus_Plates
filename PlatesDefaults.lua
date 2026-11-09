@@ -2,10 +2,6 @@ local NidhausPlates = _G.NidhausPlates
 local NidhausPlatesUtility = _G.NidhausPlatesUtility
 NidhausPlatesThemeList = NidhausPlatesThemeList or {}
 
--------------------------------------------------------------------------------------
--- Template
--------------------------------------------------------------------------------------
-
 local theme = {}
 local defaultArtPath = "Interface\\Addons\\Nidhaus_Plates\\media"
 local font = "FONTS\\arialn.ttf"
@@ -227,12 +223,9 @@ theme.threatcolor = {
 }
 
 NidhausPlates.Template = theme
--- Activates the template as a holder theme, until the user preference is loaded
+
 NidhausPlates:ActivateTheme(theme)
 
-------------
--- "Name Only" Theme
-------------
 local NameOnlyTheme = NidhausPlatesUtility.copyTable(NidhausPlates.Template)
 
 NameOnlyTheme.customtext = {
@@ -252,7 +245,6 @@ NameOnlyTheme.name = {show = false}
 NameOnlyTheme.skullicon = {show = false}
 NameOnlyTheme.spellicon = {show = false}
 
--- Hex Colors
 local TextColors = {
 	FRIENDLY = {NPC = "|cff3cee35", PLAYER = "|cff5cb8ff"},
 	HOSTILE = {NPC = "|cffff3535", PLAYER = "|cfffc551b"},

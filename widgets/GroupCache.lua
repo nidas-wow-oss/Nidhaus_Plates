@@ -1,4 +1,3 @@
--- Group Roster Monitor
 local Group = {}
 Group.Names = {}
 Group.Tanks = {}
@@ -16,7 +15,7 @@ local function IsUnitTank(unitId)
 end
 
 local function UpdateRoster(frame, event, ...)
-	-- Check Group Type
+
 	local groupType, groupSize
 	if UnitInRaid("player") then
 		groupType = "raid"
@@ -39,7 +38,6 @@ local function UpdateRoster(frame, event, ...)
 	Group.Type = groupType
 	Group.Size = groupSize
 
-	-- Cycle through Group
 	if groupType then
 		for index = 1, groupSize do
 			local unitId = groupType .. index

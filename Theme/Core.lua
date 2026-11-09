@@ -1,15 +1,7 @@
--- Nombre real de la carpeta, tal y como lo pasa el cargador de addons.
--- Estaba escrito a mano como "NidhausPlates" mas abajo; al renombrar el addon
--- esa comparacion dejaba de cumplirse y este archivo no registraba nada.
 local ADDON_NAME = ...
 
 NidhausPlatesTheme = LibStub("AceAddon-3.0"):NewAddon("NidhausPlatesTheme", "AceConsole-3.0", "AceEvent-3.0")
 
--- Nombre que ve el usuario, en un solo sitio.
--- Estaba repetido a mano ("Nidhaus Plates") en el titulo de la ventana, en los
--- avisos por chat, en el tooltip del minimapa y en la categoria de Interfaz.
--- Al renombrar el addon eso no solo quedaba feo: la llamada que abre la
--- categoria de Interfaz busca por ese texto, asi que dejaba de encontrarla.
 NidhausPlatesTheme.DISPLAY_NAME = "|cffffffffNidhaus|r|cff00ff00_Plates|r"
 local L = LibStub("AceLocale-3.0"):GetLocale("NidhausPlatesTheme", false)
 local LDS = LibStub("LibDualSpec-1.0", true)
@@ -31,12 +23,10 @@ local HEX_CLASS_COLOR = {
 	WARRIOR = "C79C6E",
 	PALADIN = "F58CBA"
 }
---
 
 NidhausPlatesThemeList = NidhausPlatesThemeList or {}
 NidhausPlatesThemeList["Nidhaus Plates"] = {}
 
--- Callback Functions
 function NidhausPlatesTheme:ProfChange()
 	if NidhausPlates_RefreshLightBorder then NidhausPlates_RefreshLightBorder() end
 	if NidhausPlatesTheme.ApplySimpleLayout then
@@ -48,9 +38,8 @@ function NidhausPlatesTheme:ProfChange()
 	NidhausPlatesTheme:ConfigRefresh()
 end
 
-
 function NidhausPlatesTheme:OnInitialize()
-	-- Opciones guardadas con los nombres viejos -> nuevos (Migrate.lua).
+
 	if NidhausPlates_Migrate then NidhausPlates_Migrate() end
 	local defaults = {
 		char = {
@@ -64,63 +53,55 @@ function NidhausPlatesTheme:OnInitialize()
 			specName = {[1] = nil, [2] = nil, [3] = nil},
 			stances = {
 				ON = false,
-				[0] = false, -- No Stance
-				[1] = false, -- Battle Stance
-				[2] = true, -- Defensive Stance
-				[3] = false -- Berserker Stance
+				[0] = false,
+				[1] = false,
+				[2] = true,
+				[3] = false
 			},
 			shapeshifts = {
 				ON = false,
-				[0] = false, -- Caster Form
-				[1] = true, -- Bear Form
-				[2] = false, -- Aquatic Form
-				[3] = false, -- Cat Form
-				[4] = false, -- Travel Form
-				[5] = false, -- Moonkin Form, Tree of Life, (Swift) Flight Form
-				[6] = false -- Flight Form (if moonkin or tree spec'd)
+				[0] = false,
+				[1] = true,
+				[2] = false,
+				[3] = false,
+				[4] = false,
+				[5] = false,
+				[6] = false
 			},
 			presences = {
 				ON = false,
-				[0] = false, -- No Presence
-				[1] = true, -- Blood
-				[2] = false, -- Frost
-				[3] = false -- Unholy
+				[0] = false,
+				[1] = true,
+				[2] = false,
+				[3] = false
 			},
 			auras = {
 				ON = false,
-				[0] = false, -- No Aura
-				[1] = true, -- Devotion Aura
-				[2] = false, -- Retribution Aura
-				[3] = false, -- Concentration Aura
-				[4] = false, -- Resistance Aura
-				[5] = false -- Crusader Aura
+				[0] = false,
+				[1] = true,
+				[2] = false,
+				[3] = false,
+				[4] = false,
+				[5] = false
 			}
 		},
 		profile = {
 			cache = {},
-			-- ESTE TAMBIEN, Y NO ES UN DUPLICADO AL PEDO.
-			--
-			-- OldSetting es la copia de seguridad de threat.ON: al entrar a
-			-- una arena o BG el addon fuerza threat.ON = false, y al volver
-			-- al mundo lo repone con threat.ON = OldSetting.
-			--
-			-- O sea que si solo apagaramos el de arriba, la primera vez que
-			-- salieras de una BG el sistema de amenaza se volveria a prender
-			-- solo. Un interruptor con dos duenos: hay que dar vuelta los dos.
+
 			OldSetting = false,
 			verbose = true,
 			blizzFade = {toggle = true, amount = -0.3},
 			healthColorChange = false,
 			customColor = false,
 			allowClass = true,
-			arcaneSkin = true,       -- tema Arcane en la ventana de opciones
-			hideSnakes = true,          -- serpientes de la trampa: enemigas
-			hideSnakesFriendly = true,  -- serpientes de la trampa: propias y aliadas
-			hideMirrorImage = true,     -- Mirror Image (mago)
-			lightBorder = false,        -- marco fino Border_Light en la barra de vida
-			lightCast   = false,        -- idem en la barra de casteo y el icono
-			castbarCVarInit = false,    -- marca de que ya se prendio showVKeyCastbar una vez
-			roundTarget = false,        -- resalte del objetivo con esquinas redondeadas
+			arcaneSkin = true,
+			hideSnakes = true,
+			hideSnakesFriendly = true,
+			hideMirrorImage = true,
+			lightBorder = false,
+			lightCast   = false,
+			castbarCVarInit = false,
+			roundTarget = false,
 			friendlyClass = false,
 			friendlyNameOnly = false,
 			friendlyClickThrough = false,
@@ -136,28 +117,28 @@ function NidhausPlatesTheme:OnInitialize()
 			tHPbarColor = {r = 0, g = 0.5, b = 1},
 			totemSettings = {
 				hideHealthbar = false,
-				-- Air Totems
+
 				["A1"] = {true, true, true, nil, nil, nil, "normal", color = {r = 0.67, g = 1, b = 1}},
 				["A2"] = {true, true, true, nil, nil, nil, "normal", color = {r = 0.67, g = 1, b = 1}},
 				["A3"] = {true, true, true, nil, nil, nil, "normal", color = {r = 0.67, g = 1, b = 1}},
 				["A4"] = {true, true, true, nil, nil, nil, "normal", color = {r = 0.67, g = 1, b = 1}},
 				["A5"] = {true, true, true, nil, nil, nil, "normal", color = {r = 0.67, g = 1, b = 1}},
 				["A6"] = {true, true, true, nil, nil, nil, "normal", color = {r = 0.67, g = 1, b = 1}},
-				-- Earth Totems
+
 				["E1"] = {true, true, true, nil, nil, nil, "normal", color = {r = 1, g = 0.7, b = 0.12}},
 				["E2"] = {true, true, true, nil, nil, nil, "normal", color = {r = 1, g = 0.7, b = 0.12}},
 				["E3"] = {true, true, true, nil, nil, nil, "normal", color = {r = 1, g = 0.7, b = 0.12}},
 				["E4"] = {true, true, true, nil, nil, nil, "normal", color = {r = 1, g = 0.7, b = 0.12}},
 				["E5"] = {true, true, true, nil, nil, nil, "normal", color = {r = 1, g = 0.7, b = 0.12}},
 				["E6"] = {true, true, true, nil, nil, nil, "normal", color = {r = 1, g = 0.7, b = 0.12}},
-				-- Fire Totems
+
 				["F1"] = {true, true, true, nil, nil, nil, "normal", color = {r = 1, g = 0.4, b = 0.4}},
 				["F2"] = {true, true, true, nil, nil, nil, "normal", color = {r = 1, g = 0.4, b = 0.4}},
 				["F3"] = {true, true, true, nil, nil, nil, "normal", color = {r = 1, g = 0.4, b = 0.4}},
 				["F4"] = {true, true, true, nil, nil, nil, "normal", color = {r = 1, g = 0.4, b = 0.4}},
 				["F5"] = {true, true, true, nil, nil, nil, "normal", color = {r = 1, g = 0.4, b = 0.4}},
 				["F6"] = {true, true, true, nil, nil, nil, "normal", color = {r = 1, g = 0.4, b = 0.4}},
-				-- Water Totems
+
 				["W1"] = {true, true, true, nil, nil, nil, "normal", color = {r = 0.58, g = 0.72, b = 1}},
 				["W2"] = {true, true, true, nil, nil, nil, "normal", color = {r = 0.58, g = 0.72, b = 1}},
 				["W3"] = {true, true, true, nil, nil, nil, "normal", color = {r = 0.58, g = 0.72, b = 1}},
@@ -604,20 +585,7 @@ function NidhausPlatesTheme:OnInitialize()
 					alpha = 0,
 					color = {r = 1, g = 1, b = 1}
 				},
-				-- IMAGEN ESPECULAR DEL MAGO  (Mirror Image)
-				--
-				-- Traido de RefinedBlizzPlates, que la tenia en su lista de
-				-- "placas que se dibujan como icono". Es la unica del set que
-				-- faltaba aca: Shadow Fiend, Spirit Wolf, Gargola, Elemental de
-				-- agua, Treants y serpientes ya estaban arriba.
-				--
-				-- Sirve para lo mismo que las otras: tres copias del mago con
-				-- barra de vida tapan media pantalla y encima confunden sobre
-				-- cual es el de verdad. Como icono ocupan un cuadradito y se
-				-- distinguen de una.
-				--
-				-- El icono NO es un archivo nuevo: es el del propio hechizo,
-				-- que ya viene en el juego. Un .tga menos que mantener.
+
 				[31] = {
 					name = L["Mirror Image"],
 					showNameplate = true,
@@ -667,8 +635,8 @@ function NidhausPlatesTheme:OnInitialize()
 				y = 35,
 				level = 1,
 				anchor = "CENTER",
-				border = true,      -- borde verde (aliado) / rojo (enemigo)
-				targetGlow = true,  -- resplandor cuando el totem es tu objetivo
+				border = true,
+				targetGlow = true,
 			},
 			debuffWidget = {
 				ON = true,
@@ -694,11 +662,10 @@ function NidhausPlatesTheme:OnInitialize()
 				y = 0,
 				theme = "default",
 				anchor = "CENTER",
-				-- Borde alrededor del icono. Cuadrado en los temas cuadrados
-				-- y anillo en el tema circle; se elige solo.
+
 				border = true,
 				borderThickness = 1,
-				-- Negro de normal, blanco cuando esa unidad es tu objetivo.
+
 				borderColor = {r = 0, g = 0, b = 0},
 				borderColorTarget = {r = 1, g = 1, b = 1}
 			},
@@ -746,7 +713,7 @@ function NidhausPlatesTheme:OnInitialize()
 				y = 6,
 				anchor = "CENTER"
 			},
-			-- Numero de arena (1-5) y de grupo (1-4) sobre la placa.
+
 			arenaPartyIDWidget = {
 				ON = false,
 				showArena = true,
@@ -951,10 +918,7 @@ function NidhausPlatesTheme:OnInitialize()
 				}
 			},
 			threat = {
-				-- APAGADO DE FABRICA. Este addon se usa para PvP y el sistema
-				-- de amenaza recolorea, reescala y cambia la opacidad de las
-				-- placas segun quien lleve la agro: en arena y BG eso es ruido.
-				-- Quien lo quiera para mazmorras lo prende y queda prendido.
+
 				ON = false,
 				nonCombat = true,
 				hideNonCombat = false,
@@ -1037,40 +1001,28 @@ function NidhausPlatesTheme:OnInitialize()
 	local db = LibStub("AceDB-3.0"):New("NidhausPlatesDB", defaults, "Default")
 	self.db = db
 
-	-----------------------------------------------------------------------------
-	-- Simplified build: one-time migration.
-	-- Existing saved profiles keep their old values, so force the new defaults
-	-- once per profile. Bump SIMPLE_LAYOUT_VERSION to re-apply after edits.
-	-----------------------------------------------------------------------------
-	-- v5: se añade hideSnakesFriendly. Los perfiles que ya existen no traen
-	-- ese campo, y sin subir la version se quedarian con las propias visibles.
-	-- v6: el sistema de amenaza pasa a venir apagado. Cambiar el valor de
-	-- fabrica no alcanza: los perfiles ya guardados traen el suyo propio.
 	local SIMPLE_LAYOUT_VERSION = 6
 	NidhausPlatesTheme.ApplySimpleLayout = function()
 		local p = NidhausPlatesTheme.db and NidhausPlatesTheme.db.profile
 		if not p or p.simpleLayout == SIMPLE_LAYOUT_VERSION then return end
 		p.simpleLayout = SIMPLE_LAYOUT_VERSION
-		p.settings.healthbar.width = 100          -- Healthbar width
-		p.settings.frame.y = 15                   -- Placement Offset Y
-		p.settings.level.show = false             -- Level Text off
-		p.settings.customtext.show = false        -- Health Text off
-		p.settings.raidicon.hpColor = false       -- Raid Mark HP Color removed
-		p.settings.healthborder.texture = "TP_HealthBarOverlayThin" -- Normal Border = Thin
-		p.settings.threatborder.show = false      -- Threat Glow removed
-		p.customColor = false                     -- Custom HP Color removed
-		p.allowClass = true                       -- Enemy Class Colors on
-		p.nameplate.scale["Target"] = 1.1         -- Target scale 110%
-		p.hideSnakes         = true               -- serpientes enemigas
-		p.hideSnakesFriendly = true               -- serpientes propias y aliadas
-		p.hideMirrorImage    = true               -- copias del mago
+		p.settings.healthbar.width = 100
+		p.settings.frame.y = 15
+		p.settings.level.show = false
+		p.settings.customtext.show = false
+		p.settings.raidicon.hpColor = false
+		p.settings.healthborder.texture = "TP_HealthBarOverlayThin"
+		p.settings.threatborder.show = false
+		p.customColor = false
+		p.allowClass = true
+		p.nameplate.scale["Target"] = 1.1
+		p.hideSnakes         = true
+		p.hideSnakesFriendly = true
+		p.hideMirrorImage    = true
 
-		-- Sistema de amenaza apagado. Los DOS, por lo que dice el comentario
-		-- de OldSetting alla arriba: si no, al salir de una BG se reactiva.
 		if p.threat then p.threat.ON = false end
 		p.OldSetting = false
 
-		-- Auras / Dual Spec Roles removed: lock the addon to the DPS/Healing scheme.
 		local c = NidhausPlatesTheme.db.char
 		if c then
 			c.spec.primary = false
@@ -1083,13 +1035,6 @@ function NidhausPlatesTheme:OnInitialize()
 	end
 	NidhausPlatesTheme.ApplySimpleLayout()
 
-	-----------------------------------------------------------------------------
-	-- Custom Nameplates: la lista de nombres contra la que se compara unit.name
-	-- solo se reconstruia dentro de UpdateSpecial() (options.lua), y esa funcion
-	-- unicamente corre la PRIMERA vez que se abre la ventana de opciones. En un
-	-- perfil nuevo la lista quedaba vacia y las placas personalizadas no hacian
-	-- nada hasta abrir /tptp una vez. Ahora se reconstruye al iniciar.
-	-----------------------------------------------------------------------------
 	NidhausPlatesTheme.RebuildUniqueList = function()
 		local p = NidhausPlatesTheme.db and NidhausPlatesTheme.db.profile
 		if not p or not p.uniqueSettings then return end
@@ -1102,7 +1047,6 @@ function NidhausPlatesTheme:OnInitialize()
 	end
 	NidhausPlatesTheme.RebuildUniqueList()
 
-	-- dual spec profiles
 	if LDS then LDS:EnhanceDatabase(self.db, "Nidhaus Plates") end
 
 	local RegisterCallback = db.RegisterCallback
@@ -1111,24 +1055,6 @@ function NidhausPlatesTheme:OnInitialize()
 	RegisterCallback(self, "OnProfileCopied", "ProfChange")
 	RegisterCallback(self, "OnProfileReset", "ProfChange")
 
-	-----------------------------------------------------------------------------
-	-- AL SALIR (o con /reload), UNA COPIA CONGELADA DEL PERFIL.
-	--
-	-- AceDB, antes de escribir a disco, BORRA del perfil todo lo que vale lo
-	-- mismo que de fabrica: asi el archivo guarda solo lo que cambiaste.
-	-- "blizzFade" es uno de esos: si nunca lo tocaste, desaparece.
-	--
-	-- Pero el juego todavia no termino: despues esconde las placas, y una
-	-- placa que estaba casteando avisa "se escondio la barra de casteo".
-	-- Eso recalcula la transparencia (SetAlpha, en Functions.lua), que lee
-	-- db.profile.blizzFade... que ya no esta. Ese era el error "attempt to
-	-- index field 'blizzFade'": una sola vez, al salir o recargar, con alguien
-	-- casteando en pantalla.
-	--
-	-- AceDB avisa justo ANTES de borrar (OnDatabaseShutdown). Ahi el addon
-	-- pasa a leer una copia completa del perfil. El perfil real -- el que se
-	-- guarda -- no se toca: lo que se escribe a disco es igual que antes.
-	-----------------------------------------------------------------------------
 	local function FrozenCopy(src, seen)
 		if type(src) ~= "table" then return src end
 		seen = seen or {}
@@ -1142,8 +1068,7 @@ function NidhausPlatesTheme:OnInitialize()
 	end
 	RegisterCallback("NidhausPlates_Shutdown", "OnDatabaseShutdown", function(_, which)
 		if which and which ~= db then return end
-		-- Lo mismo que hace el PLAYER_LOGOUT de mas abajo (no guardar el
-		-- cache), pero sobre el perfil REAL, que es el que va a disco.
+
 		if db.profile then db.profile.cache = {} end
 		NidhausPlatesTheme.db = {
 			profile = FrozenCopy(db.profile),
@@ -1156,17 +1081,15 @@ end
 
 local UnitInGroup = NidhausPlatesUtility.UnitInGroup
 local TotemNameFallback = NidhausPlatesUtility.TotemNameFallback
--- Unit Classification
+
 function NidhausPlatesTheme.UnitType(unit)
 	DB = NidhausPlatesTheme.db.profile
 	local totem = TPtotemList[unit.name] or TPtotemList[TotemNameFallback(unit.name)]
 
-	-- a totem?
 	if totem then
 		return "Totem"
 	end
 
-	-- a unique unit?
 	local unique = tContains(DB.uniqueSettings.list, unit.name)
 	if unique then
 		for k_c, k_v in pairs(DB.uniqueSettings.list) do
@@ -1188,7 +1111,6 @@ function NidhausPlatesTheme.UnitType(unit)
 		end
 	end
 
-	-- a group member with hidden nameplates?
 	if (tContains(DB.uniqueSettings.list, "GROUP") and unit.name and UnitInGroup(unit.name)) then
 		if DB.friendlyNameOnly then
 			return "Normal", true
@@ -1204,44 +1126,25 @@ function NidhausPlatesTheme.UnitType(unit)
 		end
 	end
 
-	-- aboss?
 	if (unit.isDangerous and (unit.reaction == "FRIENDLY" or unit.reaction == "HOSTILE")) then
 		return "Boss"
 	end
 
-	-- an elite?
 	if (unit.isElite and not unit.isDangerous and (unit.reaction == "FRIENDLY" or unit.reaction == "HOSTILE")) then
 		return "Elite"
 	end
 
-	-- just an oridinary unit?
 	if (not unit.isElite and not unit.isDangerous and (unit.reaction == "FRIENDLY" or unit.reaction == "HOSTILE")) then
 		return "Normal"
 	end
 
-	-- a neutral unit?
 	if unit.reaction == "NEUTRAL" then
 		return "Neutral"
 	end
 
-	-- well, fallback to normal.
 	return "Normal"
 end
 
--- Ocultado rapido por nombre.
--- Reemplaza a los plugins de PlatesMaster (of_Purity para las serpientes) sin
--- tener que tocar la pestana Custom Nameplates. Se comprueba antes que nada:
--- devolver "empty" es el estilo que no dibuja placa.
--- OJO CON EL IDIOMA. Esta era la razon de que no ocultara nada.
---
--- unit.name llega YA TRADUCIDO por el cliente. Con el WoW en español las
--- serpientes de la trampa no se llaman "Viper" y "Venomous Snake" sino
--- "Víbora" y "Culebra venenosa", asi que la tabla en ingles no acertaba ni
--- una y salian todas con placa, propias y ajenas.
---
--- Se guardan los nombres de todos los idiomas juntos: dos criaturas
--- distintas no van a compartir nombre entre idiomas, con lo que la union no
--- puede dar falsos positivos.
 local ACCENTS = {
 	["á"]="a", ["à"]="a", ["ä"]="a", ["â"]="a", ["ã"]="a",
 	["é"]="e", ["è"]="e", ["ë"]="e", ["ê"]="e",
@@ -1257,9 +1160,6 @@ local ACCENTS = {
 	["Ñ"]="n", ["Ç"]="c",
 }
 
--- Minusculas + vocales sin tilde, para no depender de como venga escrito.
--- string.lower de Lua 5.1 solo toca ASCII: los bytes UTF-8 de las vocales
--- acentuadas los deja igual, de ahi que haga falta el mapa de arriba.
 local function Normalize(name)
 	if type(name) ~= "string" then return nil end
 	name = string.gsub(name, "[\194-\244][\128-\191]", function(ch)
@@ -1279,72 +1179,29 @@ local function AddNames(t, ...)
 end
 
 AddNames(HIDE_SNAKES,
-	"Viper",  "Venomous Snake",          -- enUS
-	"Vibora", "Culebra venenosa",        -- esES / esMX (visto en el cliente)
-	"Serpiente venenosa",                -- variante esMX
-	"Vipere", "Serpent venimeux",        -- frFR
-	"Giftschlange",                      -- deDE ("Viper" se escribe igual)
-	"Cobra venenosa")                    -- ptBR
+	"Viper",  "Venomous Snake",
+	"Vibora", "Culebra venenosa",
+	"Serpiente venenosa",
+	"Vipere", "Serpent venimeux",
+	"Giftschlange",
+	"Cobra venenosa")
 
 AddNames(HIDE_MIRROR,
-	"Mirror Image",                      -- enUS
-	"Imagen especular",                  -- esES / esMX
-	"Image miroir",                      -- frFR
-	"Spiegelbild")                       -- deDE
+	"Mirror Image",
+	"Imagen especular",
+	"Image miroir",
+	"Spiegelbild")
 
--- Y EL NOMBRE QUE USA ESTE CLIENTE, SIN ADIVINARLO.
---
--- Lo de arriba son traducciones escritas a mano, y una traduccion escrita a
--- mano es una que puede estar mal -- o puede no ser la que usa ESTE core.
--- Basta una letra o un acento distinto para que la tabla no acierte y la
--- placa salga igual, que es exactamente el sintoma.
---
--- Las copias del mago se llaman igual que el hechizo que las invoca, asi
--- que en vez de adivinar se lo preguntamos al juego: GetSpellInfo devuelve
--- el nombre en el idioma del cliente, sea cual sea. Eso no se puede
--- escribir mal.
---
--- La lista de arriba se deja como respaldo por si el core no conociera el
--- hechizo (GetSpellInfo devolveria nil).
 do
-	local n = GetSpellInfo(55342)        -- Mirror Image
+	local n = GetSpellInfo(55342)
 	if n then AddNames(HIDE_MIRROR, n) end
 end
 
--- =========================================================
--- LAS COPIAS DEL MAGO NO SE LLAMAN "MIRROR IMAGE"
---
--- Esto lo dijo la medicion, no una suposicion. Con tres copias en pantalla,
--- /nphide devolvio CUATRO placas llamadas "Shaddox" -- el nombre del MAGO.
--- La criatura no se llama "Mirror Image" en ningun idioma: se llama como su
--- dueno, que es justamente para lo que sirve el hechizo.
---
--- Conclusion incomoda: ningun filtro por nombre puede funcionar aca. Ni el
--- ingles, ni el traducido, ni el que saca GetSpellInfo. Hay que reconocerlas
--- por otra cosa.
---
--- Y esa otra cosa se ve en la misma captura: EL COLOR DE LA BARRA. El mago
--- es un jugador y va con color de clase -> unit.type == "PLAYER". Las
--- copias son criaturas y van en rojo hostil -> unit.type == "NPC".
---
---     Una placa de NPC que se llama igual que un jugador es una copia.
---
--- De donde sacamos "ese nombre es de un jugador", en orden de confianza:
---
---   1. EL COMBAT LOG. Alguien lanza Mirror Image y anotamos su nombre por
---      35 segundos (el hechizo dura 30). Llega ANTES de que aparezcan las
---      placas, asi que las copias nacen ya ocultas.
---   2. LA PLACA DEL MAGO, si esta a la vista. Es la red de seguridad para
---      cuando nos perdimos el casteo -- entraste a mitad de la ronda, o
---      estabas fuera de rango.
---
--- Las dos alimentan la misma tabla y las dos caducan solas.
--- =========================================================
 local MIRROR_IMAGE_SPELLID = 55342
-local MIRROR_WINDOW        = 35    -- el hechizo dura 30; el resto es margen
-local PLAYER_SEEN_WINDOW   = 30    -- cuanto vale haber visto a un jugador
+local MIRROR_WINDOW        = 35
+local PLAYER_SEEN_WINDOW   = 30
 
-local cloneOwners = {}   -- [nombre normalizado] = momento en que caduca
+local cloneOwners = {}
 
 local function NoteName(name, ttl)
 	local n = Normalize(name)
@@ -1368,11 +1225,6 @@ local function IsCloneOwner(name)
 	return true
 end
 
--- Fuente 1: el casteo.
---
--- El evento es carisimo (llega por cada golpe de cada bicho en pantalla),
--- asi que lo primero de todo es la salida rapida: con la casilla apagada
--- son dos comparaciones y chau.
 local mirrorWatch = CreateFrame("Frame")
 mirrorWatch:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 mirrorWatch:SetScript("OnEvent", function(self, event, timestamp, subEvent,
@@ -1382,28 +1234,13 @@ mirrorWatch:SetScript("OnEvent", function(self, event, timestamp, subEvent,
 	local db = NidhausPlatesTheme.db and NidhausPlatesTheme.db.profile
 	if not db or not db.hideMirrorImage then return end
 	if NoteName(srcName, MIRROR_WINDOW) then
-		-- Una placa ya dibujada no recalcula su estilo sola: solo lo hace
-		-- cuando algo del unit cambia. Sin este empujon, una copia quieta
-		-- podia quedarse a la vista hasta que le pasara algo.
+
 		if NidhausPlates and NidhausPlates.ForceUpdate then
 			pcall(NidhausPlates.ForceUpdate, NidhausPlates)
 		end
 	end
 end)
 
--- Fuente 3: LOS JUGADORES QUE EL JUEGO NOS DEJA MIRAR DIRECTO.
---
--- Las dos fuentes de arriba dejan un hueco real, y en arena es EL hueco: el
--- mago castea detras de un pilar -- fuera del combat log y con su placa sin
--- dibujar -- y las copias salen corriendo hacia vos. Ninguna de las dos lo
--- vio, asi que las copias aparecen con placa.
---
--- Pero en arena no hace falta ver la placa de nadie: arena1..arena5 son los
--- rivales, y el juego te da sus nombres siempre, esten donde esten. Lo mismo
--- target, foco y los del grupo.
---
--- Se relee una vez por segundo. Recorrer once unidades cada cuadro seria
--- trabajo al pedo: los nombres de una arena no cambian.
 local ROSTER_UNITS = {
 	"arena1", "arena2", "arena3", "arena4", "arena5",
 	"target", "focus", "mouseover",
@@ -1417,9 +1254,7 @@ local function RefreshRosterNames()
 	rosterStamp = now
 	for i = 1, #ROSTER_UNITS do
 		local u = ROSTER_UNITS[i]
-		-- Solo JUGADORES. La mascota del cazador tambien responde a
-		-- "arena1pet", pero un nombre de mascota metido aca haria
-		-- desaparecer placas que no son copias de nadie.
+
 		if UnitExists(u) and UnitIsPlayer(u) then
 			local n = UnitName(u)
 			if n then NoteName(n, PLAYER_SEEN_WINDOW) end
@@ -1427,9 +1262,6 @@ local function RefreshRosterNames()
 	end
 end
 
--- SetStyle se llama varias veces por placa y por refresco, asi que el
--- resultado se memoriza por nombre: a partir de la segunda vez que se ve una
--- criatura es una sola busqueda en tabla, sin normalizar de nuevo.
 local nameKind = {}
 local function KindOf(name)
 	local kind = nameKind[name]
@@ -1441,14 +1273,6 @@ local function KindOf(name)
 	return kind
 end
 
--- UN SOLO DUENO DE LA REGLA "ESTO VA OCULTO".
---
--- La decision la tomaba SetStyle y nadie mas la conocia. El problema es que
--- los widgets (el icono de Custom Nameplates, por ejemplo) se dibujan por
--- su cuenta, sin mirar que estilo salio: la placa quedaba escondida y el
--- iconito flotando igual en el aire. Ocultar es ocultar.
---
--- Ahora la regla vive en un solo lado y la pueden consultar los dos.
 function NidhausPlatesTheme.IsNameHidden(name, reaction, unitType)
 	if not name then return false end
 	local db = NidhausPlatesTheme.db and NidhausPlatesTheme.db.profile
@@ -1456,14 +1280,6 @@ function NidhausPlatesTheme.IsNameHidden(name, reaction, unitType)
 
 	local kind = KindOf(name)
 
-	-- Las copias del mago, por el criterio de arriba: criatura con nombre de
-	-- jugador. El unit.type es la mitad que no se puede saltear -- sin el
-	-- estariamos ocultando al mago de verdad, que se llama igual.
-	--
-	-- Se exige ademas que el nombre no sea uno de los conocidos: si alguien
-	-- se llamara "Viper", sus serpientes de trampa no tienen por que
-	-- desaparecer por culpa de la casilla del mago. Cada casilla manda sobre
-	-- lo suyo.
 	if not kind and db.hideMirrorImage and unitType == "NPC"
 		and IsCloneOwner(name) then
 		return true
@@ -1471,8 +1287,7 @@ function NidhausPlatesTheme.IsNameHidden(name, reaction, unitType)
 
 	if not kind then return false end
 	if kind == "snake" then
-		-- Propias y aliadas van por su propia casilla: hay quien quiere
-		-- ver las suyas para saber si la trampa sigue viva.
+
 		if reaction == "FRIENDLY" then
 			return db.hideSnakesFriendly and true or false
 		end
@@ -1487,14 +1302,6 @@ end
 function NidhausPlatesTheme.SetStyle(unit)
 	DB = NidhausPlatesTheme.db.profile
 
-	-- Fuente 2: si esta placa es la de un JUGADOR, se anota su nombre. La
-	-- copia se llama igual, asi que cuando toque evaluarla ya vamos a saber
-	-- que ese nombre es de alguien de carne y hueso.
-	--
-	-- Se anota siempre, no solo con la casilla puesta: es una tabla de
-	-- nombres con vencimiento, cuesta nada, y asi al tildar la casilla ya
-	-- esta poblada en vez de tener que esperar a que el mago vuelva a
-	-- castear.
 	if unit.type == "PLAYER" and unit.name then
 		NoteName(unit.name, PLAYER_SEEN_WINDOW)
 	end
@@ -1581,9 +1388,6 @@ function NidhausPlatesTheme.SetStyle(unit)
 	end
 end
 
--- Area de click del totem sin barra: solo el icono, un 20% mas grande para
--- que sea comodo de clickear (igual que RefinedBlizzPlates). Antes seguia
--- siendo el rectangulo ancho de la barra, invisible alrededor del icono.
 function NidhausPlatesTheme.HitboxOverride(unit, stylename)
 	if stylename ~= "etotem" then return end
 	local p = NidhausPlatesTheme.db and NidhausPlatesTheme.db.profile
@@ -1596,29 +1400,11 @@ end
 local function ShowConfigPanel()
 	NidhausPlatesTheme:OpenOptions()
 end
-------------
--- EVENTS --
-------------
--- Primer inicio de este personaje. Antes aca se detectaba la spec y se
--- elegia un rol (tanque / dps / sanador); el addon ya no usa roles, asi que
--- solo queda lo que hay que hacer una vez.
+
 function NidhausPlatesTheme:StartUp()
 	if not self.db.char.welcome then
 		self.db.char.welcome = true
-		-- BARRA DE CASTEO DE LOS QUE NO SON TU OBJETIVO.
-		--
-		-- No la decide el addon sino showVKeyCastbar, una CVar del cliente
-		-- que Blizzard trae apagada. El addon solo la leia y obedecia, asi
-		-- que de fabrica no se veia ninguna barra y toda la seccion Castbar
-		-- del panel salia en gris, sin que nada explicara por que.
-		--
-		-- Ahora se prende UNA sola vez, la primera. Despues queda la marca
-		-- puesta y no se vuelve a tocar: si la apagas desde el panel, se
-		-- queda apagada. Prenderla en cada login seria pelearle al usuario.
-		--
-		-- La CVar es del cliente y va por cuenta, no viaja con los perfiles
-		-- del addon; por eso conviene que la ponga el addon y no quedarse
-		-- esperando que uno se acuerde de prenderla en cada cuenta.
+
 		if not NidhausPlatesTheme.db.profile.castbarCVarInit then
 			NidhausPlatesTheme.db.profile.castbarCVarInit = true
 			if GetCVar("ShowVKeyCastbar") ~= "1" then
@@ -1633,7 +1419,7 @@ function NidhausPlatesTheme:StartUp()
 		end
 	end
 end
---
+
 local f = CreateFrame("Frame")
 local function EventHandler(self, event, ...)
 	DB = NidhausPlatesTheme.db.profile
@@ -1658,7 +1444,7 @@ local function EventHandler(self, event, ...)
 		f:UnregisterEvent("ADDON_LOADED")
 	elseif event == "PLAYER_LOGIN" then
 		NidhausPlatesTheme:StartUp()
-		CharDB.threat.tanking = false -- sin roles: siempre el esquema de amenaza unico
+		CharDB.threat.tanking = false
 		if GetCVar("nameplateShowEnemyTotems") == "1" then
 			DB.nameplate.toggle["Totem"] = true
 		else

@@ -2,9 +2,6 @@ if GetLocale() ~= "frFR" then return end
 local _, NidhausPlates = ...
 local L = NidhausPlates.L
 
---[[ NidhausPlatesPanel.lua ]]--
-----------------------
-
 L["No Automation"] = "Aucun"
 L["Show during Combat, Hide when Combat ends"] = "Montrer pendant le combat, cacher hors combat"
 L["Hide when Combat starts, Show when Combat ends"] = "Montrer hors combat, cacher pendant le combat"
@@ -24,10 +21,6 @@ L["|cFFFF6600Nidhaus Plates: |cFFFF9900No Theme is Selected. |cFF77FF00Use |cFFF
 
 L.resetPanel = "%sResetting %sNidhaus Plates %sTheme Selection to Default"
 L.resetPanelShift = "%sHolding down %sShift %swhile clicking %sReset Configuration %swill clear your saved settings, AND reload the user interface."
-
-----------------------
---[[ TankPanel.lua ]]--
-----------------------
 
 L["Default"] = "Par défault"
 L["Text Only"] = "Texte"
@@ -66,7 +59,7 @@ L["Current Target Opacity:"] = "Opacité de la cible:"
 L["Non-Target Opacity:"] = "Opacité des autres unités:"
 L["Opacity Spotlight Mode:"] = "Mode d'opacité spotlight:"
 L["Spotlight Opacity:"] = "Opacité spotlight:"
--- L["Bring Casting Units to Target Opacity"] = ""
+
 L["Use Target Opacity When No Target Exists"] = "Utiliser l'opacité de cible si aucune cible présente"
 L["Filtered Unit Opacity:"] = "Opcité des unités filtrées:"
 L["Filter Neutral Units"] = "Filtrer les unités neutres"
@@ -93,10 +86,7 @@ L["Attacking Me"] = "M'attaquant"
 L["Losing Aggro"] = "Perte d'aggro"
 L["Attacking Others"] = "Attaquant les autres"
 L["Attacking Another Tank"] = "Attaquant un autre tank"
--- L["Show Warning around Group Members with Aggro"] = true
--- L["Show Class Color for Party and Raid Members"] = true
--- L["Widgets"] = true
--- L["Show Highlight on Current Target"] = true
+
 L["Show Elite Indicator"] = "Montrer l'icone d'élite"
 L["Show Enemy Class Icons"] = "Afficher les classes des enemies"
 L["Show Party Member Class Icons"] = "Afficher les classes des membres du groupe"
@@ -109,20 +99,11 @@ L["Range:"] = "Distance:"
 L["Show My Debuff Timers"] = "Montrer la durée de mes debuffs"
 L["Debuff Filter:"] = "Filtre des debuffs:"
 L["Debuff Names:"] = "Noms des debuffs:"
--- L["WidgetsDebuffTrackList_Description"] = [[
--- Tip: |cffCCCCCCDebuffs should be listed with the exact name, or a spell ID number.
--- You can use the prefixes, "My" or "All", to distinguish personal damage spells from global crowd control spells.
--- Auras at the top of the list will get displayed before lower ones.|r
--- ]]
--- L["Frame"] = true
+
 L["Vertical Position of Artwork:"] = "Position verticale de la texture:"
 L["Paste"] = "Coller"
 L["Copy"] = "Copier"
 L["Reset"] = "Rétablir"
-
-----------------------
---[[ DamagePanel.lua ]]--
-----------------------
 
 L["Show All Debuffs"] = "Tous les debuffs"
 L["Show Specific Debuffs... "] = "Debuffs spécifics"

@@ -1,6 +1,3 @@
-----------------------
--- Elite Art Widget --
-----------------------
 local path = "Interface\\AddOns\\Nidhaus_Plates\\Theme\\Widgets\\EliteArtWidget\\"
 
 local function UpdateEliteFrameArt(frame, unit)

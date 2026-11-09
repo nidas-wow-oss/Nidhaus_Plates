@@ -1,24 +1,3 @@
---[[
-
-Faux Plate
-
-Ideas:
-#1
-NidhausPlates:ApplyThemeToFrame(frame, unittable)
-Runs the units' UpdateStyle function, and applies the current theme to the frame.
--Benefit:
--Drawback: Need to know when theme changes
-
-#2
-NidhausPlates:CreateBlankPlate() returns a frame
-
-#3 Total simulation
-Addon creates a frame
-
-use: pcall(function() end)
-to process the style changes
---]]
-
 local NidhausPlates = NidhausPlates
 local OnNewNameplate = NidhausPlates.OnNewNameplate
 local Plates = {}
@@ -36,12 +15,9 @@ local function CreateFauxPlate(plate)
 		bars = extended.bars
 		extended.stylename = ""
 
-		-- Create Statusbars
 		local level = plate:GetFrameLevel()
 		bars.healthbar = CreateNidhausPlatesStatusbar(extended)
 		bars.castbar = CreateNidhausPlatesStatusbar(extended)
-
-		--extended.text = CreateFrame("Frame", nil, healthbar)
 
 		local health, cast, healthbar, castbar = bars.health, bars.cast, bars.healthbar, bars.castbar
 		healthbar:SetFrameLevel(level)
@@ -49,7 +25,6 @@ local function CreateFauxPlate(plate)
 		castbar:SetFrameLevel(level)
 		castbar:SetStatusBarColor(1, .8, 0)
 
-		-- Create Visual Regions
 		visual = extended.visual
 		visual.threatborder = healthbar:CreateTexture(nil, "ARTWORK")
 		visual.specialArt = extended:CreateTexture(nil, "OVERLAY")

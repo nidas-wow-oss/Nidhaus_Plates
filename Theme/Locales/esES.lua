@@ -1,21 +1,5 @@
 local L = LibStub("AceLocale-3.0"):NewLocale("NidhausPlatesTheme", "esES", false)
 if not L then return end
--- =========================================================
--- EL NOMBRE QUE SE VE EN EL CHAT
---
--- El addon se llama Nidhaus_Plates, pero los mensajes seguian diciendo
--- "Nidhaus Plates" y "Nidhaus Plates", que es de donde viene la base.
---
--- OJO CON UNA COSA: en AceLocale la CLAVE es el texto en ingles, y es lo
--- que busca el codigo. Cambiar la clave rompe la busqueda -- AceLocale
--- tira error al pedir una que no existe. Asi que las claves quedan
--- intactas y lo que cambia es el VALOR, que es lo unico que se imprime.
--- =========================================================
-
--- Traduccion al espanol.
--- Los nombres de criaturas se dejan en ingles a proposito: el addon los compara
--- contra el nombre real de la unidad, y solo funcionan si coinciden exactamente
--- con el nombre del cliente. Ver NOTA al final del archivo.
 
 L["-->>|cffff0000DPS Plates Enabled|r<<--"] = "-->>|cffff0000Placas de DPS activadas|r<<--"
 L["|cff89F559Nidhaus Plates|r: DPS switch detected, you are now in your |cff89F559"] = "|cff89F559Nidhaus Plates|r: cambio a DPS detectado, ahora estás en tu |cff89F559"
@@ -333,7 +317,6 @@ L["Rounded swaps the square highlight for a frame with rounded corners."] = "Red
 L["The same thin frame the minimap uses. The cast bar has its own setting."] = "El mismo marco fino que usa el minimapa. La barra de casteo tiene su propio ajuste."
 L["Hides the nameplates of the mage's Mirror Image copies."] = "Oculta las placas de las copias del Mirror Image del mago."
 
--- Marcador de sanadores en BG (modulo Healers)
 L["Battleground Healers"] = "Sanadores en BG"
 L["Enable Healer Marks"] = "Activar marcador de sanadores"
 L["Marks the nameplates of enemy and allied healers in battlegrounds."] = "Marca las placas de los sanadores enemigos y aliados en los campos de batalla."
@@ -358,7 +341,6 @@ L["Right"] = "Derecha"
 L["X Offset"] = "Desplazamiento X"
 L["Y Offset"] = "Desplazamiento Y"
 
--- Widget de ID de arena / grupo
 L["Arena / Party ID"] = "ID de arena / grupo"
 L["Show Arena / Party ID"] = "Mostrar ID de arena / grupo"
 L["Shows the arena number (1-5) or the party number (1-4) on the nameplate."] = "Muestra el numero de arena (1-5) o el de grupo (1-4) sobre la placa."
@@ -369,7 +351,6 @@ L["Center"] = "Centro"
 L["Bottom"] = "Abajo"
 L["Use Class Color"] = "Usar color de clase"
 
--- Borde del icono de clase
 L["Icon Border"] = "Borde del icono"
 L["Draws a border around the class icon. Square on the square themes, a ring on Circle."] = "Dibuja un borde alrededor del icono de clase. Cuadrado en los temas cuadrados y un anillo en Circle."
 L["Border Thickness"] = "Grosor del borde"

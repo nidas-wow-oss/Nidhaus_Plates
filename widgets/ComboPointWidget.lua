@@ -1,12 +1,8 @@
-------------------------------
--- Combo Point Widget
-------------------------------
 local comboWidgetPath = "Interface\\Addons\\Nidhaus_Plates\\widgets\\ComboWidget\\"
 
 local WidgetList = {}
 setmetatable(WidgetList, {__mode = "kv"})
 
--- Update Graphics
 local function UpdateWidgetFrame(frame)
 	local points
 	if UnitExists("target") then
@@ -20,17 +16,14 @@ local function UpdateWidgetFrame(frame)
 	end
 end
 
--- Context
 local function UpdateWidgetContext(frame, unit)
 	local guid = unit.guid
 	frame.guid = guid
 
-	-- Add to Widget List
 	if guid then
 		WidgetList[guid] = frame
 	end
 
-	-- Update Widget
 	if UnitGUID("target") == guid then
 		UpdateWidgetFrame(frame)
 	else
@@ -46,7 +39,6 @@ local function ClearWidgetContext(frame)
 	end
 end
 
--- Watcher Frame
 local WatcherFrame = CreateFrame("Frame", nil, WorldFrame)
 local isEnabled = false
 WatcherFrame:RegisterEvent("UNIT_COMBO_POINTS")
@@ -71,20 +63,16 @@ local function EnableWatcherFrame(arg)
 	end
 end
 
--- Widget Creation
 local function CreateWidgetFrame(parent)
-	-- Required Widget Code
+
 	local frame = CreateFrame("Frame", nil, parent)
 	frame:Hide()
 
-	-- Custom Code
 	frame:SetHeight(32)
 	frame:SetWidth(64)
 	frame.Icon = frame:CreateTexture(nil, "OVERLAY")
 	frame.Icon:SetAllPoints(frame)
-	-- End Custom Code
 
-	-- Required Widget Code
 	frame.UpdateContext = UpdateWidgetContext
 	frame.Update = UpdateWidgetFrame
 	frame._Hide = frame.Hide

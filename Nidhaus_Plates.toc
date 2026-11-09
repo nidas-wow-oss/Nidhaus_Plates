@@ -6,15 +6,10 @@
 ## SavedVariables: NidhausPlatesDB, NidhausPlatesData, BGHsettings, ThreatPlatesDB
 ## SavedVariablesPerCharacter: NidhausPlatesOptions, TidyPlatesOptions
 
-# ThreatPlatesDB y TidyPlatesOptions son los nombres viejos de las opciones
-# guardadas. Se cargan solo para pasarlas a los nombres nuevos (Migrate.lua)
-# y despues quedan vacios. Se pueden quitar de aca en una version futura.
 Migrate.lua
 
-# Motor de las placas
 Engine.xml
 
-# Tema, opciones y widgets
 Theme\Libs\embeds.xml
 Theme\Locales\locales.xml
 Theme\Core.lua
@@ -26,6 +21,5 @@ Theme\Styles.xml
 Theme\ArcaneSkin.lua
 Theme\BGClassScan.lua
 
-# Marcador de sanadores en BG (portado de BattleGroundHealers, de Khal)
 Healers\Locales.xml
 Healers\Healers.lua

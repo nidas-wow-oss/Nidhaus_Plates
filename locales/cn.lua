@@ -1,12 +1,6 @@
--- translated by: meatgaga#9470 --
-
 if GetLocale() ~= "zhCN" then return end
 local _, NidhausPlates = ...
 local L = NidhausPlates.L
-
-----------------------
---[[ NidhausPlatesPanel.lua ]]--
-----------------------
 
 L["No Automation"] = "无自动化"
 L["Show during Combat, Hide when Combat ends"] = "战斗时显示"
@@ -27,10 +21,6 @@ L["|cFFFF6600Nidhaus Plates: |cFFFF9900No Theme is Selected. |cFF77FF00Use |cFFF
 
 L.resetPanel = "%s正在将%sNidhaus Plates%s主题选择重置为默认。"
 L.resetPanelShift = "%s按下%sShift%s并点击%s重置配置%s会清除已保存的设置，并重载界面。"
-
-----------------------
---[[ TankPanel.lua ]]--
-----------------------
 
 L["Default"] = "默认"
 L["Text Only"] = "仅文字"
@@ -128,10 +118,6 @@ L["Vertical Position of Artwork:"] = "垂直位置："
 L["Paste"] = "粘贴"
 L["Copy"] = "复制"
 L["Reset"] = "重置"
-
-----------------------
---[[ DamagePanel.lua ]]--
-----------------------
 
 L["Show All Debuffs"] = "显示全部"
 L["Show Specific Debuffs... "] = "显示指定…"

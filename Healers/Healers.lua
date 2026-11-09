@@ -1,47 +1,22 @@
------------------------------------------------------------------------------------------------------
-----------------------------------------  BattleGroundHealers  --------------------------------------
------------------------------------------------------------------------------------------------------
-----  Marks BG healer nameplates with a configurable icon.                                       ----                               
-----                                                                                             ----
-----  Supports two detection methods that can work simultaneously:                               ----
-----    - Combat Log    : Detection based on the spells cast and auras applied.                  ----
-----                      * Includes optional automatic Combat Log fix.                          ----
-----    - BG Scoreboard : Detection based on the ratio between healing and damage.               ----
-----                      (healing > h2d * damage  &  healing > hth)                             ----
-----                                                                                             ----
-----  Allows printing the list of detected healers to personal or public chat channels.          ----
-----                                                                                             ----
-----  Slash Commands:                                                                            ----
-----    - /bgh       : Opens the configuration panel                                             ----
-----    - /bgh print : Prints the list of detected healers to the selected channel               ----
-----    - /bgh h2d # : Modifies healing-to-damage ratio threshold for BG Scoreboard detection    ----
-----    - /bgh hth # : Modifies healing threshold for BG Scoreboard detection                    ----
-----    - /bgh debug : Toggles Debug Mode                                                        ----
-----                                                                                             ----
-----  Designed for WoW 3.3.5a (WotLK)                                                            ----
-----  by Khal                                                                                    ----
------------------------------------------------------------------------------------------------------
------------------------------------------------------------------------------------------------------
-
 local addonName = ...
 local version = GetAddOnMetadata(addonName, "Version")
 
 local DefaultSettings = {
-    enabled = 1,                -- Interruptor general del modulo (1 = on, 0 = off)
-    CLEUtracking = 1,           -- Detect healers via Combat Log (1 = enabled, 0 = disabled)
-    CLEUfix = 1,                -- Automatic Combat Log fix (1 = enabled, 0 = disabled)
-    WSSFtracking = 1,           -- Detect healers via BG Scoreboard (1 = enabled, 0 = disabled)
-    h2dRatio = 2.5,             -- BG Scoreboard healing-to-damage ratio threshold (1 to 5)
-    healingThreshold = 50000,   -- BG Scoreboard healing detection threshold (10k to 100k)
-    printChannel = "BG",        -- Channel to print the healers list ("BG", "Party", "Guild" or "Self")
-    iconStyle = "Blizzlike",    -- Icon style ("Blizzlike" or "Minimalist")
-    iconSize = 40,              -- Icon size (20 to 40)
-    iconAnchor = "top",         -- Icon anchor relative to the nameplate ("left", "top" or "right")
-    iconXoffset = 0,            -- Horizontal offset relative to the icon anchor (-100 to 100)
-    iconYoffset = 0,            -- Vertical offset relative to the icon anchor (-40 to 40)
-    iconInvertColor = 0,        -- Invert icon colors, by default enemies are red and allies are blue (1 = enabled, 0 = disabled)
-    enableInArena = 0,          -- Tambien marcar healers en ARENAS (1 = si, 0 = solo battlegrounds)
-    showMessages = 1,           -- Addon chat messages (1 = enabled, 0 = disabled)
+    enabled = 1,
+    CLEUtracking = 1,
+    CLEUfix = 1,
+    WSSFtracking = 1,
+    h2dRatio = 2.5,
+    healingThreshold = 50000,
+    printChannel = "BG",
+    iconStyle = "Blizzlike",
+    iconSize = 40,
+    iconAnchor = "top",
+    iconXoffset = 0,
+    iconYoffset = 0,
+    iconInvertColor = 0,
+    enableInArena = 0,
+    showMessages = 1,
 }
 
 local setmetatable, print, next, ipairs, pairs, unpack, rawget, select, pcall, string_format, string_lower, string_find, table_insert, table_remove, math_sqrt, math_abs, math_floor, math_min, math_max, tonumber =
@@ -74,7 +49,7 @@ local BlizzPlates = true
 local KhalPlatesCheck = false
 local NidhausPlatesCheck = false
 local ElvUICheck = false
-local ElvUIdynamicAnchor = true -- Forces the icon to follow ElvUI's HealthBar (it moves or hides with it). Set to false for a static "always show" state.
+local ElvUIdynamicAnchor = true
 local KuiNameplatesCheck = false
 local AloftCheck = false
 local debugMode = false
@@ -109,51 +84,51 @@ for _, className in ipairs(HealerClasses) do
 end
 
 local HealerSpells = {
-    --------------------------------PALADIN--------------------------------
-    20473, 20929, 20930, 27174, 33072, 48824, 48825,  -- Holy Shock	
-    53563,  -- Beacon of Light
-    31842,  -- Divine Illumination
-    20216,  -- Divine Favor
-    31834,  -- Light's Grace
-    53655, 53656, 53657, 54152, 54153,  -- Judgements of the Pure
-    53672, 54149,  -- Infusion of Light
-    53659,  -- Sacred Cleansing
-    --------------------------------SHAMAN---------------------------------
-    49284, 49283, 32594, 32593, 974,  -- Earth Shield	
-    61301, 61300, 61299, 61295,  -- Riptide
-    51886,  -- Cleanse Spirit
-    16190,  -- Mana Tide Totem
-    16188,  -- Nature's Swiftness
-    55198,  -- Tidal Force
-    53390,  -- Tidal Waves
-    31616,  -- Nature's Guardian
-    16177, 16236, 16237, -- Ancestral Fortitude
-    ---------------------------------DRUID---------------------------------
-    53251, 53249, 53248, 48438,  -- Wild Growth
-    33891,  -- Tree of Life
-    18562,  -- Swiftmend
-    17116,  -- Nature's Swiftness
-    48504,  -- Living Seed
-    45283, 45282, 45281,  -- Natural Perfection		
-    --------------------------------DPRIEST--------------------------------
-    47750, 52983, 52984, 52985,  -- Penance
-    10060,  -- Power Infusion
-    33206,  -- Pain Suppression
-    47930,  -- Grace
-    59891, 59890, 59889, 59888, 59887,  -- Borrowed Time
-    45242, 45241, 45237,  -- Focused Will		
-    47753,  -- Divine Aegis
-    63944,  -- Renewed Hope	
-    --------------------------------HPRIEST--------------------------------	
-    48089, 48088, 34866, 34865, 34864, 34863, 34861,  -- Circle of Healing		
-    47788,	-- Guardian Spirit	
-    48085, 48084, 28276, 27874, 27873, 7001,  -- Lightwell Renew                
-    33151,  -- Surge of light	
-    65081, 64128,  -- Body and Soul
-    33143,  -- Blessed Resilience         
-    63725, 63724, 34754,  -- Holy Concentration
-    63734, 63735, 63731,  -- Serendipity
-    27827,  -- Spirit of Redemption                
+
+    20473, 20929, 20930, 27174, 33072, 48824, 48825,
+    53563,
+    31842,
+    20216,
+    31834,
+    53655, 53656, 53657, 54152, 54153,
+    53672, 54149,
+    53659,
+
+    49284, 49283, 32594, 32593, 974,
+    61301, 61300, 61299, 61295,
+    51886,
+    16190,
+    16188,
+    55198,
+    53390,
+    31616,
+    16177, 16236, 16237,
+
+    53251, 53249, 53248, 48438,
+    33891,
+    18562,
+    17116,
+    48504,
+    45283, 45282, 45281,
+
+    47750, 52983, 52984, 52985,
+    10060,
+    33206,
+    47930,
+    59891, 59890, 59889, 59888, 59887,
+    45242, 45241, 45237,
+    47753,
+    63944,
+
+    48089, 48088, 34866, 34865, 34864, 34863, 34861,
+    47788,
+    48085, 48084, 28276, 27874, 27873, 7001,
+    33151,
+    65081, 64128,
+    33143,
+    63725, 63724, 34754,
+    63734, 63735, 63731,
+    27827,
 }
 local healerSpellHash = {}
 for _, spellID in ipairs(HealerSpells) do
@@ -223,9 +198,9 @@ local function HandleLevelTextOverlap(BGHframe)
                 end
             elseif BGHsettings.iconStyle == "Minimalist" then
                 local inOverlapDomain = (
-                    x < -0.2 * D + 14 and 
-                    x > -0.8 * D + 14 and 
-                    y < 0.325 * D - 0.5 and 
+                    x < -0.2 * D + 14 and
+                    x > -0.8 * D + 14 and
+                    y < 0.325 * D - 0.5 and
                     y > -0.325 * D + 0.5
                 )
                 local OverlapAdjustment = not (
@@ -250,7 +225,6 @@ local function HandleLevelTextOverlap(BGHframe)
     end
 end
 
-------------- Update the icon texture if it changes  -------------
 local function UpdateTextures(BGHframe)
     local texture = MarkedNames[BGHframe.activeName]
     if texture then
@@ -261,15 +235,14 @@ local function UpdateTextures(BGHframe)
         end
     else
         BGHframe.icon:Hide()
-        BGHframe.prevTexture = nil   
+        BGHframe.prevTexture = nil
     end
-    -- Hide Blizz default plate's level text if it overlaps with the icon
-    if BlizzPlates then  
+
+    if BlizzPlates then
         HandleLevelTextOverlap(BGHframe)
     end
 end
 
------------- Update all mark frames when the configuration changes  ------------
 local function UpdateAllMarks()
     for plate, BGHframe in pairs(GlobalNamePlates) do
         if BGHframe.icon then
@@ -310,13 +283,12 @@ local function BGHonUpdate(BGHframe)
     end
 end
 
----- Checks if the frame is a nameplate ----
 local function IsNamePlate(frame)
-    if frame.RealPlate  -- KhalPlates
-    or frame.extended   -- NidhausPlates
-    or frame.UnitFrame  -- ElvUI
-    or frame.kui        -- KuiNameplates
-    or frame.aloftData  -- Aloft
+    if frame.RealPlate
+    or frame.extended
+    or frame.UnitFrame
+    or frame.kui
+    or frame.aloftData
     then
         return true
     end
@@ -324,10 +296,9 @@ local function IsNamePlate(frame)
     return r2 and r2:GetObjectType() == "Texture" and r2:GetTexture() == "Interface\\Tooltips\\Nameplate-Border"
 end
 
----- Checks and replaces the nameplate anchor if custom ----
 local function CheckCustomPlate(nameplate)
     local nameRegion, levelRegion = select(7, nameplate:GetRegions())
-    if nameplate.RealPlate then -- KhalPlates
+    if nameplate.RealPlate then
         if not KhalPlatesCheck then
             KhalPlatesCheck = true
             BlizzPlates = false
@@ -346,7 +317,7 @@ local function CheckCustomPlate(nameplate)
                 },
             }
         end
-    elseif nameplate.extended then -- NidhausPlates
+    elseif nameplate.extended then
         nameplate = nameplate.extended
         if not NidhausPlatesCheck then
             NidhausPlatesCheck = true
@@ -366,7 +337,7 @@ local function CheckCustomPlate(nameplate)
                 },
             }
         end
-    elseif nameplate.UnitFrame then -- ElvUI
+    elseif nameplate.UnitFrame then
         if ElvUIdynamicAnchor and nameplate.UnitFrame.Health then
             nameplate = nameplate.UnitFrame.Health
         else
@@ -390,7 +361,7 @@ local function CheckCustomPlate(nameplate)
                 },
             }
         end
-    elseif nameplate.kui then -- KuiNameplates
+    elseif nameplate.kui then
         nameRegion, levelRegion = nameplate.kui.oldName, nameplate.kui.level
         if not KuiNameplatesCheck then
             KuiNameplatesCheck = true
@@ -410,7 +381,7 @@ local function CheckCustomPlate(nameplate)
                 },
             }
         end
-    elseif nameplate.aloftData then -- Aloft
+    elseif nameplate.aloftData then
         if not AloftCheck then
             AloftCheck = true
             BlizzPlates = false
@@ -433,7 +404,6 @@ local function CheckCustomPlate(nameplate)
     return nameplate, nameRegion, levelRegion
 end
 
--------- Setup a frame that manages the mark texture parameters  --------
 local function SetupNamePlate(nameplate)
     local plate, nameRegion, levelRegion = CheckCustomPlate(nameplate)
     local BGHframe = CreateFrame("Frame", nil, plate)
@@ -491,11 +461,6 @@ local function SetupNamePlate(nameplate)
     end
 end
 
------- Detects when the number of nameplates in the WorldFrame increases  ------
---
--- Se guarda el frame en una local (antes era anonimo) para poder pararlo
--- cuando el modulo se desactiva desde el menu. Si no, seguiria recorriendo
--- WorldFrame en cada fotograma aunque el marcador estuviera apagado.
 local ChildCount, NewChildCount = 0
 local Scanner = CreateFrame("Frame")
 local function ScannerOnUpdate()
@@ -503,7 +468,7 @@ local function ScannerOnUpdate()
     if ChildCount ~= NewChildCount then
         for i = ChildCount + 1, NewChildCount do
             local child = select(i, WorldFrame:GetChildren())
-            -- 1 frame delay to ensure custom nameplate is available --
+
             CreateFrame("Frame"):SetScript("OnUpdate", function(self)
                 self:Hide()
                 if IsNamePlate(child) then
@@ -516,7 +481,6 @@ local function ScannerOnUpdate()
 end
 Scanner:SetScript("OnUpdate", ScannerOnUpdate)
 
---------- Assigns a healer mark to a nameplate ---------
 local function SetBGHmark(name, texture)
     if texture == "blue" then
         MarkedNames[name] = IconTextures.Blizzlike.Blue
@@ -545,7 +509,6 @@ local function RGBToHex(r, g, b)
     return string_format("|cff%02x%02x%02x", r * 255, g * 255, b * 255)
 end
 
------------ Updates BG players list -----------
 local function UpdateCurrentBGplayers()
     currentBGplayers = {}
     for i = 1, GetNumBattlefieldScores() do
@@ -584,7 +547,6 @@ local function UpdateCurrentBGplayers()
     ClearDeserterHealers(CLEUhealers)
 end
 
----------- Updates the list of healers based on the BG Scoreboard (WorldStateScoreFrame), prioritizing the Combat Log healers list if active ----------
 local function UpdateWSSFhealers()
     if BGHsettings.WSSFtracking == 1 then
         local name, faction, class, damageDone, healingDone, _
@@ -598,21 +560,20 @@ local function UpdateWSSFhealers()
                         SetBGHmark(name, ((BGHsettings.iconInvertColor == 1) == (faction == playerFaction)) and IconTextures[BGHsettings.iconStyle].Red or IconTextures[BGHsettings.iconStyle].Blue)
                         if debugMode then
                             BGHprint(string_format("Debug: %s (%s) added to BG Scoreboard healers list.", name, faction == 1 and "Alliance" or "Horde"))
-                        end 
+                        end
                     end
                 elseif WSSFhealers[name] then
                     WSSFhealers[name] = nil
                     SetBGHmark(name, nil)
                     if debugMode then
                         BGHprint(string_format("Debug: %s (%s) removed from BG Scoreboard healers list (below healing-to-damage ratio).", name, faction == 1 and "Alliance" or "Horde"))
-                    end 
+                    end
                 end
             end
         end
     end
 end
 
------------ Manages Combat Log tracking, considering a player can change specs during the Preparation phase -----------
 local function UpdateCLEUstate()
     if BGHsettings.CLEUtracking == 1 then
         local inPreparation = false
@@ -640,18 +601,18 @@ local function UpdateCLEUstate()
             end
         else
             if not CLEUregistered then
-                CLEUframe:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")    
-                CLEUregistered = true        
+                CLEUframe:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+                CLEUregistered = true
                 if debugMode then
                     BGHprint("Debug: Combat Log tracking enabled.")
-                end 
+                end
             end
             if not USSregistered and BGHsettings.CLEUfix == 1 then
                 CLEUframe:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
                 USSregistered = true
                 if debugMode then
                     BGHprint("Debug: Automatic Combat Log fix enabled.")
-                end 
+                end
             end
         end
     end
@@ -660,7 +621,7 @@ end
 local lastCLEUtime = nil
 local CLEUtimeout = nil
 local CLEUcheck = false
-------------------- Updates the list of healers based on Combat Log Events -------------------
+
 local function CLEUhandler(self, event, ...)
     if event == "COMBAT_LOG_EVENT_UNFILTERED" then
         lastCLEUtime = GetTime()
@@ -684,7 +645,7 @@ local function CLEUhandler(self, event, ...)
                                 end
                                 if debugMode then
                                     BGHprint(string_format("Debug: %s (%s) added to Combat Log healers list (spellID: %s)", name, faction == 1 and "Alliance" or "Horde", spellID))
-                                end 
+                                end
                                 if WSSFhealers[name] then
                                     WSSFhealers[name] = nil
                                     if debugMode then
@@ -729,7 +690,7 @@ end
 
 local lastUpdateTime = 0
 local UPDATE_INTERVAL = 5
----------- Periodically updates healer lists and fix the Combat Log if it's unresponsive ----------
+
 local function OnUpdate(self, elapsed)
     lastUpdateTime = lastUpdateTime + elapsed
     if lastUpdateTime >= UPDATE_INTERVAL then
@@ -751,13 +712,13 @@ local function OnUpdate(self, elapsed)
 		CombatLogClearEntries()
         if debugMode then
             BGHprint("Debug: Combat Log unresponsive. Entries cleared to fix it.")
-        end   
+        end
 	end
 end
 
 local lastPrintTime = 0
 local printCooldown = 5
----------------- Prints the list of detected healers with a cooldown control ----------------
+
 local function PrintDetectedHealers()
     if not inBG then
         BGHprint(L["Print failed (not in BG)"])
@@ -826,7 +787,6 @@ local function PrintDetectedHealers()
     lastPrintTime = currentTime
 end
 
----------------------------- Creates a panel to manage the configuration settings  ----------------------------
 local function ConfigUI()
     if not BGHConfigUIglobalFrame then
         local ConfigUIFrame = CreateFrame("Frame", "BGHConfigUIglobalFrame", UIParent)
@@ -887,12 +847,12 @@ local function ConfigUI()
             leftLine:SetTexture(0.55, 0.55, 0.55, 1)
             leftLine:SetPoint("LEFT", subtitle, "LEFT", -lineWidth, -1)
             leftLine:SetPoint("RIGHT", subtitle, "LEFT", -5, -1)
-            leftLine:SetHeight(1) 
+            leftLine:SetHeight(1)
             local rightLine = ConfigUIFrame:CreateTexture(nil, "OVERLAY")
             rightLine:SetTexture(0.55, 0.55, 0.55, 1)
             rightLine:SetPoint("LEFT", subtitle, "RIGHT", 5, -1)
             rightLine:SetPoint("RIGHT", subtitle, "RIGHT", lineWidth, -1)
-            rightLine:SetHeight(1) 
+            rightLine:SetHeight(1)
             return leftLine, rightLine
         end
 
@@ -905,21 +865,19 @@ local function ConfigUI()
             return texture
         end
 
-        ---------- Healer Detection Methods ----------
-        ConfigUIFrame.subtitle1 = ConfigUIFrame:CreateFontString(nil,"ARTWORK") 
+        ConfigUIFrame.subtitle1 = ConfigUIFrame:CreateFontString(nil,"ARTWORK")
         ConfigUIFrame.subtitle1:SetFont("Fonts\\FRIZQT__.TTF", 11)
         ConfigUIFrame.subtitle1:SetPoint("TOP", 0, -53)
         ConfigUIFrame.subtitle1:SetText(L["Healer Detection Methods"])
         ConfigUIFrame.subtitle1:SetTextColor(1, 0.82, 0, 1)
         CreateSeparatorLine(ConfigUIFrame.subtitle1)
 
-        -- Automatic Combat Log Fix (Checkbox)
         local CLEUfixCheckbox = CreateFrame("CheckButton", "BGHConfigUICLEUfixCheckbox", ConfigUIFrame, "UICheckButtonTemplate")
         CLEUfixCheckbox:SetPoint("TOPLEFT", 59, -102)
         CLEUfixCheckbox:SetSize(21, 21)
         CLEUfixCheckbox.Text = _G[CLEUfixCheckbox:GetName() .. "Text"]
         CLEUfixCheckbox.Text:SetText(L["Automatic Combat Log Fix"])
-        CLEUfixCheckbox.Text:SetPoint("LEFT", CLEUfixCheckbox, "RIGHT", 1, 1) 
+        CLEUfixCheckbox.Text:SetPoint("LEFT", CLEUfixCheckbox, "RIGHT", 1, 1)
         CLEUfixCheckbox.Text:SetFont(CLEUfixCheckbox.Text:GetFont(), 9.5)
         CLEUfixCheckbox.Text:SetTextColor(1, 1, 1, 1)
         CLEUfixCheckbox:SetChecked(BGHsettings.CLEUfix == 1)
@@ -931,15 +889,14 @@ local function ConfigUI()
                 CLEUframe:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED")
                 USSregistered = false
             end
-        end)    
-        
-        -- Combat Log Tracking (Checkbox)
+        end)
+
         local CLEUtrackingCheckbox = CreateFrame("CheckButton", "BGHConfigUICLEUtrackingCheckbox", ConfigUIFrame, "UICheckButtonTemplate")
         CLEUtrackingCheckbox:SetPoint("TOPLEFT", 34, -77)
         CLEUtrackingCheckbox:SetSize(24, 24)
         CLEUtrackingCheckbox.Text = _G[CLEUtrackingCheckbox:GetName() .. "Text"]
         CLEUtrackingCheckbox.Text:SetText(L["Track Healers via Combat Log"])
-        CLEUtrackingCheckbox.Text:SetPoint("LEFT", CLEUtrackingCheckbox, "RIGHT", 1, 1) 
+        CLEUtrackingCheckbox.Text:SetPoint("LEFT", CLEUtrackingCheckbox, "RIGHT", 1, 1)
         CLEUtrackingCheckbox.Text:SetTextColor(1, 1, 1, 1)
         CLEUtrackingCheckbox:SetChecked(BGHsettings.CLEUtracking == 1)
         if BGHsettings.CLEUtracking == 1 then
@@ -970,17 +927,16 @@ local function ConfigUI()
                 if inBG then
                     UpdateCurrentBGplayers()
                     UpdateWSSFhealers()
-                end   
+                end
             end
-        end)    
+        end)
 
-        -- BG Scoreboard Tracking (Checkbox)
         local WSSFtrackingCheckbox = CreateFrame("CheckButton", "BGHConfigUIWSSFtrackingCheckbox", ConfigUIFrame, "UICheckButtonTemplate")
         WSSFtrackingCheckbox:SetPoint("TOPLEFT", 34, -127)
         WSSFtrackingCheckbox:SetSize(24, 24)
         WSSFtrackingCheckbox.Text = _G[WSSFtrackingCheckbox:GetName() .. "Text"]
         WSSFtrackingCheckbox.Text:SetText(L["Track Healers via BG Scoreboard"])
-        WSSFtrackingCheckbox.Text:SetPoint("LEFT", WSSFtrackingCheckbox, "RIGHT", 1, 1) 
+        WSSFtrackingCheckbox.Text:SetPoint("LEFT", WSSFtrackingCheckbox, "RIGHT", 1, 1)
         WSSFtrackingCheckbox.Text:SetTextColor(1, 1, 1, 1)
         WSSFtrackingCheckbox:SetChecked(BGHsettings.WSSFtracking == 1)
         WSSFtrackingCheckbox:SetScript("OnClick", function(self)
@@ -994,9 +950,8 @@ local function ConfigUI()
                 BGHsettings.WSSFtracking = 0
                 ClearHealers(WSSFhealers)
             end
-        end) 
+        end)
 
-        -- Print Channel (Dropdown)
         local printChannelDropdown = CreateFrame("Frame", "BGHConfigUIprintChannelDropdown", ConfigUIFrame, "UIDropDownMenuTemplate")
         printChannelDropdown:SetPoint("TOPRIGHT", -18, -161)
         printChannelDropdown.Label = ConfigUIFrame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
@@ -1027,8 +982,7 @@ local function ConfigUI()
                 UIDropDownMenu_AddButton(info, level)
             end
         end)
-      
-        -- Print Healers (Button)
+
         local printHealersButton = CreateFrame("Button", "BGHConfigUIprintHealersButton", ConfigUIFrame, "UIPanelButtonTemplate")
         printHealersButton:SetSize(91, 26)
         printHealersButton:GetFontString():SetFont(printHealersButton:GetFontString():GetFont(), 10.5)
@@ -1036,17 +990,15 @@ local function ConfigUI()
         printHealersButton:SetText(L["Print Healers"])
         printHealersButton:SetScript("OnClick", function()
             PrintDetectedHealers()
-        end)   
+        end)
 
-        ----------- Icon Display Settings -----------
-        ConfigUIFrame.subtitle2 = ConfigUIFrame:CreateFontString(nil,"ARTWORK") 
+        ConfigUIFrame.subtitle2 = ConfigUIFrame:CreateFontString(nil,"ARTWORK")
         ConfigUIFrame.subtitle2:SetFont("Fonts\\FRIZQT__.TTF", 11)
         ConfigUIFrame.subtitle2:SetPoint("TOP", 0, -204)
         ConfigUIFrame.subtitle2:SetText(L["Icon Display Settings"])
         ConfigUIFrame.subtitle2:SetTextColor(1, 0.82, 0, 1)
         CreateSeparatorLine(ConfigUIFrame.subtitle2)
 
-        -- Icon Size (Slider)
         local iconSizeSlider = CreateFrame("Slider", "BGHConfigUIiconSizeSlider", ConfigUIFrame, "OptionsSliderTemplate")
         iconSizeSlider:SetSize(185, 15)
         iconSizeSlider:SetPoint("TOP", 0, -242)
@@ -1058,7 +1010,7 @@ local function ConfigUI()
         iconSizeSlider.Label:SetText(L["Icon Size"])
         iconSizeSlider.Label:SetFont(GameFontNormal:GetFont(), 10.5)
         iconSizeSlider.Thumb = iconSizeSlider:GetThumbTexture()
-        iconSizeSlider.Value = iconSizeSlider:CreateFontString(nil, "ARTWORK", "GameFontHighlight") 
+        iconSizeSlider.Value = iconSizeSlider:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
         iconSizeSlider.Value:SetPoint("BOTTOM", iconSizeSlider.Thumb, "TOP", 0, -4)
         iconSizeSlider.Value:SetText(iconSizeSlider:GetValue())
         iconSizeSlider.Value:SetFont(GameFontHighlight:GetFont(), 10.5)
@@ -1070,7 +1022,6 @@ local function ConfigUI()
             UpdateAllMarks()
         end)
 
-        -- Icon Style (Dropdown)
         local iconStyleDropdown = CreateFrame("Frame", "BGHConfigUIiconStyleDropdown", ConfigUIFrame, "UIDropDownMenuTemplate")
         iconStyleDropdown:SetPoint("TOPLEFT", 18, -292)
         iconStyleDropdown.Label = ConfigUIFrame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
@@ -1087,7 +1038,7 @@ local function ConfigUI()
         iconStyleDropdown.Text:SetJustifyH("CENTER")
         iconStyleDropdown.Options = {"Blizzlike", "Minimalist"}
         UIDropDownMenu_SetWidth(iconStyleDropdown, 85)
-        UIDropDownMenu_SetText(iconStyleDropdown, BGHsettings.iconStyle or "Blizzlike")  
+        UIDropDownMenu_SetText(iconStyleDropdown, BGHsettings.iconStyle or "Blizzlike")
         UIDropDownMenu_Initialize(iconStyleDropdown, function(self, level)
             for _, iconStyle in ipairs(iconStyleDropdown.Options) do
                 local info = UIDropDownMenu_CreateInfo()
@@ -1106,15 +1057,12 @@ local function ConfigUI()
                 end
                 UIDropDownMenu_AddButton(info, level)
             end
-        end) 
+        end)
 
-        -- Icon X offset (Slider)
         local iconXoffsetSlider = CreateFrame("Slider", "BGHConfigUIiconXoffsetSlider", ConfigUIFrame, "OptionsSliderTemplate")
         iconXoffsetSlider:SetSize(185, 15)
         iconXoffsetSlider:SetPoint("TOP", 0, -343)
-        -- RANGO AMPLIADO A 100 (de fabrica eran 40).
-        -- Solo cambia el limite del control: el valor guardado y como se
-        -- aplica siguen igual.
+
         iconXoffsetSlider:SetMinMaxValues(-100, 100)
         iconXoffsetSlider:SetValueStep(1)
         iconXoffsetSlider:SetValue(BGHsettings.iconXoffset or 0)
@@ -1135,7 +1083,6 @@ local function ConfigUI()
             UpdateAllMarks()
         end)
 
-        -- Icon Y offset (Slider)
         local iconYoffsetSlider = CreateFrame("Slider", "BGHConfigUIiconYoffsetSlider", ConfigUIFrame, "OptionsSliderTemplate")
         iconYoffsetSlider:SetSize(185, 15)
         iconYoffsetSlider:SetPoint("TOP", 0, -392)
@@ -1159,7 +1106,6 @@ local function ConfigUI()
             UpdateAllMarks()
         end)
 
-        -- Icon Anchor (Dropdown)
         local iconAnchorDropdown = CreateFrame("Frame", "BGHConfigUIiconAnchorDropdown", ConfigUIFrame, "UIDropDownMenuTemplate")
         iconAnchorDropdown:SetPoint("TOPRIGHT", -18, -292)
         iconAnchorDropdown.Label = ConfigUIFrame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
@@ -1196,15 +1142,14 @@ local function ConfigUI()
                 end
                 UIDropDownMenu_AddButton(info, level)
             end
-        end)       
- 
-        -- Invert Icon Color (Checkbox)
+        end)
+
         local iconInvertColorCheckbox = CreateFrame("CheckButton", "BGHConfigUIiconInvertColorCheckbox", ConfigUIFrame, "UICheckButtonTemplate")
         iconInvertColorCheckbox:SetPoint("TOPLEFT", 34, -432)
         iconInvertColorCheckbox:SetSize(24, 24)
         iconInvertColorCheckbox.Text = _G[iconInvertColorCheckbox:GetName().."Text"]
         iconInvertColorCheckbox.Text:SetText(L["Invert Icon Color"])
-        iconInvertColorCheckbox.Text:SetPoint("LEFT", iconInvertColorCheckbox, "RIGHT", 1, 1) 
+        iconInvertColorCheckbox.Text:SetPoint("LEFT", iconInvertColorCheckbox, "RIGHT", 1, 1)
         iconInvertColorCheckbox.Text:SetTextColor(1, 1, 1, 1)
         iconInvertColorCheckbox:SetChecked(BGHsettings.iconInvertColor == 1)
         iconInvertColorCheckbox:SetScript("OnClick", function(self)
@@ -1213,9 +1158,8 @@ local function ConfigUI()
                 MarkedNames[name] = invertTextureColor(texture)
             end
             UpdateAllMarks()
-        end)    
+        end)
 
-        -- Mark Target (Button)
         local testMarkButton = CreateFrame("Button", "BGHConfigUItestMarkButton", ConfigUIFrame, "UIPanelButtonTemplate")
         local testModeMarkedNames = {}
         testMarkButton:SetSize(95, 26)
@@ -1243,13 +1187,12 @@ local function ConfigUI()
             UpdateAllMarks()
         end)
 
-        -- Test Mode (Checkbox)
         local testModeCheckbox = CreateFrame("CheckButton", "BGHConfigUItestModeCheckbox", ConfigUIFrame, "UICheckButtonTemplate")
         testModeCheckbox:SetPoint("TOPLEFT", 34, -462)
         testModeCheckbox:SetSize(24, 24)
         testModeCheckbox.Text = _G[testModeCheckbox:GetName().."Text"]
         testModeCheckbox.Text:SetText(L["Enable Test Mode"])
-        testModeCheckbox.Text:SetPoint("LEFT", testModeCheckbox, "RIGHT", 1, 1) 
+        testModeCheckbox.Text:SetPoint("LEFT", testModeCheckbox, "RIGHT", 1, 1)
         testModeCheckbox.Text:SetTextColor(1, 1, 1, 1)
         testModeCheckbox:SetChecked(false)
         testModeCheckbox:SetScript("OnClick", function(self)
@@ -1263,14 +1206,8 @@ local function ConfigUI()
                 testModeMarkedNames = {}
                 UpdateAllMarks()
             end
-        end)    
+        end)
 
-        -- Tambien en arenas (Checkbox)
-        --
-        -- El modulo nacio pensado para battlegrounds: la deteccion por
-        -- marcador (Scoreboard) solo existe ahi. En arena queda la
-        -- deteccion por combat log, que alcanza de sobra -- un healer
-        -- tira su primera curacion en los primeros segundos.
         local arenaCheckbox = CreateFrame("CheckButton", "BGHConfigUIarenaCheckbox", ConfigUIFrame, "UICheckButtonTemplate")
         arenaCheckbox:SetPoint("TOPLEFT", 34, -492)
         arenaCheckbox:SetSize(24, 24)
@@ -1281,14 +1218,10 @@ local function ConfigUI()
         arenaCheckbox:SetChecked(BGHsettings.enableInArena == 1)
         arenaCheckbox:SetScript("OnClick", function(self)
             BGHsettings.enableInArena = self:GetChecked() and 1 or 0
-            -- Se pide por CAMPO y no por local: RefreshZoneState se define
-            -- mas abajo en el archivo, y en Lua un local de mas abajo no
-            -- existe para el codigo de arriba. Como campo se resuelve
-            -- recien al hacer click, que es despues de todo.
+
             if BGH.RefreshZoneState then BGH.RefreshZoneState() end
         end)
 
-        -- Reset Settings (Button)
         local resetButton = CreateFrame("Button", "BGHConfigUIresetButton", ConfigUIFrame, "UIPanelButtonTemplate")
         resetButton:SetSize(80, 27)
         resetButton:GetFontString():SetPoint("CENTER", resetButton, "CENTER", 0, 0.5)
@@ -1347,16 +1280,16 @@ local function ConfigUI()
                         end
                     end
                     if BGHsettings.WSSFtracking == 1 then
-                        WSSFtrackingCheckbox:SetChecked(true)   
+                        WSSFtrackingCheckbox:SetChecked(true)
                         if inBG then
                             UpdateCurrentBGplayers()
                             UpdateWSSFhealers()
                         end
                     else
-                        WSSFtrackingCheckbox:SetChecked(false)  
+                        WSSFtrackingCheckbox:SetChecked(false)
                         ClearHealers(WSSFhealers)
-                    end  
-                    UIDropDownMenu_SetText(printChannelDropdown, BGHsettings.printChannel)  
+                    end
+                    UIDropDownMenu_SetText(printChannelDropdown, BGHsettings.printChannel)
                     iconSizeSlider:SetValue(BGHsettings.iconSize)
                     UIDropDownMenu_SetText(iconStyleDropdown, BGHsettings.iconStyle)
                     UIDropDownMenu_SetText(iconAnchorDropdown, BGHsettings.iconAnchor)
@@ -1373,7 +1306,6 @@ local function ConfigUI()
             StaticPopup_Show("CONFIRM_RESET_BGH_CONFIG")
         end)
 
-        -- Script to move and scale ConfigUIFrame
         ConfigUIFrame:SetMovable(true)
         ConfigUIFrame:EnableMouse(true)
         ConfigUIFrame:SetClampedToScreen(true)
@@ -1405,7 +1337,6 @@ local function ConfigUI()
             end
         end)
 
-        -- Script to disable Test Mode when ConfigUIFrame is closed
         ConfigUIFrame:HookScript("OnHide", function()
             if testModeCheckbox:GetChecked() then
                 testModeCheckbox:SetChecked(false)
@@ -1426,7 +1357,6 @@ local function ConfigUI()
     end
 end
 
-------------------- Adds the addon's panel to the game interface options -------------------
 local function AddInterfaceOptions()
     local addonPanel = CreateFrame("Frame")
     addonPanel.name = "BattleGroundHealers"
@@ -1438,7 +1368,7 @@ local function AddInterfaceOptions()
         title:SetJustifyV("TOP")
         title:SetShadowColor(0, 0, 0)
         title:SetShadowOffset(1, -1)
-        title:SetText(self.name)              
+        title:SetText(self.name)
         local description = self:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
         description:SetFont(GameFontHighlightSmall:GetFont(), 12)
         description:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -18)
@@ -1465,7 +1395,6 @@ local function AddInterfaceOptions()
     InterfaceOptions_AddCategory(addonPanel)
 end
 
---------- Reset tracking state before joining other BG ---------
 local function ResetTrackingState()
     BGH:SetScript("OnUpdate",nil)
     CLEUframe:SetScript("OnEvent", nil)
@@ -1473,8 +1402,8 @@ local function ResetTrackingState()
     CLEUframe:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED")
     CLEUregistered = false
     USSregistered = false
-    playerFaction = false  
-    currentBGplayers = {} 
+    playerFaction = false
+    currentBGplayers = {}
     lastUpdateTime = 0
     lastCLEUtime = nil
     CLEUtimeout = nil
@@ -1485,15 +1414,6 @@ local function ResetTrackingState()
     BGH.HordeCount = 0
 end
 
--- =====================================================================
--- Interruptor general (Nidhaus_Plates)
---
--- El addon original no tenia forma de apagarse: o lo cargabas o no. Aqui
--- vive dentro de Nidhaus_Plates, asi que hace falta una casilla. Apagarlo
--- no es solo dejar de pintar iconos: hay que soltar los eventos, parar el
--- recorrido de WorldFrame y esconder lo que hubiera puesto, o el trabajo
--- se sigue haciendo en balde.
--- =====================================================================
 local moduleEnabled = false
 
 local function HideAllMarks()
@@ -1502,23 +1422,12 @@ local function HideAllMarks()
     end
 end
 
--- ¿ESTA ZONA CUENTA?
---
--- Antes la pregunta estaba escrita dos veces como instanceType == "pvp",
--- una en el arranque en caliente y otra en PLAYER_ENTERING_WORLD. Dos
--- copias de la misma regla es como se desincronizan las cosas, asi que
--- ahora hay una sola y las dos preguntan aca.
 local function ZoneWanted(instanceType)
     if instanceType == "pvp" then return true end
     if instanceType == "arena" then return BGHsettings.enableInArena == 1 end
     return false
 end
 
--- Volver a mirar la zona AHORA MISMO.
---
--- La usa la casilla de arenas: si la tildas estando ya adentro de una, no
--- tiene sentido esperar al proximo PLAYER_ENTERING_WORLD para que empiece
--- a marcar. Hace lo mismo que ese evento, ni mas ni menos.
 local function RefreshZoneState()
     if not moduleEnabled then return end
     local _, instanceType = IsInInstance()
@@ -1540,9 +1449,6 @@ local function RefreshZoneState()
     end
 end
 
--- Se cuelga del frame para que el panel, que esta ESCRITO MAS ARRIBA en
--- el archivo, pueda llamarla. Un local declarado aca abajo no existe para
--- el codigo de arriba.
 BGH.RefreshZoneState = RefreshZoneState
 
 local function ApplyEnabled()
@@ -1554,7 +1460,7 @@ local function ApplyEnabled()
         Scanner:SetScript("OnUpdate", ScannerOnUpdate)
         BGH:RegisterEvent("PLAYER_ENTERING_WORLD")
         BGH:RegisterEvent("UPDATE_BATTLEFIELD_STATUS")
-        -- Si ya estabas dentro de un BG al encenderlo, arrancar en caliente.
+
         local _, instanceType = IsInInstance()
         if ZoneWanted(instanceType) then
             inBG = true
@@ -1576,7 +1482,6 @@ local function ApplyEnabled()
     end
 end
 
--- Lo llama la pagina de opciones de Nidhaus_Plates.
 function BGH.SetEnabled(on)
     if not BGHsettings then return end
     BGHsettings.enabled = on and 1 or 0
@@ -1589,15 +1494,11 @@ end
 
 BGH.ApplySettings = UpdateAllMarks
 
-------------------- Script to manage the addon's main frame events -------------------
 BGH:RegisterEvent("ADDON_LOADED")
 BGH:SetScript("OnEvent", function(self, event, ...)
     if event == "ADDON_LOADED" and (...) == addonName then
         self:UnregisterEvent("ADDON_LOADED")
 
-        -- Si el addon suelto sigue instalado y activo, este modulo se calla.
-        -- Los dos harian lo mismo sobre la misma placa y verias el icono
-        -- duplicado, ademas de recorrer WorldFrame dos veces por fotograma.
         if IsAddOnLoaded("BattleGroundHealers") then
             Scanner:SetScript("OnUpdate", nil)
             print("|cff00FF98[Nidhaus_Plates]|r " .. (L["BGH_DUPLICATE"] or
@@ -1606,8 +1507,7 @@ BGH:SetScript("OnEvent", function(self, event, ...)
         end
 
         InitSettings()
-        -- El panel propio en Interfaz ya no se registra: los ajustes viven en
-        -- la pagina "Battleground Healers" de este mismo addon.
+
         moduleEnabled = false
         ApplyEnabled()
     elseif event == "PLAYER_ENTERING_WORLD" then
@@ -1620,7 +1520,7 @@ BGH:SetScript("OnEvent", function(self, event, ...)
                 UpdateCLEUstate()
             end
             inBG = true
-            self:SetScript("OnUpdate", OnUpdate) 
+            self:SetScript("OnUpdate", OnUpdate)
             CLEUframe:SetScript("OnEvent", CLEUhandler)
         elseif inBG then
             inBG = false
@@ -1640,7 +1540,6 @@ BGH:SetScript("OnEvent", function(self, event, ...)
     end
 end)
 
------------------------- Slash Commands ------------------------
 SLASH_NPHEALERS1 = "/nphealers"
 SLASH_NPHEALERS2 = "/bgh"
 SlashCmdList["NPHEALERS"] = function(msg)
@@ -1662,7 +1561,7 @@ SlashCmdList["NPHEALERS"] = function(msg)
                 if (value > 5) then value = 5 end
                 if (value < 1) then value = 1 end
                 BGHsettings.h2dRatio = value;
-                BGHprint(L["BG Scoreboard healing-to-damage tracking ratio set to:"], BGHsettings.h2dRatio);       
+                BGHprint(L["BG Scoreboard healing-to-damage tracking ratio set to:"], BGHsettings.h2dRatio);
             else
                 BGHprint(L["Value is not a number"]);
             end
@@ -1676,16 +1575,16 @@ SlashCmdList["NPHEALERS"] = function(msg)
                 if (value > 100000) then value = 100000 end
                 if (value < 10000) then value = 10000 end
                 BGHsettings.healingThreshold = value;
-                BGHprint(L["BG Scoreboard healing tracking threshold set to:"], BGHsettings.healingThreshold);       
+                BGHprint(L["BG Scoreboard healing tracking threshold set to:"], BGHsettings.healingThreshold);
             else
                 BGHprint(L["Value is not a number"]);
             end
         end
     elseif cmd == "debug" then
-        if debugMode then 
+        if debugMode then
             debugMode = false
             BGHprint("Debug mode " .. HEX_RED .. "Disabled" .. "|r")
-        else 
+        else
             debugMode = true
             BGHprint("Debug mode " .. HEX_GREEN .. "Enabled" .. "|r")
         end

@@ -1,9 +1,6 @@
-----------------------
--- PolledHideIn() - Registers a callback, which polls the frame until it expires, then hides the frame and removes the callback
-----------------------
 local PolledHideIn
 do
-	local Framelist = {} -- Key = Frame, Value = Expiration Time
+	local Framelist = {}
 	local Watcherframe = CreateFrame("Frame")
 	local WatcherframeActive = false
 	local select = select
@@ -16,20 +13,20 @@ do
 		end
 		local framecount = 0
 		timeToUpdate = curTime + 1
-		-- Cycle through the watchlist, hiding frames which are timed-out
+
 		for frame, expiration in pairs(Framelist) do
-			-- If expired...
+
 			if expiration < curTime then
-				-- If active...
+
 				frame:Hide()
 				Framelist[frame] = nil
 			else
-				-- Update the frame
+
 				frame:Poll(expiration)
 				framecount = framecount + 1
 			end
 		end
-		-- If no more frames to watch, unregister the OnUpdate script
+
 		if framecount == 0 then
 			Watcherframe:SetScript("OnUpdate", nil)
 			WatcherframeActive = false
@@ -54,19 +51,17 @@ end
 
 local CrowdControlMonitor = CreateFrame("Frame")
 
--- List of Widget Frames
 local WidgetList = {}
--- GUIDs
+
 local CrowdControlledUnits = {}
 local CrowdControlExpirationTimes = {}
--- Raid Icon to GUID 		-- ex.  ByRaidIcon["SKULL"] = GUID
+
 local ByRaidIcon = {}
--- Name to GUID
+
 local ByName = {}
 
--- ID and Normal Duration (PvP MAX is 10 seconds)
 local CrowdControlSpells = {}
-CrowdControlSpells[339] = true -- Entangling Roots
+CrowdControlSpells[339] = true
 
 local function CrowdControlAura_Update(targetguid, targetname, sourceguid, sourcename, spellid, spellname)
 	local targetUnitId
@@ -79,10 +74,8 @@ local function CrowdControlAura_Update(targetguid, targetname, sourceguid, sourc
 		end
 	end
 
-	-- Register Crowd Control to Target GUID
 	CrowdControlledUnits[targetguid] = spellid
 
-	-- Attempt to gather Expiration time from Caster, or use 10 seconds (A table of times might be another option)
 	if targetUnitId then
 		local name, rank, icon, count, dispelType, duration, expires = UnitDebuff(targetUnitId, spellname)
 		CrowdControlExpirationTimes[targetguid] = expires
@@ -97,10 +90,10 @@ local function CrowdControlAura_Remove(targetguid, ...)
 end
 
 local CombatLogEvents = {
-	-- Refresh Expire Time
+
 	["SPELL_AURA_APPLIED"] = CrowdControlAura_Update,
 	["SPELL_AURA_REFRESH"] = CrowdControlAura_Update,
-	-- Expires Aura
+
 	["SPELL_AURA_BROKEN"] = CrowdControlAura_Remove,
 	["SPELL_AURA_BROKEN_SPELL"] = CrowdControlAura_Remove,
 	["SPELL_AURA_REMOVED"] = CrowdControlAura_Remove
@@ -123,12 +116,11 @@ local function CrowdControlEventHandler(frame, event, timestamp, combatevent, so
 
 	if CombatLogFunction and (bit.band(destFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) > 0) then
 		if CrowdControlSpells[spellId] then
-			-- Cache Unit Name
+
 			if bit.band(sourceFlags, COMBATLOG_OBJECT_CONTROL_PLAYER) > 0 then
 				ByName[destName] = destGUID
 			end
 
-			-- Cache Raid Icon Data
 			for iconname, bitmask in pairs(RaidIconBit) do
 				if bit.band(destFlags, bitmask) > 0 then
 					ByRaidIcon[iconname] = destGUID
@@ -136,10 +128,8 @@ local function CrowdControlEventHandler(frame, event, timestamp, combatevent, so
 				end
 			end
 
-			-- Update Data Table
 			CombatLogFunction(destGUID, destName, sourceGUID, sourceName, spellId, spellName)
 
-			-- Update Widget
 			for widget in pairs(WidgetList) do
 				widget:UpdateIcon()
 			end
@@ -157,9 +147,6 @@ local function Disable()
 	CrowdControlMonitor:UnregisterAllEvents()
 end
 
-------------------------------------------------- Widget Frames
-
--- Polled by PolledHideIn
 local function UpdateWidgetTime(frame, expiration)
 	local timeleft = ceil(expiration - GetTime())
 	frame.TimeLeft:SetText(timeleft)
@@ -198,15 +185,13 @@ local function UpdateWidgetIcon(frame)
 	frame:Hide()
 end
 
--- Context Update (mouseover, target change)
 local function UpdateWidgetContext(frame, unit)
-	-- Context Update
+
 	frame.Unit = unit
 	WidgetList[frame] = true
 
-	-- Update widget *now*, depending on context
 	if unit.isTarget or unit.isMouseover or unit.isMarked then
-		-- Update Widget
+
 		frame:UpdateIcon()
 	end
 end
@@ -223,20 +208,20 @@ local function CreateCrowdControlWidget(parent)
 	local frame = CreateFrame("Frame", nil, parent)
 	frame:SetWidth(64)
 	frame:SetHeight(64)
-	-- Backdrop
+
 	frame.Backdrop = frame:CreateTexture(nil, "ARTWORK")
 	frame.Backdrop:SetWidth(256)
 	frame.Backdrop:SetHeight(128)
 	frame.Backdrop:SetPoint("CENTER", 0, -27)
 	frame.Backdrop:SetTexture(backdropart)
-	-- Icon
+
 	frame.Icon = frame:CreateTexture(nil, "BACKGROUND")
 	frame.Icon:SetWidth(53)
 	frame.Icon:SetHeight(33)
 	frame.Icon:SetPoint("CENTER")
 	frame.Icon:SetTexture(testicon)
 	frame.Icon:SetTexCoord(.07, 1 - .07, .23, 1 - .23)
-	-- Text
+
 	frame.TimeLeft = frame:CreateFontString(nil, "OVERLAY")
 	frame.TimeLeft:SetFont(font, 20, "OUTLINE")
 	frame.TimeLeft:SetShadowOffset(1, -1)
@@ -246,7 +231,7 @@ local function CreateCrowdControlWidget(parent)
 	frame.TimeLeft:SetHeight(16)
 	frame.TimeLeft:SetJustifyH("RIGHT")
 	frame.TimeLeft:SetText("20")
-	-- Functions
+
 	frame.UpdateContext = UpdateWidgetContext
 	frame.UpdateIcon = UpdateWidgetIcon
 	frame.Poll = UpdateWidgetTime

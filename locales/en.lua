@@ -13,20 +13,12 @@ local L = setmetatable({}, {
     end
 })
 
--- Quick usage of string.format
--- @param line the line to print
--- @param ...
--- @return returns the formatted
 function L:F(line, ...)
     line = L[line]
     return format(line, ...)
 end
 
 NidhausPlates.L = L
-
-----------------------
---[[ NidhausPlatesPanel.lua ]]--
-----------------------
 
 L["No Automation"] = true
 L["Show during Combat, Hide when Combat ends"] = true
@@ -47,10 +39,6 @@ L["|cFFFF6600Nidhaus Plates: |cFFFF9900No Theme is Selected. |cFF77FF00Use |cFFF
 
 L.resetPanel = "%sResetting %sNidhaus Plates %sTheme Selection to Default"
 L.resetPanelShift = "%sHolding down %sShift %swhile clicking %sReset Configuration %swill clear your saved settings, AND reload the user interface."
-
-----------------------
---[[ TankPanel.lua ]]--
-----------------------
 
 L["Default"] = true
 L["Text Only"] = true
@@ -149,10 +137,6 @@ L["Paste"] = true
 L["Copy"] = true
 L["Reset"] = true
 
-----------------------
---[[ DamagePanel.lua ]]--
-----------------------
-
 L["Show All Debuffs"] = true
 L["Show Specific Debuffs... "] = true
 L["Show All My Debuffs "] = true
@@ -160,10 +144,6 @@ L["Show My Specific Debuffs... "] = true
 L["By High Threat"] = true
 L["Gaining Aggro"] = true
 L["Show Warning on Group Members with Aggro"] = true
-
----------------------
---[[ Totem Names ]]--
----------------------
 
 L["Fire Resistance Totem I"] = true
 L["Fire Resistance Totem II"] = true

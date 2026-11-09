@@ -3,15 +3,11 @@ local L = LibStub("AceLocale-3.0"):GetLocale("NidhausPlatesTheme")
 local LDS = LibStub("LibDualSpec-1.0", true)
 local class = select(2, UnitClass("Player"))
 
--- Titulo de la ventana de opciones: solo el nombre, sin numero de
--- version. Antes se leia del .toc y quedaba un "v6.5.0" que es de la
--- base original (Nidhaus Plates), no de esta build.
 local ADDON_NAME = ...
 NidhausPlatesTheme.title = NidhausPlatesTheme.DISPLAY_NAME
 local path = "Interface\\Addons\\Nidhaus_Plates\\Theme\\Media\\Artwork\\"
 local db
 
--- Reference Tables
 local themeList = {"normal", "tank", "dps", "totem", "unique", "text"}
 local FullAlign = {
 	TOPLEFT = "TOPLEFT",
@@ -164,20 +160,15 @@ StaticPopupDialogs["TPTP Donate"] = {
 	hideOnEscape = 1
 }
 
--- Simplified build: el dialogo "TPTP Discord" solo lo abria el boton de la
--- pestana About, que ya no existe. Se elimina para no dejarlo colgando.
-
--- Shared Media Configs
 local MediaFetch = NidhausPlatesUtility.MediaFetch
 local MediaList = NidhausPlatesUtility.MediaList
 local MediaRegister = NidhausPlatesUtility.MediaRegister
 MediaRegister("statusbar", "NidhausPlatesBar", [[Interface\Addons\Nidhaus_Plates\Theme\Media\Artwork\TP_BarTexture.tga]])
 MediaRegister("font", "Accidental Presidency", [[Interface\Addons\Nidhaus_Plates\Theme\Media\Fonts\Accidental Presidency.ttf]])
--- Extra fonts
+
 MediaRegister("font", "Continuum Medium", [[Interface\Addons\Nidhaus_Plates\Theme\Media\Fonts\ContinuumMedium.ttf]])
 MediaRegister("font", "Domyouji Regular", [[Interface\Addons\Nidhaus_Plates\Theme\Media\Fonts\DomyoujiRegular.ttf]])
 
--- Functions
 local function GetSpellName(number)
 	return (GetSpellInfo(number))
 end
@@ -238,8 +229,6 @@ local function ThreatDisabled()
 	end
 end
 
--- Saved Variables Only
-
 local function GetValue(info)
 	local a, b, c, d = info.arg[1], info.arg[2], info.arg[3], info.arg[4]
 	if d then
@@ -268,18 +257,6 @@ local function SetValue(info, val)
 	Update()
 end
 
--- ============================================================
--- Marcador de sanadores (modulo Healers)
---
--- Sus ajustes NO viven en el perfil de AceDB como el resto de la pestaña,
--- sino en la global BGHsettings, que es como los guardaba el addon del que
--- viene. Se dejan ahi a proposito: asi el modulo sigue siendo el mismo
--- codigo de siempre y se puede actualizar sin reescribirle la base de datos.
--- De ahi que necesite sus propios get/set en vez de GetValue/SetValue.
---
--- Ademas guarda los booleanos como 1 y 0, no como true/false, asi que las
--- casillas necesitan un par aparte que traduzca.
--- ============================================================
 local function BGHmodule()
 	return _G.NidhausPlatesHealers
 end
@@ -315,7 +292,6 @@ local function SetBGH(info, val)
 	if m and m.ApplySettings then m.ApplySettings() end
 end
 
--- Todo lo que no sea la casilla maestra se apaga cuando el modulo esta off.
 local function BGHoff()
 	return not (BGHready() and BGHsettings.enabled == 1)
 end
@@ -348,8 +324,6 @@ local function SetValueChar(info, val)
 	end
 	Update()
 end
-
--- Colors
 
 local function GetColor(info)
 	local h, i, j, k = info.arg[1], info.arg[2], info.arg[3], info.arg[4]
@@ -413,8 +387,6 @@ local function SetColorAlpha(info, r, g, b, a)
 	Update()
 end
 
--- Set Theme Values
-
 local function SetThemeValue(info, val)
 	local a, b, c, d = info.arg[1], info.arg[2], info.arg[3], info.arg[4]
 	db[a][b][c] = val
@@ -424,15 +396,6 @@ local function SetThemeValue(info, val)
 	Update()
 end
 
--- Setter propio para el icono clicable del totem.
---
--- No sirve SetThemeValue: espera un arg de tres niveles (db[a][b][c]) y este
--- ajuste vive suelto en la raiz del perfil, asi que b y c llegaban nil y
--- reventaba al indexar.
---
--- Ademas hay que recalcular el hitbox a mano: los estilos lo construyen una
--- sola vez en ADDON_LOADED, asi que sin esto el cambio no se veria hasta
--- recargar la interfaz.
 local function SetThemeValueArt(info, val)
 	local a, b, c, d = info.arg[1], info.arg[2], info.arg[3], info.arg[4]
 	db[a][b][c] = val
@@ -442,22 +405,6 @@ local function SetThemeValueArt(info, val)
 	Update()
 end
 
--- Borde de la barra de vida: comparte el desplegable con las texturas del
--- tema, pero "Light" no es una de ellas.
---
--- Las otras dos son un .tga que el motor estira al ancho de la placa. La
--- textura Light esta hecha para SetBackdrop, con esquinas propias: estirada
--- como overlay plano las esquinas se emborronan. Por eso el modo Light se
--- dibuja como un marco aparte (mira NidhausPlatesCore) y aca lo unico que se
--- hace es levantar la bandera y dejar la textura anterior donde estaba: el
--- motor la esconde igual mientras el modo este puesto.
--- Mismo caso que el borde Light: "Rounded" no es una textura que el motor
--- pueda estirar, es un marco con backdrop. Comparte el desplegable y tiene
--- get y set propios.
--- Borde de la barra de casteo. Mismo mecanismo que los otros dos: "Light"
--- no es una textura del tema sino un marco con backdrop, asi que comparte
--- el desplegable pero no el camino. Arrastra al icono del hechizo, que
--- cuelga de la barra y aparece y desaparece con ella.
 local function GetCastBorder(info)
 	if db.lightCast then return "Border_Light" end
 	return GetValue(info)
@@ -506,8 +453,6 @@ local function SetHealthBorder(info, val)
 	end
 end
 
--- Shared Media
-
 local function SetLSMFont(info, val)
 	local a, b, c, d = info.arg[1], info.arg[2], info.arg[3], info.arg[4]
 	db[a][b][c] = val
@@ -535,7 +480,6 @@ local function SetToggleNameplate(info)
 	Update()
 end
 
--- Return the Options table
 local options = nil
 local function GetOptions()
 	if not options then
@@ -545,7 +489,7 @@ local function GetOptions()
 			type = "group",
 			childGroups = "tab",
 			args = {
-				-- Config Guide
+
 				NameplateSettings = {
 					name = L["Nameplate Settings"],
 					type = "group",
@@ -1054,14 +998,14 @@ local function GetOptions()
 												}
 											}
 										},
-										-- Simplified build: 'Custom HP Color' and 'Raid Mark HP Color' option groups removed.
+
 										ThreatColors = {
 											name = L["Threat Colors"],
 											order = 1,
 											type = "group",
 											inline = true,
 											args = {
-												-- Simplified build: "Show Threat Glow" toggle removed (glow is off).
+
 												Header = {
 													name = L["Colors"],
 													type = "header",
@@ -2763,12 +2707,7 @@ local function GetOptions()
 											set = SetBGHflag,
 											arg = "enabled"
 										},
-										-- TAMBIEN EN ARENAS.
-										--
-										-- El modulo nacio para battlegrounds: la deteccion por
-										-- marcador solo existe ahi. En arena queda la del combat
-										-- log, que alcanza de sobra -- un healer tira su primera
-										-- curacion en los primeros segundos.
+
 										enableInArena = {
 											name = L["Also mark healers in arenas"] or "Also mark healers in arenas",
 											type = "toggle",
@@ -2781,8 +2720,7 @@ local function GetOptions()
 											get = GetBGHflag,
 											set = function(info, value)
 												SetBGHflag(info, value)
-												-- Si ya estas dentro de una arena, que empiece a
-												-- marcar ahora y no al entrar de nuevo.
+
 												local f = _G["NidhausPlatesHealers"]
 												if f and f.RefreshZoneState then f.RefreshZoneState() end
 											end,
@@ -2874,10 +2812,7 @@ local function GetOptions()
 											name = L["X Offset"],
 											type = "range",
 											order = 4,
-											-- Rango ampliado a 100 (de fabrica eran 40). El icono
-											-- se posiciona por offset desde su ancla, asi que un
-											-- limite chico impedia sacarlo del todo a un costado
-											-- de la placa.
+
 											min = -100, max = 100, step = 1,
 											get = GetBGH, set = SetBGH, arg = "iconXoffset"
 										},
@@ -3430,7 +3365,7 @@ local function GetOptions()
 								}
 							}
 						},
-						-- Simplified build: "Dual Spec Roles" removed (addon is fixed to DPS/Healing).
+
 					}
 				},
 				Widgets = {
@@ -4098,7 +4033,7 @@ local function GetOptions()
 					order = 60,
 					args = {}
 				}
-				-- Simplified build: pestana "About" eliminada.
+
 			}
 		}
 	end
@@ -4116,14 +4051,11 @@ local function GetOptions()
 					options.args.Widgets.args.ClassIconWidget.args.Textures.args["Prev" .. k_c].image = "Interface\\AddOns\\Nidhaus_Plates\\Theme\\Widgets\\ClassIconWidget\\" .. db.classWidget.theme .. "\\" .. CLASS_SORT_ORDER[k_c]
 				end
 			end,
-			-- "circle": juego circular con anillo dorado, tomado de
-			-- RefinedBlizzPlates (de Khal). Mismos 10 nombres de archivo
-			-- que los otros temas, asi que el widget no necesita cambios.
+
 			values = {default = "Default", transparent = "Transparent", circle = "Circle"},
 			arg = {"classWidget", "theme"}
 		},
-		-- Borde del icono. La FORMA no se elige: se saca del tema, porque un
-		-- marco cuadrado sobre el icono redondo queda mal y al reves tambien.
+
 		Border = {
 			name = L["Icon Border"],
 			order = -2,
@@ -4945,16 +4877,14 @@ local function GetIntOptions()
 				openoptions = {
 					type = "execute",
 					name = L["Open Config"],
-					-- SIN LOGO: la imagen era el titulo "Nidhaus Plates" de
-					-- la base original, dibujado como textura. Queda solo
-					-- el boton con su texto.
+
 					width = "double",
 					func = function()
 						NidhausPlatesTheme:OpenOptions()
 					end,
 					order = 20
 				},
-				-- Simplified build: settings merged in from the old "Nidhaus Plates" panel.
+
 				coreheader = {
 					type = "header",
 					name = L["Nameplate Settings"],
@@ -4998,105 +4928,18 @@ local function GetIntOptions()
 	return intoptions
 end
 
--- =========================================================
--- QUE LA VENTANA SE VEA COMO LA DE NUF
---
--- Esta ventana no la dibuja este addon: la arma AceConfigDialog con los
--- widgets de AceGUI, que traen su propio aspecto -- fondo negro opaco,
--- cabecera de piedra clara y pestanas con los colores de Blizzard.
---
--- POR QUE NO SE TOCA LA LIBRERIA.
---
--- Lo evidente seria editar AceGUIContainer-Frame.lua y -TabGroup.lua, que
--- estan ahi en Libs. Dos razones para no hacerlo:
---
---   1. AceGUI se carga por LibStub, que se queda con la PRIMERA version
---      mas alta que aparezca. Hay otros addons tuyos con su propia copia
---      (PlateBuffs, RefinedBlizzPlates); si gana la de ellos, mis cambios
---      no se ejecutan nunca y el sintoma seria "no hizo nada".
---   2. Si gana la nuestra, le cambio el aspecto a las ventanas de TODOS
---      los addons que usen esa copia, no solo a esta.
---
--- Asi que se repinta desde afuera, sobre los frames ya creados. Cuesta un
--- poco mas de codigo y a cambio no se le mete la mano a nada compartido.
---
--- LOS NUMEROS NO SON INVENTADOS: son los de NUF.
--- Nidhaus_UnitFrames_Config/ThemeManager.lua, panelBGColor del tema
--- Classic = {0.06, 0.06, 0.06, 0.85}. Si algun dia alla cambia, aca hay
--- que venir a mano -- son dos addons distintos y no comparten codigo.
--- =========================================================
-local SKIN_BG    = { 0.06, 0.06, 0.06, 0.85 };  -- fondo, igual que NUF
-local SKIN_TITLE = { 0.28, 0.28, 0.28, 1 };     -- tinte de la cabecera
-local TAB_ON     = { 1, 0.82, 0 };              -- la elegida, en amarillo
-local TAB_OFF    = { 1, 1, 1 };                 -- las demas, en blanco
+local SKIN_BG    = { 0.06, 0.06, 0.06, 0.85 };
+local SKIN_TITLE = { 0.28, 0.28, 0.28, 1 };
+local TAB_ON     = { 1, 0.82, 0 };
+local TAB_OFF    = { 1, 1, 1 };
 
--- Blizzard pinta las pestanas AL REVES de lo que queres: PanelTemplates_
--- SelectTab le pone blanco a la elegida y deja las otras en dorado. Y lo
--- vuelve a hacer en cada click, asi que no alcanza con pintarlas una vez.
---
--- Por eso se repintan en cada cuadro mientras la ventana esta abierta,
--- y NO envolviendo el SetSelected de cada boton: esos botones salen de
--- un pool compartido y envolverles un metodo se lo dejaba envuelto al
--- siguiente addon que los recibiera.
--- =========================================================
--- TODO LO QUE SE PINTA, Y CADA CUANTO
---
--- Tercer intento, y esta vez con el widget leido en vez de supuesto.
---
--- En la ventana de AceGUI hay DOS marcos con fondo, no uno:
---
---     frame     la ventana entera        SetBackdropColor(0, 0, 0, 1)
---     statusbg  la barrita de abajo      SetBackdropColor(0.1, 0.1, 0.1)
---
--- El segundo no lo estaba tocando, y por eso quedaba una franja de otro
--- gris abajo: eso es "otra gama de color".
---
--- Y el parpadeo del fondo al abrir con doble click es otra cosa: AceGUI
--- RECICLA los widgets. Al cerrar y volver a abrir te puede devolver un
--- marco distinto, que nunca pase por mi repintado y venga con el negro que
--- le puso su constructor. Yo pintaba una sola vez, al abrir, y si el marco
--- cambiaba despues no me enteraba.
---
--- Asi que se pinta TODO en cada cuadro -- fondo, cabecera y pestanas -- y
--- las referencias se buscan una sola vez por ventana. Si el marco cambia,
--- se detecta y se vuelven a buscar. Lo que se hace por cuadro es una
--- decena de llamadas sobre objetos ya resueltos; no se recorre nada.
--- =========================================================
-local tpTabs    = {};   -- botones de pestana
-local tpHeaders = {};   -- texturas de la cabecera
-local tpPanes   = {};   -- marcos con fondo (la ventana y la barra de estado)
-local tpFrame;          -- la ventana que estamos pintando ahora
-local tpArcane;         -- si la piel Arcane estaba prendida en el ultimo repaso
+local tpTabs    = {};
+local tpHeaders = {};
+local tpPanes   = {};
+local tpFrame;
+local tpArcane;
 
--- =========================================================
--- LO QUE PINTAMOS NO ES NUESTRO: HAY QUE DEVOLVERLO.
---
--- Esta es la causa de que, despues de abrir estas opciones, PlateBuffs,
--- SoundAlerter, BankStack y cualquier otro addon con panel aparecieran
--- con ESTOS colores. No era casualidad ni un choque de addons.
---
--- AceGUI mantiene UN pool de widgets, en AceGUI.objPools, y LibStub carga
--- UNA sola copia de la libreria para todo el juego. O sea que el marco que
--- te dan al abrir esta ventana es el mismo objeto que despues se le
--- entrega a otro addon cuando lo suelta.
---
--- Y los colores originales se ponen en el CONSTRUCTOR del widget, no en
--- OnAcquire (AceGUIContainer-Frame.lua: SetBackdropColor(0,0,0,1) en la
--- linea del constructor, statusbg en 0.1). OnAcquire solo hace SetParent,
--- strata, titulo, texto de estado y Show. Nadie repone el color.
---
--- Conclusion: cada SetBackdropColor que haciamos era PERMANENTE y viajaba
--- con el widget al siguiente addon.
---
--- Peor era el envoltorio de SetSelected en los botones de pestana: eso
--- reemplazaba un metodo de un objeto compartido, para siempre. Se saco
--- entero, y ademas no hacia falta -- ya repintamos las pestanas en cada
--- cuadro mientras la ventana esta abierta.
---
--- Ahora: se anota el valor anterior de todo lo que se toca y se repone al
--- cerrar. Lo que sale del pool sale como entro.
--- =========================================================
-local tpSaved = {};     -- { {obj=, kind=, r=, g=, b=, a=}, ... }
+local tpSaved = {};
 
 local function TP_Remember(obj, kind, r, g, b, a)
 	tpSaved[#tpSaved + 1] = { obj = obj, kind = kind, r = r, g = g, b = b, a = a };
@@ -5112,12 +4955,11 @@ local function TP_RestoreAll()
 		elseif s.kind == "text" then
 			pcall(s.obj.SetTextColor, s.obj, s.r, s.g, s.b, s.a);
 		elseif s.kind == "settext" then
-			-- Se le devuelve su propio SetText. Es un campo del objeto, no
-			-- un hook: por suerte esto SI se puede deshacer.
+
 			s.obj.SetText = s.r;
 			s.obj.nufOldSetText = nil;
 		elseif s.kind == "buildtabs" then
-			-- Idem con BuildTabs: es un campo del widget, se repone.
+
 			s.obj.BuildTabs = s.r;
 			s.obj.nufOldBuildTabs = nil;
 		end
@@ -5130,57 +4972,9 @@ local function TP_RestoreAll()
 	tpArcane = nil;
 end
 
--- =========================================================
--- EL ANCHO DE LAS PESTANAS
---
--- Sintoma: las seis pestanas salian apiladas, una por fila.
---
--- Medido con /nptabs en el cliente: ventana 750, contenedor 714, y las SEIS
--- pestanas con ancho 716 -- mas que el contenedor -- con el trozo del medio
--- estirado a 676 en todas, dijera el texto 39 o 104. O sea que el ancho no
--- salia del texto: se lo forzaban.
---
--- De donde sale: AceGUI hace esto al poner el texto de cada pestana
---
---     PanelTemplates_TabResize(frame, 0, nil, width)   -- width = 716
---
--- y en este cliente ese cuarto argumento es el ancho MINIMO. Resultado:
--- ninguna pestana puede medir menos que el contenedor y entra una por fila.
---
--- NO ES UN BUG DE ESTE ADDON: la copia de AceGUI de Nidhaus_Plates y la de
--- BigDebuffs son identicas byte a byte, asi que le pasa a todo addon con
--- pestanas de AceGUI en 3.3.5a.
---
--- POR QUE NO SE ARREGLA EN LA LIBRERIA. Es compartida, y ademas la que
--- termina cargando es la del addon que gane por orden de carga -- tocar la
--- nuestra no haria nada, y subirle la version se lo impondria a todos.
---
--- PERO EL SetText NO ALCANZA. Ese cuarto argumento aparece DOS veces:
---
---   1) al poner el texto           PanelTemplates_TabResize(tab, 0, nil, width)
---   2) al final de BuildTabs       PanelTemplates_TabResize(tab, pad+4, width)
---
--- El primero decide como se reparten las filas; el segundo decide el ancho
--- final. Arreglando solo el primero las filas salen bien (dos en vez de
--- seis) y despues el segundo vuelve a inflar cada pestana al ancho del
--- contenedor: por eso quedaban dos filas con huecos enormes, una pestana
--- cortada contra el borde y otras dos que ni se veian.
---
--- Asi que se reemplazan las dos cosas, y las dos son campos de objeto, no
--- hooks, asi que las dos se pueden devolver al cerrar (ver TP_RestoreAll):
---
---   - tab.SetText  -> TP_TabSetText   (mide por el texto)
---   - widget.BuildTabs -> TP_BuildTabs (copia del original de AceGUI con el
---     cuarto argumento sacado de la ultima pasada, y nada mas cambiado)
---
--- No se toca PanelTemplates_TabResize, que es global de Blizzard: escribirle
--- encima desde un addon la deja contaminada para todo el resto de la
--- interfaz y termina en "Interface action failed because of an AddOn".
--- =========================================================
 local function TP_TabSetText(tab, text)
 	if tab.nufOldSetText then pcall(tab.nufOldSetText, tab, text); end
-	-- Relleno 0, igual que AceGUI. Lo que se saca es el cuarto argumento.
-	-- El relleno de verdad lo reparte BuildTabs despues, por fila.
+
 	if PanelTemplates_TabResize then pcall(PanelTemplates_TabResize, tab, 0); end
 end
 
@@ -5192,9 +4986,6 @@ local function TP_FixTabWidth(tab)
 	tab.SetText = TP_TabSetText;
 end
 
--- Copia de AceGUIContainer-TabGroup:BuildTabs. La UNICA diferencia esta
--- marcada abajo con "AQUI". El resto es igual a proposito: si algun dia se
--- actualiza la libreria, se ve de un vistazo que hay que volver a mirar.
 local tpW, tpRowW, tpRowE = {}, {}, {};
 
 local function TP_Wipe(t)
@@ -5211,13 +5002,12 @@ local function TP_BuildTabs(self)
 
 	TP_Wipe(tpW); TP_Wipe(tpRowW); TP_Wipe(tpRowE);
 
-	-- Poner el texto y medir.
 	for i, v in ipairs(tablist) do
 		local tab = tabs[i];
 		if not tab then
 			tab = self:CreateTab(i);
 			tabs[i] = tab;
-			TP_FixTabWidth(tab);   -- pestana nueva: tambien hay que medirla bien
+			TP_FixTabWidth(tab);
 		end
 		tab:Show();
 		tab:SetText(v.text);
@@ -5230,7 +5020,6 @@ local function TP_BuildTabs(self)
 		tabs[i]:Hide();
 	end
 
-	-- Cuantas filas hacen falta.
 	local numtabs   = #tablist;
 	local numrows   = 1;
 	local usedwidth = 0;
@@ -5246,7 +5035,6 @@ local function TP_BuildTabs(self)
 	tpRowW[numrows] = usedwidth + 10;
 	tpRowE[numrows] = #tablist;
 
-	-- Si la ultima fila queda con una sola pestana, se baja una de arriba.
 	if numrows > 1 and tpRowE[numrows - 1] == numtabs - 1 then
 		if (numrows == 2 and tpRowE[numrows - 1] > 2)
 		   or (tpRowE[numrows] - tpRowE[numrows - 1] > 2) then
@@ -5258,7 +5046,6 @@ local function TP_BuildTabs(self)
 		end
 	end
 
-	-- Anclar las filas y repartir el sobrante entre las pestanas de cada una.
 	local starttab = 1;
 	for row, endtab in ipairs(tpRowE) do
 		local first = true;
@@ -5278,15 +5065,11 @@ local function TP_BuildTabs(self)
 		if not (numrows == 1 and tpRowW[1] < width * 0.75) then
 			padding = (width - tpRowW[row]) / (endtab - starttab + 1);
 		end
-		-- Sin ancho minimo, un reparto negativo achicaria la pestana por
-		-- debajo de su propio texto y lo cortaria. Se corta en 0.
+
 		if padding < 0 then padding = 0 end
 
 		for i = starttab, endtab do
-			-- AQUI: el original es
-			--     PanelTemplates_TabResize(tabs[i], padding + 4, nil, width)
-			-- y ese "width" es el ancho minimo. Sin el, el ancho sale del
-			-- texto mas el relleno, que es lo que queremos.
+
 			if PanelTemplates_TabResize then
 				pcall(PanelTemplates_TabResize, tabs[i], padding + 4);
 			end
@@ -5294,7 +5077,6 @@ local function TP_BuildTabs(self)
 		starttab = endtab + 1;
 	end
 
-	-- El borde del contenido baja segun cuantas filas de pestanas haya.
 	self.borderoffset = (hastitle and 17 or 10) + (numrows * 20);
 	self.border:SetPoint("TOPLEFT", 1, -self.borderoffset);
 end
@@ -5316,9 +5098,6 @@ local function TP_RecolorTab(tab)
 	end
 end
 
--- Las pestanas cuelgan de un marco interno del TabGroup, no de la ventana,
--- asi que hay que bajar. El tope de profundidad es por las dudas: un ciclo
--- de padres aca colgaria el cliente.
 local function TP_WalkTabs(f, depth)
 	if not f or depth > 6 then return end
 	for _, child in ipairs({ f:GetChildren() }) do
@@ -5340,24 +5119,17 @@ local function TP_WalkTabs(f, depth)
 	end
 end
 
--- Buscar UNA vez por ventana: las referencias no cambian mientras sea la
--- misma, y recorrer regiones e hijos en cada cuadro seria trabajo al pedo.
 local function TP_Collect(frame)
-	-- Lo anterior se devuelve ANTES de quedarnos con otra cosa: si nos
-	-- dieron un marco distinto del pool, el viejo ya no es nuestro.
+
 	TP_RestoreAll();
 	tpFrame = frame
 	if not frame then return end
 
-	-- La ventana misma.
 	if frame.SetBackdropColor and frame.GetBackdropColor then
 		tpPanes[#tpPanes + 1] = frame
 		TP_Remember(frame, "backdrop", frame:GetBackdropColor());
 	end
 
-	-- Y cualquier hijo directo con fondo propio: hoy es la barrita de
-	-- estado de abajo. Se busca por "tiene backdrop" y no por nombre
-	-- porque el widget no la exporta con ninguno.
 	for _, child in ipairs({ frame:GetChildren() }) do
 		if child.GetBackdrop and child:GetBackdrop() and child.SetBackdropColor and child.GetBackdropColor then
 			tpPanes[#tpPanes + 1] = child
@@ -5365,8 +5137,6 @@ local function TP_Collect(frame)
 		end
 	end
 
-	-- La cabecera: el widget solo exporta titletext, content y frame, asi
-	-- que sus texturas se identifican por el archivo que usan.
 	for _, r in ipairs({ frame:GetRegions() }) do
 		if r.GetObjectType and r:GetObjectType() == "Texture" and r.GetTexture then
 			local t = r:GetTexture()
@@ -5379,9 +5149,6 @@ local function TP_Collect(frame)
 
 	TP_WalkTabs(frame, 0)
 
-	-- Con los anchos ya corregidos hay que pedirle a AceGUI que reparta
-	-- las filas de nuevo: el reparto se calculo con los anchos viejos.
-	-- Una sola vez por ventana, no en cada cuadro.
 	local primera = tpTabs[1];
 	if primera and primera.obj then
 		TP_FixBuildTabs(primera.obj);
@@ -5401,26 +5168,6 @@ local function TP_Paint()
 	end
 end
 
--- =========================================================
--- DOS PIELES NO PUEDEN PINTAR LO MISMO
---
--- SINTOMA: un parpadeo del fondo y del texto de las pestanas, un par de
--- veces por segundo.
---
--- CAUSA: esta piel gris repinta EN CADA CUADRO (tpSkinTimer, abajo) y la
--- piel Arcane repinta cada medio segundo. Las dos escriben sobre los
--- MISMOS objetos -- la ventana, las cabeceras y el texto de las pestanas.
--- El color queda yendo y viniendo: gris casi siempre, azul en el cuadro
--- justo en que pasa la otra. Eso es el parpadeo.
---
--- Son excluyentes, igual que los estilos de marcos de grupo: manda la que
--- eligio el usuario. Si Arcane esta prendida, esta se calla.
---
--- OJO CON UNA COSA: "callarse" es NO PINTAR, no dejar de trabajar. El
--- arreglo del ancho de las pestanas tambien vive en TP_Collect y hace
--- falta siempre, prendas la piel que prendas. Por eso se sigue
--- recolectando y lo unico que se saltea es TP_Paint.
--- =========================================================
 local function TP_ArcaneOn()
 	local p = NidhausPlatesTheme and NidhausPlatesTheme.db and NidhausPlatesTheme.db.profile
 	return (p and p.arcaneSkin) and true or false
@@ -5444,19 +5191,14 @@ local tpSkinTimer = CreateFrame("Frame")
 tpSkinTimer:Hide()
 tpSkinTimer:SetScript("OnUpdate", function(self)
 	local frame = TP_CurrentFrame()
-	-- Ventana cerrada (o soltada por AceGUI): se apaga solo.
+
 	if not frame or not frame:IsShown() then
 		self:Hide()
-		-- Se cerro: los widgets vuelven al pool, asi que se les
-		-- devuelven los colores antes de soltarlos.
+
 		TP_RestoreAll()
 		return
 	end
-	-- Te devolvieron OTRO marco del pool: hay que volver a buscar todo.
-	--
-	-- Y lo mismo si te prendieron o apagaron Arcane con la ventana abierta:
-	-- TP_Collect empieza devolviendo lo anterior, asi que rehacerlo deja los
-	-- colores originales bien anotados y no se le escapa el gris al pool.
+
 	local arcane = TP_ArcaneOn()
 	if frame ~= tpFrame or arcane ~= tpArcane then
 		TP_Collect(frame)
@@ -5489,14 +5231,10 @@ end
 function NidhausPlatesTheme:SetUpInitialOptions()
 	self:RegisterChatCommand("tptp", "ChatCommand")
 	LibStub("AceConfig-3.0"):RegisterOptionsTable("Nidhaus Plates Dialog", GetIntOptions)
-	-- Simplified build: single entry in the Interface > AddOns list.
-	-- El nombre visible tambien pasa a Nidhaus_Plates: era lo unico que
-	-- seguia diciendo "Nidhaus Plates" en la lista de Interfaz.
+
 	self.optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions(
 		"Nidhaus Plates Dialog", NidhausPlatesTheme.DISPLAY_NAME)
 end
-
--- Simplified build: NidhausPlatesTheme:AddOptions() removed (Auras/Stances tab).
 
 function NidhausPlatesTheme:SetUpOptions()
 	db = self.db.profile
@@ -5504,12 +5242,9 @@ function NidhausPlatesTheme:SetUpOptions()
 	GetOptions()
 	UpdateSpecial()
 
-	-- Simplified build: Auras / Stances / Shapeshifts / Presences tab removed.
-
 	options.args.profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
 	options.args.profiles.order = 10000
 
-	-- dual spec profiles
 	if LDS then LDS:EnhanceOptions(options.args.profiles, self.db) end
 
 	LibStub("AceConfig-3.0"):RegisterOptionsTable("Nidhaus Plates", options)

@@ -7,7 +7,6 @@ f:RegisterEvent("BN_FRIEND_ACCOUNT_ONLINE")
 f:RegisterEvent("BN_FRIEND_ACCOUNT_OFFLINE")
 f:RegisterEvent("BN_FRIEND_LIST_SIZE_CHANGED")
 
---local
 local weaktable = NidhausPlatesUtility.weaktable
 local ListTable = {}
 ListTable.g = setmetatable({}, weaktable)

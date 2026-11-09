@@ -1,32 +1,8 @@
--- =========================================================
--- BGClassScan.lua
---
--- Al entrar a un campo de batalla, lee el marcador y guarda de una vez la
--- clase de todos los participantes.
---
--- PARA QUE SIRVE (y para que NO)
--- ------------------------------
--- Solo afecta a las placas ALIADAS. La clase de un enemigo NidhausPlates ya la
--- deduce del color de su barra de vida (NidhausPlatesCore, ClassReference), asi
--- que esos iconos salen bien desde el primer fotograma sin necesitar nada.
--- Las placas aliadas son todas verdes y no llevan color de clase: ahi hay que
--- preguntarlo, y hasta ahora solo se podia cuando la placa ya estaba a la
--- vista. Con esto se sabe antes de haber visto a nadie.
---
--- NO es una mejora de rendimiento. Añade un barrido cada diez segundos
--- mientras estas en el BG; lo que gana es que el icono este bien antes, no
--- que el addon vaya mas suelto.
--- =========================================================
-
-local anadidos = {}      -- lo que metimos nosotros, para poder limpiarlo
+local anadidos = {}
 local enBG = false
 local acumulado = 0
-local PERIODO = 10       -- segundos entre peticiones; cubre a los que llegan tarde
+local PERIODO = 10
 
--- El marcador devuelve la clase TRADUCIDA ("Paladín", "Cazador"...), pero la
--- cache y las texturas de icono usan el nombre ingles en mayusculas. Mismo
--- problema que tuvimos con las serpientes de la trampa: si se guarda el texto
--- tal cual llega, con el cliente en español no coincide con nada.
 local POR_NOMBRE = {}
 do
 	local listas = {LOCALIZED_CLASS_NAMES_MALE, LOCALIZED_CLASS_NAMES_FEMALE}
@@ -39,10 +15,6 @@ do
 	end
 end
 
--- Devuelve el token ingles a partir de lo que entregue el marcador.
--- Se aceptan las dos vias porque el orden de los valores de
--- GetBattlefieldScore no es igual en todos los cores de 3.3.5: unos traen el
--- token en su sitio y otros dejan ahi el nombre traducido.
 local function TokenDeClase(clase, token)
 	if token and RAID_CLASS_COLORS and RAID_CLASS_COLORS[token] then
 		return token
@@ -78,9 +50,6 @@ local function Escanear()
 	return nuevos
 end
 
--- Al salir se borra lo que metimos nosotros, salvo que el usuario haya pedido
--- guardar clases (cacheClass). Si no, la cache del perfil crecería con
--- cuarenta nombres por cada campo de batalla y no pararía nunca.
 local function Limpiar()
 	local db = NidhausPlatesTheme and NidhausPlatesTheme.db and NidhausPlatesTheme.db.profile
 	if db and db.cache and not db.cacheClass then
@@ -100,7 +69,7 @@ f:SetScript("OnEvent", function(self, event)
 		if tipo == "pvp" then
 			if not enBG then
 				enBG = true
-				acumulado = PERIODO      -- primera peticion en el siguiente tick
+				acumulado = PERIODO
 				self:RegisterEvent("UPDATE_BATTLEFIELD_SCORE")
 			end
 		elseif enBG then
@@ -109,8 +78,7 @@ f:SetScript("OnEvent", function(self, event)
 			Limpiar()
 		end
 	elseif event == "UPDATE_BATTLEFIELD_SCORE" then
-		-- Se escanea cuando llegan los datos, no tras una espera fija: al
-		-- entrar el marcador esta vacio y tarda lo que tarde el servidor.
+
 		Escanear()
 	end
 end)
@@ -123,7 +91,6 @@ f:SetScript("OnUpdate", function(self, elapsed)
 	RequestBattlefieldScoreData()
 end)
 
--- Para probarlo a mano.
 SLASH_NPBGCLASES1 = "/npclases"
 SlashCmdList["NPBGCLASES"] = function()
 	RequestBattlefieldScoreData()

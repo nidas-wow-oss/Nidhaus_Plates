@@ -2,9 +2,6 @@ NidhausPlatesUtility = {}
 
 local _
 
--------------------------------------------------------------------------------------
---  General Helpers
--------------------------------------------------------------------------------------
 local copytable
 copytable = function(original)
 	local duplicate = {}
@@ -42,7 +39,7 @@ local function mergetable(master, mate)
 end
 
 local function updatetable(original, added)
-	-- Check for exist
+
 	if not (original or added) then
 		return original
 	end
@@ -82,9 +79,6 @@ NidhausPlatesUtility.copyTable = copytable
 NidhausPlatesUtility.mergeTable = mergetable
 NidhausPlatesUtility.updateTable = updatetable
 
-------------------------
--- Threat Function
-------------------------
 do
 	local function GetRelativeThreat(unit)
 		if not UnitExists(unit) then
@@ -97,15 +91,14 @@ do
 
 		local leader = nil
 
-		-- Request Player Threat
 		_, _, playerthreat, _, playerThreatVal = UnitDetailedThreatSituation("player", unit)
-		-- Request Pet Threat
+
 		if HasPetUI() then
 			_, _, petthreat = UnitDetailedThreatSituation("pet", unit)
 			leaderThreat = petthreat or 0
 			leaderUnitID = "pet"
 		end
-		-- Get Group Type
+
 		if UnitInRaid("player") then
 			group = "raid"
 			size = GetNumRaidMembers() - 1
@@ -115,7 +108,7 @@ do
 		else
 			group = nil
 		end
-		-- Cycle through Group, picking highest threat holder
+
 		if group then
 			for index = 1, size do
 				local unitid = group .. index
@@ -144,9 +137,6 @@ do
 	NidhausPlatesUtility.GetRelativeThreat = GetRelativeThreat
 end
 
-------------------------
--- Group Functions
-------------------------
 do
 	local GetNumRaidMembers, GetNumPartyMembers = GetNumRaidMembers, GetNumPartyMembers
 
@@ -243,10 +233,6 @@ do
 	NidhausPlatesUtility.UnitIterator = UnitIterator
 end
 
-------------------------------------------------------------------
--- Panel Helpers (Used to create interface panels)
-------------------------------------------------------------------
-
 local function CreatePanelFrame(self, reference, listname, title)
 	local panelframe = CreateFrame("Frame", reference, UIParent)
 	panelframe.name = listname
@@ -276,7 +262,7 @@ local function CreateDescriptionFrame(self, reference, parent, title, text)
 	descframe.Description:SetJustifyH("LEFT")
 	descframe.Description:SetJustifyV("TOP")
 	descframe.Description:SetText(text)
-	--
+
 	return descframe
 end
 
@@ -344,17 +330,17 @@ local function CreateSliderFrame(self, reference, parent, label, val, minval, ma
 	slider:SetValue(val or .5)
 	slider:SetOrientation("HORIZONTAL")
 	slider:Enable()
-	-- Labels
+
 	slider.Label = slider:CreateFontString(nil, "ARTWORK", "GameFontNormal")
 	slider.Label:SetPoint("TOPLEFT", -5, 18)
 	slider.Low = _G[reference .. "Low"]
 	slider.High = _G[reference .. "High"]
 	slider.Label:SetText(label or "")
-	-- Value
+
 	slider.Value = slider:CreateFontString(nil, "ARTWORK", "GameFontWhite")
 	slider.Value:SetPoint("BOTTOM", 0, -10)
 	slider.Value:SetWidth(50)
-	--slider.Value
+
 	if mode and mode == "ACTUAL" then
 		slider.Value:SetText(tostring(ceil(val)))
 		slider:SetScript("OnValueChanged", function()
@@ -375,8 +361,6 @@ local function CreateSliderFrame(self, reference, parent, label, val, minval, ma
 	return slider
 end
 
--- http://www.wowwiki.com/UI_Object_UIDropDownMenu
--- item.fontObject
 local function CreateDropdownFrame(helpertable, reference, parent, menu, default, label, byName)
 	local dropdown = CreateFrame("Frame", reference, parent, "UIDropDownMenuTemplate")
 	local index, item
@@ -397,7 +381,6 @@ local function CreateDropdownFrame(helpertable, reference, parent, menu, default
 
 	dropdown.Value = default
 
-	-- Injects the init function into the template
 	dropdown.initialize = function(self, level)
 		for index, item in pairs(menu) do
 			item.func = function(self)
@@ -458,7 +441,7 @@ do
 		ColorPickerFrame:SetFrameStrata(frame:GetFrameStrata())
 		ColorPickerFrame:SetFrameLevel(frame:GetFrameLevel() + 1)
 		ColorPickerFrame:Hide()
-		ColorPickerFrame:Show() -- Need to activate the OnShow handler.
+		ColorPickerFrame:Show()
 	end
 
 	function CreateColorBox(self, reference, parent, label, r, g, b, a)
@@ -475,7 +458,7 @@ do
 		})
 		colorbox:SetBackdropColor(r, g, b, a)
 		colorbox:SetScript("OnClick", function() ShowColorPicker(colorbox) end)
-		-- Label
+
 		colorbox.Label = colorbox:CreateFontString(nil, "ARTWORK", "GameFontWhiteSmall")
 		colorbox.Label:SetPoint("TOPLEFT", colorbox, "TOPRIGHT", 4, -7)
 		colorbox.Label:SetText(label)
@@ -506,7 +489,7 @@ PanelHelpers.CreateColorBox = CreateColorBox
 NidhausPlatesUtility.PanelHelpers = PanelHelpers
 
 local function StartMovement(frame)
-	-- Store Original Point to frame.OriginalAnchor
+
 	frame:StartMoving()
 	local OriginalAnchor = frame.OriginalAnchor
 
@@ -520,7 +503,7 @@ local function StartMovement(frame)
 end
 
 local function FinishMovement(frame)
-	-- Store New Screen-RelativePosition to frame.NewAnchor
+
 	local NewAnchor = frame.NewAnchor
 	local OriginalAnchor = frame.OriginalAnchor
 	NewAnchor.point, NewAnchor.relativeTo, NewAnchor.relativePoint, NewAnchor.xOfs, NewAnchor.yOfs = frame:GetPoint(1)
@@ -538,12 +521,9 @@ end
 
 PanelHelpers.EnableFreePositioning = EnableFreePositioning
 
-----------------------
--- Call In() - Registers a callback, which hides the specified frame in X seconds
-----------------------
 do
-	local CallList = {} -- Key = Frame, Value = Expiration Time
-	setmetatable(CallList, {__mode = "kv"}) -- TODO: keep an eye on weak tables.
+	local CallList = {}
+	setmetatable(CallList, {__mode = "kv"})
 
 	local Watcherframe = CreateFrame("Frame")
 	local WatcherframeActive = false
@@ -557,7 +537,7 @@ do
 		end
 		local count = 0
 		timeToUpdate = curTime + 1
-		-- Cycle through the watchlist
+
 		for func, expiration in pairs(CallList) do
 			if expiration < curTime then
 				CallList[func] = nil
@@ -566,16 +546,16 @@ do
 				count = count + 1
 			end
 		end
-		-- If no more frames to watch, unregister the OnUpdate script
+
 		if count == 0 then
 			Watcherframe:SetScript("OnUpdate", nil)
 		end
 	end
 
 	local function CallIn(func, expiration)
-		-- Register Frame
+
 		CallList[func] = expiration + GetTime()
-		-- Init Watchframe
+
 		if not WatcherframeActive then
 			Watcherframe:SetScript("OnUpdate", CheckWatchList)
 			WatcherframeActive = true
@@ -585,9 +565,6 @@ do
 	NidhausPlatesUtility.CallIn = CallIn
 end
 
--------------------------------------------------------------------------------------
---  ShareMedia
--------------------------------------------------------------------------------------
 do
 	local LSM = LibStub("LibSharedMedia-3.0")
 
@@ -608,9 +585,6 @@ do
 	NidhausPlatesUtility.MediaRegister = MediaRegister
 end
 
--------------------------------------------------------------------------------------
---  Weak Tables
--------------------------------------------------------------------------------------
 do
 	local tablePool = {}
 	setmetatable(tablePool, {__mode = "k"})
