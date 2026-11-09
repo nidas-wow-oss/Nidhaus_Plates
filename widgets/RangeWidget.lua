@@ -63,7 +63,7 @@ local function CheckRanges(self)
 	for name, range in pairs(Ranges) do
 		if range ~= RangesCache[name] then
 			RangesCache[name] = range
-			TidyPlates:Update()
+			NidhausPlates:Update()
 		end
 	end
 end
@@ -129,4 +129,4 @@ local function CreateRangeWidget(parent)
 	return frame
 end
 
-TidyPlatesWidgets.CreateRangeWidget = CreateRangeWidget
+NidhausPlatesWidgets.CreateRangeWidget = CreateRangeWidget

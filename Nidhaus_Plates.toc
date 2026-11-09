@@ -3,24 +3,28 @@
 ## Version: 1.1
 ## Notes: Nidhaus Plates - placas de nombre con sistema de amenaza y marcador de sanadores
 ## Author: Nidhaus  |cff808080(base: Binbwen and Friends / Suicidal Katt / Kader backport; sanadores: Khal)|r
-## SavedVariables: TidyPlatesData, TidyPlatesHubTankCache, TidyPlatesHubDamageCache, ThreatPlatesDB, BGHsettings
-## SavedVariablesPerCharacter: TidyPlatesOptions, TidyPlatesHubTankSavedVariables, TidyPlatesHubDamageSavedVariables
-## X-Date: 2022-08-07 @ 03:19 PM |cff808080UTC|r
+## SavedVariables: NidhausPlatesDB, NidhausPlatesData, BGHsettings, ThreatPlatesDB
+## SavedVariablesPerCharacter: NidhausPlatesOptions, TidyPlatesOptions
 
-# Engine
-TidyPlates.xml
+# ThreatPlatesDB y TidyPlatesOptions son los nombres viejos de las opciones
+# guardadas. Se cargan solo para pasarlas a los nombres nuevos (Migrate.lua)
+# y despues quedan vacios. Se pueden quitar de aca en una version futura.
+Migrate.lua
 
-# Threat Plates theme (merged in, was TidyPlates_ThreatPlates)
-ThreatPlates\Libs\embeds.xml
-ThreatPlates\Locales\locales.xml
-ThreatPlates\Core.lua
-ThreatPlates\commands.lua
-ThreatPlates\Functions.lua
-ThreatPlates\Widgets.xml
-ThreatPlates\options.lua
-ThreatPlates\Styles.xml
-ThreatPlates\ArcaneSkin.lua
-ThreatPlates\BGClassScan.lua
+# Motor de las placas
+Engine.xml
+
+# Tema, opciones y widgets
+Theme\Libs\embeds.xml
+Theme\Locales\locales.xml
+Theme\Core.lua
+Theme\commands.lua
+Theme\Functions.lua
+Theme\Widgets.xml
+Theme\options.lua
+Theme\Styles.xml
+Theme\ArcaneSkin.lua
+Theme\BGClassScan.lua
 
 # Marcador de sanadores en BG (portado de BattleGroundHealers, de Khal)
 Healers\Locales.xml

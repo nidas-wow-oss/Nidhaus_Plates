@@ -2,21 +2,19 @@
 
 # Nidhaus_Plates
 
-**Build unificada y simplificada de Tidy Plates + Threat Plates para World of Warcraft 3.3.5a (WotLK)**, con marcador de sanadores en battlegrounds integrado.
-
-> **Buscabas TidyPlates?** Estás en el lugar correcto. Nidhaus_Plates es una versión mantenida de **TidyPlates** (con **Threat Plates** ya fusionado adentro) portada y adaptada para 3.3.5a. Instalás una sola carpeta en vez de tres addons separados.
+**Placas de nombre para World of Warcraft 3.3.5a (WotLK)** con herramientas de amenaza y marcador de sanadores en battlegrounds integrado. Una sola carpeta, un solo panel de opciones, con el estilo de Nidhaus UnitFrames.
 
 **Autor:** Nidhaus · **Versión:** 1.1
-**Basado en:** Tidy Plates de *Binbwen and Friends* / *Suicidal Katt*, backport de *Kader* · Marcador de sanadores portado de *BattleGroundHealers* de *Khal*
+**Créditos:** ver la sección del final.
 
 ## Por qué existe
 
-El stack clásico de nameplates en 3.3.5a eran tres addons que había que instalar y mantener por separado (`TidyPlates`, `TidyPlates_ThreatPlates`, `BattleGroundHealers`), con un panel de opciones enorme donde el 90% de las opciones no se tocan nunca. Nidhaus_Plates los junta en un solo addon y recorta la configuración a lo que realmente se usa.
+Tener buenas nameplates en 3.3.5a era instalar y mantener varios addons por separado, con un panel de opciones enorme donde el 90% de las opciones no se tocan nunca. Nidhaus_Plates es un solo addon con la configuración recortada a lo que realmente se usa.
 
 ## Qué trae
 
-- **Motor Tidy Plates completo** — nameplates reemplazadas, castbars, widgets, detección de objetivo.
-- **Tema Threat Plates fusionado** — coloreo por amenaza para tanque y para DPS, sin instalarlo aparte.
+- **Motor de placas completo** — nameplates reemplazadas, castbars, widgets, detección de objetivo.
+- **Sistema de amenaza** — color, transparencia y escala por amenaza, con un solo juego de niveles.
 - **Marcador de sanadores en BG** — resalta a los healers enemigos en battlegrounds (portado de BattleGroundHealers, de Khal).
 - **Fuentes extra** registradas vía LibSharedMedia, seleccionables desde las opciones: *Accidental Presidency*, *Continuum Medium* y *Domyouji Regular*, además de la fuente por defecto.
 - **Opciones simplificadas** — panel recortado a los ajustes que se usan de verdad.
@@ -27,7 +25,7 @@ El stack clásico de nameplates en 3.3.5a eran tres addons que había que instal
 ## Instalación
 
 1. Cerrá el juego.
-2. **Importante:** si tenías `TidyPlates`, `TidyPlates_ThreatPlates` o `BattleGroundHealers` instalados, borralos o desactivalos. Nidhaus_Plates los reemplaza a los tres y van a chocar entre sí.
+2. **Importante:** desactivá cualquier otro addon de nameplates o BattleGroundHealers. Nidhaus_Plates ya hace lo suyo y van a chocar entre sí.
 3. Copiá la carpeta `Nidhaus_Plates` dentro de `World of Warcraft\Interface\AddOns\`.
 4. Iniciá el juego y activá el addon en el selector de la pantalla de personajes.
 
@@ -35,13 +33,11 @@ El stack clásico de nameplates en 3.3.5a eran tres addons que había que instal
 
 | Comando | Qué hace |
 |---|---|
-| `/tidyplates` o `/tptp` | Abre el panel de opciones principal |
+| `/nplates` o `/tptp` | Abre el panel de opciones principal |
 | `/nphealers` o `/bgh` | Opciones del marcador de sanadores en BG |
 | `/tptpol` | Alterna el control de superposición de nameplates |
 | `/tptpverbose` | Salida detallada para depurar |
 
-> El addon detecta tu rol por los talentos y da vuelta la escala de colores de amenaza solo
-> (y por forma en druidas), así que no hay comandos manuales de tanque/dps que recordar.
 
 
 ## Novedades de la 1.1
@@ -54,9 +50,9 @@ El stack clásico de nameplates en 3.3.5a eran tres addons que había que instal
 
 Este addon es trabajo derivado. El crédito del motor y del tema es de sus autores originales:
 
-- **Tidy Plates** — Binbwen and Friends / Suicidal Katt
+- **Motor de placas original** (Tidy Plates) — Binbwen and Friends / Suicidal Katt
 - **Backport a 3.3.5a** — Kader
-- **Threat Plates** — sus autores originales, incluido aquí como tema fusionado
+- **Tema de amenaza original** (Threat Plates) — sus autores originales
 - **BattleGroundHealers** — Khal
 - **Unificación, simplificación, fuentes y mantenimiento** — Nidhaus
 

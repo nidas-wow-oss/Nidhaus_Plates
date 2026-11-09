@@ -75,7 +75,7 @@ local function UpdateTracker()
 
 	-- Call for indicator Update, if needed
 	if changes then
-		TidyPlates:Update()
+		NidhausPlates:Update()
 	end
 end
 

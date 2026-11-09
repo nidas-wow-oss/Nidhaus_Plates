@@ -104,7 +104,7 @@ local function UPDATE_BATTLEFIELD_SCORE()
 		-- End For/Do Loop
 	end
 	if HealerListIsUpdated then
-		TidyPlates:Update()
+		NidhausPlates:Update()
 	end
 end
 
@@ -174,7 +174,7 @@ local function Disable()
 	end
 end
 
-TidyPlatesUtility.EnableHealerDetection = Enable
-TidyPlatesUtility.DisableHealerDetection = Disable
-TidyPlatesUtility.CurrentTargetHealers = CurrentTargetHealers
-TidyPlatesUtility.EnemyHealerList = EnemyHealerList
+NidhausPlatesUtility.EnableHealerDetection = Enable
+NidhausPlatesUtility.DisableHealerDetection = Disable
+NidhausPlatesUtility.CurrentTargetHealers = CurrentTargetHealers
+NidhausPlatesUtility.EnemyHealerList = EnemyHealerList

@@ -10,7 +10,7 @@ local function EventHandler(frame, unit)
 	for debuffIndex = 1, 40 do
 		local debuffName, _, _, _, debuffType = UnitDebuff(unit, debuffIndex)
 		if debuffName and (TrackedAuras[debuffName] or TrackedAuras[debuffType]) then
-			TidyPlates:Update()
+			NidhausPlates:Update()
 			return
 		end
 	end

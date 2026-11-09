@@ -7,7 +7,7 @@ local function UpdateClassWidget(self, unit, showFriendly)
 	local class
 	if unit then
 		if showFriendly and unit.reaction == "FRIENDLY" and unit.type == "PLAYER" then
-			class = TidyPlatesUtility.GroupMembers.Class[unit.name]
+			class = NidhausPlatesUtility.GroupMembers.Class[unit.name]
 		elseif unit.type == "PLAYER" then
 			class = unit.class
 		end
@@ -32,4 +32,4 @@ local function CreateClassWidget(parent)
 	return frame
 end
 
-TidyPlatesWidgets.CreateClassWidget = CreateClassWidget
+NidhausPlatesWidgets.CreateClassWidget = CreateClassWidget

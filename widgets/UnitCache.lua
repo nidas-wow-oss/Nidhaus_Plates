@@ -1,15 +1,15 @@
-TidyPlatesData = TidyPlatesData or {}
-TidyPlatesData.UnitDescriptions = {}
-TidyPlatesData.UnitClass = {}
-TidyPlatesData.Friends = {}
-TidyPlatesData.Guild = {}
+NidhausPlatesData = NidhausPlatesData or {}
+NidhausPlatesData.UnitDescriptions = {}
+NidhausPlatesData.UnitClass = {}
+NidhausPlatesData.Friends = {}
+NidhausPlatesData.Guild = {}
 
 local UnitCacheMonitor
 local UnitCacheMonitorEvents = {}
 
 local function UpdateGuildCache()
-	if not TidyPlatesData.Guild then
-		TidyPlatesData.Guild = {}
+	if not NidhausPlatesData.Guild then
+		NidhausPlatesData.Guild = {}
 	end
 	local guildname = GetGuildInfo("player")
 	if not guildname then
@@ -18,22 +18,22 @@ local function UpdateGuildCache()
 	local numGuildMembers, numOnline = GetNumGuildMembers()
 	for index = 1, numGuildMembers do
 		local name, rank, rankIndex, level, class = GetGuildRosterInfo(index)
-		TidyPlatesData.Guild[name] = true
-		TidyPlatesData.UnitClass[name] = class
-		TidyPlatesData.UnitDescriptions[name] = guildname
+		NidhausPlatesData.Guild[name] = true
+		NidhausPlatesData.UnitClass[name] = class
+		NidhausPlatesData.UnitDescriptions[name] = guildname
 	end
 end
 
 local function UpdateFriendCache()
-	if not TidyPlatesData.Friends then
-		TidyPlatesData.Friends = {}
+	if not NidhausPlatesData.Friends then
+		NidhausPlatesData.Friends = {}
 	end
 
 	local numFriends = GetNumFriends()
 	for index = 1, numFriends do
 		local name, level, class = GetFriendInfo(index)
 		if name then
-			TidyPlatesData.Friends[name] = true
+			NidhausPlatesData.Friends[name] = true
 		end
 	end
 end
@@ -48,9 +48,9 @@ function UnitCacheMonitorEvents.UPDATE_MOUSEOVER_UNIT(self, ...)
 		description = GetGuildInfo("mouseover")
 		class = select(2, UnitClass("mouseover"))
 
-		if TidyPlatesData.UnitClass[name] ~= class then
+		if NidhausPlatesData.UnitClass[name] ~= class then
 			unitadded = true
-			TidyPlatesData.UnitClass[name] = class
+			NidhausPlatesData.UnitClass[name] = class
 		end
 	elseif GameTooltipTextLeft1:GetText() == UnitName("mouseover") then
 		name = GameTooltipTextLeft1:GetText()
@@ -63,13 +63,13 @@ function UnitCacheMonitorEvents.UPDATE_MOUSEOVER_UNIT(self, ...)
 		end
 	end
 
-	if TidyPlatesData.UnitDescriptions[name] ~= description then
+	if NidhausPlatesData.UnitDescriptions[name] ~= description then
 		unitadded = true
-		TidyPlatesData.UnitDescriptions[name] = description
+		NidhausPlatesData.UnitDescriptions[name] = description
 	end
 
 	if unitadded then
-		TidyPlates:RequestDelegateUpdate()
+		NidhausPlates:RequestDelegateUpdate()
 	end
 end
 
@@ -94,17 +94,17 @@ local function Enable()
 	end
 	UnitCacheMonitor:SetScript("OnEvent", OnEvent)
 
-	if not TidyPlatesData.UnitDescriptions then
-		TidyPlatesData.UnitDescriptions = {}
+	if not NidhausPlatesData.UnitDescriptions then
+		NidhausPlatesData.UnitDescriptions = {}
 	end
-	if not TidyPlatesData.UnitClass then
-		TidyPlatesData.UnitClass = {}
+	if not NidhausPlatesData.UnitClass then
+		NidhausPlatesData.UnitClass = {}
 	end
-	if not TidyPlatesData.Guild then
-		TidyPlatesData.Guild = {}
+	if not NidhausPlatesData.Guild then
+		NidhausPlatesData.Guild = {}
 	end
-	if not TidyPlatesData.Friends then
-		TidyPlatesData.Friends = {}
+	if not NidhausPlatesData.Friends then
+		NidhausPlatesData.Friends = {}
 	end
 
 	if IsInGuild() then
@@ -121,5 +121,5 @@ local function Disable()
 	end
 end
 
-TidyPlatesUtility.EnableUnitCache = Enable
-TidyPlatesUtility.DisableUnitCache = Disable
+NidhausPlatesUtility.EnableUnitCache = Enable
+NidhausPlatesUtility.DisableUnitCache = Disable

@@ -39,7 +39,7 @@ BattleGroundHealers_Localization:CreateLocaleTable({
 	["Settings reset to default values."] = "Configuración restablecida a los valores por defecto.",
 	["Yes"] = "Si",
 	["No"] = "No",
-	["TidyPlates detected, anchors adjusted."] = "TidyPlates detectado, anclajes ajustados.",
+	["NidhausPlates detected, anchors adjusted."] = "NidhausPlates detectado, anclajes ajustados.",
 	["_VirtualPlates detected, anchors adjusted."] = "_VirtualPlates detectado, anclajes ajustados.",
 	["%s %s has left the BG, removed from healers list."] = "%s %s ha abandonado la BG, eliminado de la lista de healers",
 	["Current BG Scoreboard healing-to-damage tracking ratio:"] = "Razón sanación/daño actual para la detección por Tabla de Puntuación de BG:",

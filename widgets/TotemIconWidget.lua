@@ -177,8 +177,8 @@ local function CreateTotemIconWidget(parent)
 	return frame
 end
 
-TidyPlatesWidgets.CreateTotemIconWidget = CreateTotemIconWidget
-TidyPlatesUtility.TotemTable = Totem_InfoTable
-TidyPlatesUtility.TotemNameFallback = TotemNameFallback
-TidyPlatesUtility.TotemSlot = TotemSlot
-TidyPlatesUtility.TotemSlot = TotemSlot
+NidhausPlatesWidgets.CreateTotemIconWidget = CreateTotemIconWidget
+NidhausPlatesUtility.TotemTable = Totem_InfoTable
+NidhausPlatesUtility.TotemNameFallback = TotemNameFallback
+NidhausPlatesUtility.TotemSlot = TotemSlot
+NidhausPlatesUtility.TotemSlot = TotemSlot

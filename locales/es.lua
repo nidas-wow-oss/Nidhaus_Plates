@@ -1,9 +1,9 @@
 if GetLocale() ~= "esES" and GetLocale() ~= "esMX" then return end
-local _, TidyPlates = ...
-local L = TidyPlates.L
+local _, NidhausPlates = ...
+local L = NidhausPlates.L
 
 ----------------------
---[[ TidyPlatesPanel.lua ]]--
+--[[ NidhausPlatesPanel.lua ]]--
 ----------------------
 
 -- L["No Automation"] = true
@@ -19,15 +19,12 @@ local L = TidyPlates.L
 -- L["Show Non-Target Casting Bars (When Possible)"] = true
 -- L["Enable Minimap Icon"] = true
 -- L["Reset Configuration"] = true
--- L["|cFFFF6600Tidy Plates: |cFFFFFFFFWidget file versions do not match. This may be caused by an issue with auto-updater software."] = true
--- L["Please uninstall Tidy Plates, and then re-install. You do NOT need to clear your variables."] = true
--- L["|cFFFF6600Tidy Plates: |cFFFF9900No Theme is Selected. |cFF77FF00Use |cFFFFFF00/tidyplates|cFF77FF00 to bring up the Theme Selection Window."] = true
+-- L["|cFFFF6600Nidhaus Plates: |cFFFFFFFFWidget file versions do not match. This may be caused by an issue with auto-updater software."] = true
+-- L["Please uninstall Nidhaus Plates, and then re-install. You do NOT need to clear your variables."] = true
+-- L["|cFFFF6600Nidhaus Plates: |cFFFF9900No Theme is Selected. |cFF77FF00Use |cFFFFFF00/nidhausplates|cFF77FF00 to bring up the Theme Selection Window."] = true
 
--- L.resetTidyPlanel = "%sResetting %sTidy Plates %sTheme Selection to Default"
--- L.commonResetPanel = "%sResetting %sTidy Plates Hub: %s%s %sConfiguration to Default"
--- L.resetTidyPlanelShift = "%sHolding down %sShift %swhile clicking %sReset Configuration %swill clear your saved settings, AND reload the user interface."
--- L.commonCopyPanel = "%sCopied %sTidy Plates Hub: %s%s %sTheme Values to Cache."
--- L.commonPastePanel = "%sPasted %sTidy Plates Hub: %s%s %sTheme Values from Cache."
+-- L.resetPanel = "%sResetting %sNidhaus Plates %sTheme Selection to Default"
+-- L.resetPanelShift = "%sHolding down %sShift %swhile clicking %sReset Configuration %swill clear your saved settings, AND reload the user interface."
 
 ----------------------
 --[[ TankPanel.lua ]]--
@@ -147,6 +144,6 @@ local L = TidyPlates.L
 ----------------------
 
 L["Left-Click: Open Options"] = "Clic izquierdo: abrir opciones"
-L["|cFFFF6600Tidy Plates: |cFFFF9900Threat Plates theme could not be loaded. The addon files may be damaged; reinstall Tidy Plates."] = "|cFFFF6600Tidy Plates: |cFFFF9900No se ha podido cargar el tema Threat Plates. Puede que los archivos estén dañados; reinstala Tidy Plates."
-L["|cFFFF6600Tidy Plates: |cFFFFFFFFWidget file versions do not match. This may be caused by an issue with auto-updater software."] = "|cFFFF6600Tidy Plates: |cFFFFFFFFLas versiones de los archivos de widgets no coinciden. Puede deberse a un fallo del actualizador automático."
-L["Please uninstall Tidy Plates, and then re-install. You do NOT need to clear your variables."] = "Desinstala Tidy Plates y vuelve a instalarlo. NO hace falta que borres tu configuración."
+L["|cFFFF6600Nidhaus Plates: |cFFFF9900Nidhaus Plates theme could not be loaded. The addon files may be damaged; reinstall Nidhaus Plates."] = "|cFFFF6600Nidhaus Plates: |cFFFF9900No se ha podido cargar el tema Nidhaus Plates. Puede que los archivos estén dañados; reinstala Nidhaus Plates."
+L["|cFFFF6600Nidhaus Plates: |cFFFFFFFFWidget file versions do not match. This may be caused by an issue with auto-updater software."] = "|cFFFF6600Nidhaus Plates: |cFFFFFFFFLas versiones de los archivos de widgets no coinciden. Puede deberse a un fallo del actualizador automático."
+L["Please uninstall Nidhaus Plates, and then re-install. You do NOT need to clear your variables."] = "Desinstala Nidhaus Plates y vuelve a instalarlo. NO hace falta que borres tu configuración."

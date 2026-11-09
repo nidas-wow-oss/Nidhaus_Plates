@@ -1,7 +1,7 @@
 ------------------------------
 -- Debuff and Roster Handler
 ------------------------------
-local UnitIds = TidyPlatesUtility.GroupMembers.UnitId
+local UnitIds = NidhausPlatesUtility.GroupMembers.UnitId
 local DangerWatcher
 
 -- Event Handler
@@ -11,7 +11,7 @@ local function AggroEvents(frame, event, unit)
 	local isUnitPet = (unit == "pet")
 
 	if isUnitInParty or isUnitInRaid or isUnitPet then
-		TidyPlates:Update()
+		NidhausPlates:Update()
 	end
 end
 
@@ -32,7 +32,7 @@ local function Enable()
 	end
 	DangerWatcher:SetScript("OnEvent", AggroEvents)
 	DangerWatcher:RegisterEvent("UNIT_THREAT_SITUATION_UPDATE")
-	TidyPlatesUtility.EnableGroupWatcher()
+	NidhausPlatesUtility.EnableGroupWatcher()
 end
 
 local function Disable()
@@ -41,6 +41,6 @@ local function Disable()
 	DangerWatcher = nil
 end
 
-TidyPlatesWidgets.EnableAggroWatch = Enable
-TidyPlatesWidgets.DisableAggroWatch = Disable
-TidyPlatesWidgets.GetThreatCondition = GetThreatCondition
+NidhausPlatesWidgets.EnableAggroWatch = Enable
+NidhausPlatesWidgets.DisableAggroWatch = Disable
+NidhausPlatesWidgets.GetThreatCondition = GetThreatCondition

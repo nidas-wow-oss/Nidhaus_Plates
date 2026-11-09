@@ -72,7 +72,7 @@ local USSregistered = false
 local playerFaction = false
 local BlizzPlates = true
 local KhalPlatesCheck = false
-local TidyPlatesCheck = false
+local NidhausPlatesCheck = false
 local ElvUICheck = false
 local ElvUIdynamicAnchor = true -- Forces the icon to follow ElvUI's HealthBar (it moves or hides with it). Set to false for a static "always show" state.
 local KuiNameplatesCheck = false
@@ -313,7 +313,7 @@ end
 ---- Checks if the frame is a nameplate ----
 local function IsNamePlate(frame)
     if frame.RealPlate  -- KhalPlates
-    or frame.extended   -- TidyPlates
+    or frame.extended   -- NidhausPlates
     or frame.UnitFrame  -- ElvUI
     or frame.kui        -- KuiNameplates
     or frame.aloftData  -- Aloft
@@ -346,10 +346,10 @@ local function CheckCustomPlate(nameplate)
                 },
             }
         end
-    elseif nameplate.extended then -- TidyPlates
+    elseif nameplate.extended then -- NidhausPlates
         nameplate = nameplate.extended
-        if not TidyPlatesCheck then
-            TidyPlatesCheck = true
+        if not NidhausPlatesCheck then
+            NidhausPlatesCheck = true
             BlizzPlates = false
             anchorMapping = {
                 ["left"] = {

@@ -52,11 +52,11 @@ do
 		frame.icon:SetAllPoints(frame)
 		frame.icon:Hide()
 		-- Update
-		frame.HideIn = TidyPlatesWidgets.HideIn
+		frame.HideIn = NidhausPlatesWidgets.HideIn
 		frame.Update = UpdateTankedWidget
 		frame:Hide()
 		return frame
 	end
 
-	TidyPlatesWidgets.CreateTankedWidget = CreateTankedWidget
+	NidhausPlatesWidgets.CreateTankedWidget = CreateTankedWidget
 end

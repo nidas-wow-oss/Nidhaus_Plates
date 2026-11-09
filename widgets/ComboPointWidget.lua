@@ -98,4 +98,4 @@ local function CreateWidgetFrame(parent)
 	return frame
 end
 
-TidyPlatesWidgets.CreateComboPointWidget = CreateWidgetFrame
+NidhausPlatesWidgets.CreateComboPointWidget = CreateWidgetFrame

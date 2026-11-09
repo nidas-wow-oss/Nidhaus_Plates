@@ -1,12 +1,12 @@
-TidyPlatesWidgets.DebuffWidgetBuild = 2
+NidhausPlatesWidgets.DebuffWidgetBuild = 2
 
 local GetSpellInfo = GetSpellInfo
-local PolledHideIn = TidyPlatesWidgets.PolledHideIn
+local PolledHideIn = NidhausPlatesWidgets.PolledHideIn
 local AuraMonitor = CreateFrame("Frame")
 
 -- TODO: keep an eye on weak tables.
 local WidgetList = setmetatable({}, {__mode = "kv"})
-local weaktable = TidyPlatesUtility.weaktable
+local weaktable = NidhausPlatesUtility.weaktable
 local WidgetGUID = setmetatable({}, weaktable)
 
 local UpdateWidget
@@ -142,18 +142,18 @@ end
 -----------------------------------------------------
 -- Aura Durations
 -----------------------------------------------------
-TidyPlatesData = TidyPlatesData or {}
-TidyPlatesData.CachedAuraDurations = {}
+NidhausPlatesData = NidhausPlatesData or {}
+NidhausPlatesData.CachedAuraDurations = {}
 
 local function GetSpellDuration(spellid)
 	if spellid then
-		return TidyPlatesData.CachedAuraDurations[spellid]
+		return NidhausPlatesData.CachedAuraDurations[spellid]
 	end
 end
 
 local function SetSpellDuration(spellid, duration)
 	if spellid then
-		TidyPlatesData.CachedAuraDurations[spellid] = duration
+		NidhausPlatesData.CachedAuraDurations[spellid] = duration
 	end
 end
 
@@ -162,8 +162,8 @@ end
 -----------------------------------------------------
 
 -- TODO: keep an eye on weak tables.
-local newTable = TidyPlatesUtility.NewTable
-local delTable = TidyPlatesUtility.DelTable
+local newTable = NidhausPlatesUtility.NewTable
+local delTable = NidhausPlatesUtility.DelTable
 
 local Aura_List = setmetatable({}, weaktable) -- Two Dimensional
 local Aura_Spellid = {}
@@ -377,7 +377,7 @@ end
 local function EventUnitTarget()
 	wipe(TargetOfGroupMembers)
 
-	for name, unitid in pairs(TidyPlatesUtility.GroupMembers.UnitId) do
+	for name, unitid in pairs(NidhausPlatesUtility.GroupMembers.UnitId) do
 		local targetOf = unitid .. ("target" or "")
 		if UnitExists(targetOf) then
 			TargetOfGroupMembers[UnitGUID(targetOf)] = targetOf
@@ -599,7 +599,7 @@ function UpdateWidget(frame)
 	end
 
 	UpdateIconGrid(frame, guid)
-	TidyPlates:RequestDelegateUpdate() -- Delegate Update, For Debuff Widget-Controlled Scale and Opacity Functions
+	NidhausPlates:RequestDelegateUpdate() -- Delegate Update, For Debuff Widget-Controlled Scale and Opacity Functions
 end
 
 local function UpdateWidgetTarget(frame)
@@ -648,9 +648,9 @@ end
 -------------------------------------------------------------
 -- Widget Frames
 -------------------------------------------------------------
-local AuraBorderArt = "Interface\\AddOns\\TidyPlatesWidgets\\Aura\\AuraFrame" -- FINISH ART
-local AuraGlowArt = "Interface\\AddOns\\TidyPlatesWidgets\\Aura\\AuraGlow"
-local AuraHighlightArt = "Interface\\AddOns\\TidyPlatesWidgets\\Aura\\CCBorder" -- AuraBorderArt, AuraHighlightArt
+local AuraBorderArt = "Interface\\AddOns\\NidhausPlatesWidgets\\Aura\\AuraFrame" -- FINISH ART
+local AuraGlowArt = "Interface\\AddOns\\NidhausPlatesWidgets\\Aura\\AuraGlow"
+local AuraHighlightArt = "Interface\\AddOns\\NidhausPlatesWidgets\\Aura\\CCBorder" -- AuraBorderArt, AuraHighlightArt
 local AuraTestArt = ""
 local AuraFont = "Interface\\Addons\\Nidhaus_Plates\\Media\\DefaultFont.ttf"
 
@@ -661,17 +661,17 @@ local function Enable()
 		AuraMonitor:RegisterEvent(event)
 	end
 
-	TidyPlatesUtility:EnableGroupWatcher()
+	NidhausPlatesUtility:EnableGroupWatcher()
 
-	if not TidyPlatesData.CachedAuraDurations then
-		TidyPlatesData.CachedAuraDurations = {}
+	if not NidhausPlatesData.CachedAuraDurations then
+		NidhausPlatesData.CachedAuraDurations = {}
 	end
 end
 
 local function Disable()
 	AuraMonitor:SetScript("OnEvent", nil)
 	AuraMonitor:UnregisterAllEvents()
-	--TidyPlatesUtility:DisableGroupWatcher()
+	--NidhausPlatesUtility:DisableGroupWatcher()
 end
 
 -- Create an Aura Icon
@@ -765,13 +765,13 @@ end
 -----------------------------------------------------
 -- External
 -----------------------------------------------------
-TidyPlatesWidgets.GetAuraWidgetByGUID = GetAuraWidgetByGUID
-TidyPlatesWidgets.IsAuraShown = IsAuraShown
-TidyPlatesWidgets.CanPlayerDispel = CanPlayerDispel
+NidhausPlatesWidgets.GetAuraWidgetByGUID = GetAuraWidgetByGUID
+NidhausPlatesWidgets.IsAuraShown = IsAuraShown
+NidhausPlatesWidgets.CanPlayerDispel = CanPlayerDispel
 
-TidyPlatesWidgets.CreateAuraWidget = CreateAuraWidget
-TidyPlatesWidgets.EnableAuraWatcher = Enable
-TidyPlatesWidgets.DisableAuraWatcher = Disable
+NidhausPlatesWidgets.CreateAuraWidget = CreateAuraWidget
+NidhausPlatesWidgets.EnableAuraWatcher = Enable
+NidhausPlatesWidgets.DisableAuraWatcher = Disable
 
 do
 	local CCSpells = {
@@ -874,7 +874,7 @@ do
 		-- Engineering
 		[GetSpellInfo(67890)] = true -- Cobalt Frag Bomb
 	}
-	TidyPlatesWidgets.CCSpells = CCSpells
+	NidhausPlatesWidgets.CCSpells = CCSpells
 end
 
 -----------------------------------------------------

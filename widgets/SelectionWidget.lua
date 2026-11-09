@@ -28,4 +28,4 @@ local function CreateSelectionWidget(parent)
 	return frame
 end
 
-TidyPlatesWidgets.CreateSelectionWidget = CreateSelectionWidget
+NidhausPlatesWidgets.CreateSelectionWidget = CreateSelectionWidget

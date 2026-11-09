@@ -1,9 +1,9 @@
 if GetLocale() ~= "koKR" then return end
-local _, TidyPlates = ...
-local L = TidyPlates.L
+local _, NidhausPlates = ...
+local L = NidhausPlates.L
 
 ----------------------
---[[ TidyPlatesPanel.lua ]]--
+--[[ NidhausPlatesPanel.lua ]]--
 ----------------------
 
 -- L["No Automation"] = true
@@ -19,15 +19,12 @@ local L = TidyPlates.L
 -- L["Show Non-Target Casting Bars (When Possible)"] = true
 -- L["Enable Minimap Icon"] = true
 -- L["Reset Configuration"] = true
--- L["|cFFFF6600Tidy Plates: |cFFFFFFFFWidget file versions do not match. This may be caused by an issue with auto-updater software."] = true
--- L["Please uninstall Tidy Plates, and then re-install. You do NOT need to clear your variables."] = true
--- L["|cFFFF6600Tidy Plates: |cFFFF9900No Theme is Selected. |cFF77FF00Use |cFFFFFF00/tidyplates|cFF77FF00 to bring up the Theme Selection Window."] = true
+-- L["|cFFFF6600Nidhaus Plates: |cFFFFFFFFWidget file versions do not match. This may be caused by an issue with auto-updater software."] = true
+-- L["Please uninstall Nidhaus Plates, and then re-install. You do NOT need to clear your variables."] = true
+-- L["|cFFFF6600Nidhaus Plates: |cFFFF9900No Theme is Selected. |cFF77FF00Use |cFFFFFF00/nidhausplates|cFF77FF00 to bring up the Theme Selection Window."] = true
 
--- L.resetTidyPlanel = "%sResetting %sTidy Plates %sTheme Selection to Default"
--- L.commonResetPanel = "%sResetting %sTidy Plates Hub: %s%s %sConfiguration to Default"
--- L.resetTidyPlanelShift = "%sHolding down %sShift %swhile clicking %sReset Configuration %swill clear your saved settings, AND reload the user interface."
--- L.commonCopyPanel = "%sCopied %sTidy Plates Hub: %s%s %sTheme Values to Cache."
--- L.commonPastePanel = "%sPasted %sTidy Plates Hub: %s%s %sTheme Values from Cache."
+-- L.resetPanel = "%sResetting %sNidhaus Plates %sTheme Selection to Default"
+-- L.resetPanelShift = "%sHolding down %sShift %swhile clicking %sReset Configuration %swill clear your saved settings, AND reload the user interface."
 
 ----------------------
 --[[ TankPanel.lua ]]--

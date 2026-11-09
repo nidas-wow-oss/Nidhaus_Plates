@@ -40,7 +40,7 @@ local function GetThreatSegment(threat)
 	end
 end
 
-local GetRelativeThreat = TidyPlatesUtility.GetRelativeThreat
+local GetRelativeThreat = NidhausPlatesUtility.GetRelativeThreat
 
 ---------------
 -- Roster Monitor
@@ -148,12 +148,12 @@ do
 		frame.TargetText:SetWidth(50)
 		frame.TargetText:SetHeight(20)
 		-- Setup
-		frame.HideIn = TidyPlatesWidgets.HideIn
+		frame.HideIn = NidhausPlatesWidgets.HideIn
 		frame.FadeTime = 0
 		frame:Hide()
 		frame.Update = UpdateThreatWheelWidget
 		return frame
 	end
 
-	TidyPlatesWidgets.CreateThreatWheelWidget = CreateThreatWheelWidget
+	NidhausPlatesWidgets.CreateThreatWheelWidget = CreateThreatWheelWidget
 end

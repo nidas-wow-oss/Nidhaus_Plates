@@ -56,7 +56,7 @@ local function TargetWatcherEvents()
 
 	-- Call for indicator Update, if needed
 	if changes then
-		TidyPlates:Update()
+		NidhausPlates:Update()
 	end
 end
 
@@ -142,6 +142,6 @@ local function DisableTankWatch()
 	end
 end
 
-TidyPlatesWidgets.EnableTankWatch = EnableTankWatch
-TidyPlatesWidgets.DisableTankWatch = DisableTankWatch
-TidyPlatesWidgets.IsTankedByAnotherTank = IsTankedByAnotherTank
+NidhausPlatesWidgets.EnableTankWatch = EnableTankWatch
+NidhausPlatesWidgets.DisableTankWatch = DisableTankWatch
+NidhausPlatesWidgets.IsTankedByAnotherTank = IsTankedByAnotherTank

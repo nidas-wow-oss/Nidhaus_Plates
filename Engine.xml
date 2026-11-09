@@ -1,0 +1,14 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+<Include file="libs\embeds.xml" />
+<Include file="Locales.xml" />
+<Script file="PlatesStatusbar.lua"/>
+<Script file="PlatesCore.lua"/>
+<Script file="PlatesUtility.lua"/>
+<Script file="PlatesDefaults.lua"/>
+<Script file="PlatesPanel.lua"/>
+<Script file="MinimapButton.lua"/>
+<Script file="SpellCastMonitor.lua"/>
+<Include file="Widgets.xml" />
+<Script file="DebuffHelpers.lua"/>
+</Ui>

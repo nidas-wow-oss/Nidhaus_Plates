@@ -55,7 +55,7 @@ local function UpdateRoster(frame, event, ...)
 		end
 	end
 
-	TidyPlates:Update()
+	NidhausPlates:Update()
 end
 
 local function Enable()
@@ -88,6 +88,6 @@ local function Disable()
 	end
 end
 
-TidyPlatesUtility.GroupMembers = Group
-TidyPlatesUtility.EnableGroupWatcher = Enable
-TidyPlatesUtility.DisableGroupWatcher = Disable
+NidhausPlatesUtility.GroupMembers = Group
+NidhausPlatesUtility.EnableGroupWatcher = Enable
+NidhausPlatesUtility.DisableGroupWatcher = Disable

@@ -1,11 +1,11 @@
 -- translated by: meatgaga#9470 --
 
 if GetLocale() ~= "zhCN" then return end
-local _, TidyPlates = ...
-local L = TidyPlates.L
+local _, NidhausPlates = ...
+local L = NidhausPlates.L
 
 ----------------------
---[[ TidyPlatesPanel.lua ]]--
+--[[ NidhausPlatesPanel.lua ]]--
 ----------------------
 
 L["No Automation"] = "无自动化"
@@ -21,15 +21,12 @@ L["Blizzard Nameplate Motion & Visibility"] = "姓名板原生设置"
 L["Show Non-Target Casting Bars (When Possible)"] = "(可能时)显示非目标的施法条"
 L["Enable Minimap Icon"] = "启用小地图图标"
 L["Reset Configuration"] = "重置配置"
-L["|cFFFF6600Tidy Plates: |cFFFFFFFFWidget file versions do not match. This may be caused by an issue with auto-updater software."] = "|cFFFF6600Tidy Plates：|cFFFFFFFF部件文件版本不匹配。这可能是由自动更新软件的问题引起的。"
-L["Please uninstall Tidy Plates, and then re-install. You do NOT need to clear your variables."] = "请卸载Tidy Plates并重新安装。无需清理Variables文件。"
-L["|cFFFF6600Tidy Plates: |cFFFF9900No Theme is Selected. |cFF77FF00Use |cFFFFFF00/tidyplates|cFF77FF00 to bring up the Theme Selection Window."] = "|cFFFF6600Tidy Plates：|cFFFF9900没有选定主题。|cFF77FF00使用|cFFFFFF00/tidyplates|cFF77FF00命令打开主题选择窗口。"
+L["|cFFFF6600Nidhaus Plates: |cFFFFFFFFWidget file versions do not match. This may be caused by an issue with auto-updater software."] = "|cFFFF6600Nidhaus Plates：|cFFFFFFFF部件文件版本不匹配。这可能是由自动更新软件的问题引起的。"
+L["Please uninstall Nidhaus Plates, and then re-install. You do NOT need to clear your variables."] = "请卸载Nidhaus Plates并重新安装。无需清理Variables文件。"
+L["|cFFFF6600Nidhaus Plates: |cFFFF9900No Theme is Selected. |cFF77FF00Use |cFFFFFF00/nidhausplates|cFF77FF00 to bring up the Theme Selection Window."] = "|cFFFF6600Nidhaus Plates：|cFFFF9900没有选定主题。|cFF77FF00使用|cFFFFFF00/nidhausplates|cFF77FF00命令打开主题选择窗口。"
 
-L.resetTidyPlanel = "%s正在将%sTidy Plates%s主题选择重置为默认。"
-L.commonResetPanel = "%s正在将%sTidy Plates Hub: %s%s%s配置重置为默认。"
-L.resetTidyPlanelShift = "%s按下%sShift%s并点击%s重置配置%s会清除已保存的设置，并重载界面。"
-L.commonCopyPanel = "%s已将%sTidy Plates Hub: %s%s%s主题值复制到缓存中。"
-L.commonPastePanel = "%s已从缓存中粘贴%sTidy Plates Hub: %s%s%s主题值。"
+L.resetPanel = "%s正在将%sNidhaus Plates%s主题选择重置为默认。"
+L.resetPanelShift = "%s按下%sShift%s并点击%s重置配置%s会清除已保存的设置，并重载界面。"
 
 ----------------------
 --[[ TankPanel.lua ]]--

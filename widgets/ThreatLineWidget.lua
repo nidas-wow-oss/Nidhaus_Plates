@@ -1,4 +1,4 @@
-local GetRelativeThreat = TidyPlatesUtility.GetRelativeThreat
+local GetRelativeThreat = NidhausPlatesUtility.GetRelativeThreat
 
 ----------------------
 -- FadeLater() - Registers a callback, which hides the specified frame in X seconds
@@ -313,4 +313,4 @@ local function CreateWidgetFrame(parent)
 	return frame
 end
 
-TidyPlatesWidgets.CreateThreatLineWidget = CreateWidgetFrame
+NidhausPlatesWidgets.CreateThreatLineWidget = CreateWidgetFrame

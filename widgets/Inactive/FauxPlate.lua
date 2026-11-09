@@ -4,13 +4,13 @@ Faux Plate
 
 Ideas:
 #1
-TidyPlates:ApplyThemeToFrame(frame, unittable)
+NidhausPlates:ApplyThemeToFrame(frame, unittable)
 Runs the units' UpdateStyle function, and applies the current theme to the frame.
 -Benefit:
 -Drawback: Need to know when theme changes
 
 #2
-TidyPlates:CreateBlankPlate() returns a frame
+NidhausPlates:CreateBlankPlate() returns a frame
 
 #3 Total simulation
 Addon creates a frame
@@ -19,8 +19,8 @@ use: pcall(function() end)
 to process the style changes
 --]]
 
-local TidyPlates = TidyPlates
-local OnNewNameplate = TidyPlates.OnNewNameplate
+local NidhausPlates = NidhausPlates
+local OnNewNameplate = NidhausPlates.OnNewNameplate
 local Plates = {}
 
 local function CreateFauxPlate(plate)
@@ -38,8 +38,8 @@ local function CreateFauxPlate(plate)
 
 		-- Create Statusbars
 		local level = plate:GetFrameLevel()
-		bars.healthbar = CreateTidyPlatesStatusbar(extended)
-		bars.castbar = CreateTidyPlatesStatusbar(extended)
+		bars.healthbar = CreateNidhausPlatesStatusbar(extended)
+		bars.castbar = CreateNidhausPlatesStatusbar(extended)
 
 		--extended.text = CreateFrame("Frame", nil, healthbar)
 

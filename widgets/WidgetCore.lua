@@ -1,4 +1,4 @@
-TidyPlatesWidgets = {}
+NidhausPlatesWidgets = {}
 
 ----------------------
 -- HideIn() - Registers a callback, which hides the specified frame in X seconds
@@ -32,7 +32,7 @@ do
 		end
 	end
 
-	function TidyPlatesWidgets:HideIn(frame, expiration)
+	function NidhausPlatesWidgets:HideIn(frame, expiration)
 		-- Register Frame
 		Framelist[frame] = expiration
 		-- Init Watchframe
@@ -69,7 +69,7 @@ do
 				-- If active...
 				frame:Hide()
 				Framelist[frame] = nil
-				TidyPlates:RequestDelegateUpdate() -- Request an Update on Delegate functions, so we can catch when auras fall off
+				NidhausPlates:RequestDelegateUpdate() -- Request an Update on Delegate functions, so we can catch when auras fall off
 			else
 				-- Update the frame
 				if frame.Poll then
@@ -101,11 +101,11 @@ do
 		end
 	end
 
-	TidyPlatesWidgets.PolledHideIn = PolledHideIn
+	NidhausPlatesWidgets.PolledHideIn = PolledHideIn
 end
 
 ---------------------
--- Reset/Nil Tidy Plates Widget Frames
+-- Reset/Nil Nidhaus Plates Widget Frames
 ---------------------
 do
 	local Plate, plateIndex, WorldFrameChildren, WidgetChildren, widgetIndex
@@ -121,5 +121,5 @@ do
 			end
 		end
 	end
-	TidyPlatesWidgets.ResetWidgets = ResetWidgets
+	NidhausPlatesWidgets.ResetWidgets = ResetWidgets
 end

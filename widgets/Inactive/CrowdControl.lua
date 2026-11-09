@@ -73,7 +73,7 @@ local function CrowdControlAura_Update(targetguid, targetname, sourceguid, sourc
 	if sourceguid == UnitGUID("player") then
 		targetUnitId = "target"
 	else
-		local unitId = TidyPlatesUtility.GroupMembers.UnitId[sourcename]
+		local unitId = NidhausPlatesUtility.GroupMembers.UnitId[sourcename]
 		if unitId then
 			targetUnitId = unitId .. "target"
 		end
@@ -215,8 +215,8 @@ local function ClearWidgetContext(frame)
 	WidgetList[frame] = nil
 end
 
-local borderart = "Interface\\AddOns\\TidyPlatesWidgets\\Aura\\CCBorder"
-local backdropart = "Interface\\AddOns\\TidyPlatesWidgets\\Aura\\CCBackdrop"
+local borderart = "Interface\\AddOns\\NidhausPlatesWidgets\\Aura\\CCBorder"
+local backdropart = "Interface\\AddOns\\NidhausPlatesWidgets\\Aura\\CCBackdrop"
 local testicon = "Interface\\ICONS\\Spell_Shaman_Hex"
 local font = "Interface\\Addons\\Nidhaus_Plates\\Media\\DefaultFont.ttf"
 local function CreateCrowdControlWidget(parent)
@@ -260,6 +260,6 @@ local function CreateCrowdControlWidget(parent)
 	return frame
 end
 
-TidyPlatesWidgets.CreateCrowdControlWidget = CreateCrowdControlWidget
-TidyPlatesWidgets.EnableCrowdControlWatcher = Enable
-TidyPlatesWidgets.DisableCrowdControlWatcher = Disable
+NidhausPlatesWidgets.CreateCrowdControlWidget = CreateCrowdControlWidget
+NidhausPlatesWidgets.EnableCrowdControlWatcher = Enable
+NidhausPlatesWidgets.DisableCrowdControlWatcher = Disable
