@@ -98,10 +98,14 @@ function NidhausPlatesTheme:OnInitialize()
 			hideSnakes = true,
 			hideSnakesFriendly = true,
 			hideMirrorImage = true,
-			lightBorder = false,
-			lightCast   = false,
 			castbarCVarInit = false,
-			roundTarget = false,
+			castGlow    = true,
+
+			roundHealth = true,
+			healthBorder = "none",
+			healthGlow  = "classic",
+			targetStyle = "glow",
+			mouseStyle  = "line",
 			friendlyClass = false,
 			friendlyNameOnly = false,
 			friendlyClickThrough = false,
@@ -742,7 +746,7 @@ function NidhausPlatesTheme:OnInitialize()
 					texture = "TP_HealthBarHighlight"
 				},
 				elitehealthborder = {
-					texture = "TP_HealthBarEliteOverlay",
+					texture = "TP_HealthBarEliteOverlayThin",
 					show = true
 				},
 				healthborder = {
@@ -751,7 +755,7 @@ function NidhausPlatesTheme:OnInitialize()
 					show = true
 				},
 				threatborder = {
-					show = false
+					show = true
 				},
 				healthbar = {
 					texture = "NidhausPlatesBar",
@@ -1012,7 +1016,7 @@ function NidhausPlatesTheme:OnInitialize()
 		p.settings.customtext.show = false
 		p.settings.raidicon.hpColor = false
 		p.settings.healthborder.texture = "TP_HealthBarOverlayThin"
-		p.settings.threatborder.show = false
+		p.settings.threatborder.show = true
 		p.customColor = false
 		p.allowClass = true
 		p.nameplate.scale["Target"] = 1.1

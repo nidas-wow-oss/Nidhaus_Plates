@@ -83,6 +83,8 @@ local warned = {}
 local function LoadTheme(incomingtheme)
 	local theme
 
+	if NidhausPlates_RefreshLightBorder then NidhausPlates_RefreshLightBorder() end
+
 	for themename, themetable in pairs(NidhausPlatesThemeList) do
 		if themetable.OnActivateTheme then
 			themetable.OnActivateTheme(nil, nil)
@@ -134,7 +136,6 @@ NidhausPlates._LoadTheme = LoadTheme
 
 function NidhausPlates:ReloadTheme()
 
-	if NidhausPlates_RefreshLightBorder then NidhausPlates_RefreshLightBorder() end
 	LoadTheme(NidhausPlatesOptions[activespec])
 	NidhausPlates:ForceUpdate()
 end

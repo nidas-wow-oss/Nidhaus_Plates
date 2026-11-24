@@ -233,7 +233,6 @@ end
 
 do
 	NidhausPlatesUtility:EnableGroupWatcher()
-	NidhausPlatesWidgets:EnableAuraWatcher()
 	NidhausPlatesWidgets:EnableTankWatch()
 
 	local isTanked = NidhausPlatesWidgets.IsTankedByAnotherTank

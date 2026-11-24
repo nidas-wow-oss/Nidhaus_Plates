@@ -18,40 +18,190 @@ local EMPTY_TEXTURE = "Interface\\Addons\\Nidhaus_Plates\\Media\\Empty"
 
 local ART = "Interface\\AddOns\\Nidhaus_Plates\\Theme\\Media\\Artwork\\"
 
-local LIGHT_BACKDROP = {
-	edgeFile = ART .. "Border_Light",
-	edgeSize = 8,
-	insets = { left = 2, right = 2, top = 2, bottom = 2 },
-}
-
-local ROUND_BACKDROP = {
-	edgeFile = ART .. "Border_Rounded",
-	edgeSize = 8,
-	insets = { left = 2, right = 2, top = 2, bottom = 2 },
-}
-
-NidhausPlates_LightBorder = false
-NidhausPlates_LightCast   = false
-NidhausPlates_RoundTarget = false
+NidhausPlates_RoundHealth = false
+NidhausPlates_HealthBorder = "thin"
+NidhausPlates_TargetStyle = "line"
+NidhausPlates_MouseStyle  = "line"
+NidhausPlates_CastGlow    = true
+NidhausPlates_HealthGlow  = "soft"
 
 function NidhausPlates_RefreshLightBorder()
 	local t = _G.NidhausPlatesTheme
 	local prof = t and t.db and t.db.profile
-	NidhausPlates_LightBorder = (prof and prof.lightBorder) and true or false
-	NidhausPlates_LightCast   = (prof and prof.lightCast)   and true or false
-	NidhausPlates_RoundTarget = (prof and prof.roundTarget) and true or false
+
+	local hb = prof and prof.healthBorder
+	if not hb then
+		local s = prof and prof.settings and prof.settings.healthborder
+		hb = (s and s.show == false) and "none" or "thin"
+	end
+	NidhausPlates_HealthBorder = hb
+
+	local st = prof and prof.settings
+	local ts = prof and prof.targetStyle
+	if not ts then
+		ts = (st and st.target and st.target.texture == "Empty") and "none" or "line"
+	end
+	NidhausPlates_TargetStyle = ts
+	local ms = prof and prof.mouseStyle
+	if not ms then
+		ms = (st and st.highlight and st.highlight.texture == "Empty") and "none" or "line"
+	end
+	NidhausPlates_MouseStyle = ms
+
+	NidhausPlates_CastGlow    = not (prof and prof.castGlow == false)
+	NidhausPlates_RoundHealth = (prof and prof.roundHealth) and true or false
+	NidhausPlates_HealthGlow  = (prof and prof.healthGlow) or "soft"
 end
 
-local function CreateLightBorder(parent, target, pad, backdrop)
+local bordeCache = {}
+local function GetBorderBackdrop(file, size)
+	local key = file .. size
+	local bd = bordeCache[key]
+	if not bd then
+		bd = { edgeFile = file, edgeSize = size }
+		bordeCache[key] = bd
+	end
+	return bd
+end
+
+local function ApplyBorder(f)
+	local w, h = f:GetWidth() or 0, f:GetHeight() or 0
+	local m = (w < h) and w or h
+	local size = 8
+	if m > 0 then
+		size = math.floor(m / 2)
+		if size > 8 then size = 8 elseif size < 2 then size = 2 end
+	end
+	if f.bdSize == size and f.bdFile == f.wantFile then return end
+
+	local r, g, b, a = 1, 1, 1, 1
+	if f.bdSize then r, g, b, a = f:GetBackdropBorderColor() end
+	f:SetBackdrop(GetBorderBackdrop(f.wantFile, size))
+	f:SetBackdropBorderColor(r, g, b, a)
+	f.bdSize, f.bdFile = size, f.wantFile
+end
+
+local function SetBorderFile(f, file)
+	f.wantFile = file
+	ApplyBorder(f)
+end
+
+local function SetBorderShape(f, round)
+	f.isRound = round and true or false
+	SetBorderFile(f, ART .. (round and "Border_Rounded" or "Border_Light"))
+end
+
+local function HealthBorderFile(round, mode)
+	return ART .. "Border_" .. (round and "Round" or "Square")
+		.. "_" .. (mode == "thick" and "Thick" or "Thin")
+end
+
+local function CreateLightBorder(parent, target, pad, round)
 	local f = CreateFrame("Frame", nil, parent)
 	f:SetFrameLevel(parent:GetFrameLevel() + 1)
 	f:SetPoint("TOPLEFT", target, "TOPLEFT", -pad, pad)
 	f:SetPoint("BOTTOMRIGHT", target, "BOTTOMRIGHT", pad, -pad)
-	f:SetBackdrop(backdrop or LIGHT_BACKDROP)
-	f:SetBackdropBorderColor(1, 1, 1, 1)
+	f:SetScript("OnSizeChanged", ApplyBorder)
+	SetBorderShape(f, round)
 	f:Hide()
 	return f
 end
+
+local GLOW_TEX  = ART .. "Cast_Glow"
+
+local GLOW_TEX_SQ = ART .. "Cast_Glow_Square"
+
+local GLOW_TEX_RING = ART .. "Cast_Glow_Ring"
+local GLOW_SIZE = 7
+
+local function LayoutGlow(f)
+	local h = f:GetHeight() or 0
+	local round = f.round and not f.cuadrado and h > 0
+	local r, S = 0, GLOW_SIZE
+	if round then
+		r = h * 0.25
+		S = r * 2.8
+	end
+	local key = (round and "r" or "s") .. S
+	if f.layoutKey == key then return end
+	f.layoutKey = key
+	local p = f.p
+	local C = S + r
+	local esquina = round and GLOW_TEX_RING or GLOW_TEX_SQ
+	local lado = round and GLOW_TEX or GLOW_TEX_SQ
+	for _, n in ipairs({"tl", "tr", "bl", "br"}) do
+		p[n]:SetTexture(esquina)
+		p[n]:SetWidth(C)
+		p[n]:SetHeight(C)
+		p[n]:ClearAllPoints()
+	end
+	for _, n in ipairs({"top", "bottom", "left", "right"}) do
+		p[n]:SetTexture(lado)
+		p[n]:ClearAllPoints()
+	end
+	p.tl:SetPoint("BOTTOMRIGHT", f, "TOPLEFT", r, -r)
+	p.tr:SetPoint("BOTTOMLEFT", f, "TOPRIGHT", -r, -r)
+	p.bl:SetPoint("TOPRIGHT", f, "BOTTOMLEFT", r, r)
+	p.br:SetPoint("TOPLEFT", f, "BOTTOMRIGHT", -r, r)
+	p.top:SetPoint("BOTTOMLEFT", f, "TOPLEFT", r, 0)
+	p.top:SetPoint("TOPRIGHT", f, "TOPRIGHT", -r, S)
+	p.bottom:SetPoint("TOPLEFT", f, "BOTTOMLEFT", r, 0)
+	p.bottom:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -r, -S)
+	p.left:SetPoint("TOPRIGHT", f, "TOPLEFT", 0, -r)
+	p.left:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT", -S, r)
+	p.right:SetPoint("TOPLEFT", f, "TOPRIGHT", 0, -r)
+	p.right:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", S, r)
+end
+
+local function CreateCastGlow(castbar, target, cuadrado)
+	local f = CreateFrame("Frame", nil, castbar)
+	f:SetAllPoints(target or castbar)
+	local piezas, p = {}, {}
+	local function Pieza(n, l, r, t, b)
+		local tx = f:CreateTexture(nil, "BACKGROUND")
+		tx:SetTexCoord(l, r, t, b)
+		tx:SetBlendMode("ADD")
+		piezas[#piezas + 1] = tx
+		p[n] = tx
+	end
+	Pieza("tl", 0, .5, 0, .5)
+	Pieza("tr", .5, 1, 0, .5)
+	Pieza("bl", 0, .5, .5, 1)
+	Pieza("br", .5, 1, .5, 1)
+	Pieza("top", .5, .5, 0, .5)
+	Pieza("bottom", .5, .5, .5, 1)
+	Pieza("left", 0, .5, .5, .5)
+	Pieza("right", .5, 1, .5, .5)
+	f.piezas, f.p = piezas, p
+	f.cuadrado = cuadrado
+	f.round = false
+	LayoutGlow(f)
+
+	f:SetScript("OnSizeChanged", LayoutGlow)
+	f:Hide()
+	return f
+end
+
+local function SetGlowShape(f, round)
+	if not f then return end
+	f.round = round and true or false
+	LayoutGlow(f)
+end
+
+local function ColorGlow(f, r, g, b, a)
+	for _, tx in ipairs(f.piezas) do
+		tx:SetVertexColor(r, g, b, a)
+	end
+end
+
+local function IsEmptyTexture(tex)
+	return tex and string.find(tex, "Empty$") and true or false
+end
+
+local function HasVisibleBar(barstyle)
+	return barstyle and not IsEmptyTexture(barstyle.texture)
+end
+
 local select, pairs, tostring = select, pairs, tostring
 local CreateNidhausPlatesStatusbar = CreateNidhausPlatesStatusbar
 
@@ -218,9 +368,12 @@ do
 		else
 			visual.skullicon:Hide()
 		end
+
+		visual.target:Hide()
+		visual.highlight:Hide()
 		if not unit.isTarget then
-			visual.target:Hide()
 			if visual.roundTarget then visual.roundTarget:Hide() end
+			if visual.targetGlow then visual.targetGlow:Hide() end
 		end
 		if not unit.isMarked then
 			visual.raidicon:Hide()
@@ -229,30 +382,37 @@ do
 			MatchTextWidth()
 		end
 
-		local light = NidhausPlates_LightBorder
-		if visual.lightHealth then
-			if light and style.healthborder.show then
-				visual.lightHealth:Show()
-				visual.healthborder:Hide()
+		local mode = NidhausPlates_HealthBorder
+		local round = NidhausPlates_RoundHealth
+		local file = HealthBorderFile(round, mode)
+		visual.healthborder:Hide()
+
+		visual.threatborder:SetAlpha(0)
+		visual.castborder:Hide()
+		visual.castnostop:Hide()
+		local function Borde(f, mostrar)
+			if not f then return end
+			if mode ~= "none" and mostrar then
+				SetBorderFile(f, file)
+				f:Show()
 			else
-				visual.lightHealth:Hide()
+				f:Hide()
 			end
 		end
-		local lightCast = NidhausPlates_LightCast
-		if visual.lightCast then
-			if lightCast and style.castborder.show then
-				visual.lightCast:Show()
-			else
-				visual.lightCast:Hide()
-			end
-		end
-		if visual.lightIcon then
-			if lightCast and style.spellicon.show then
-				visual.lightIcon:Show()
-			else
-				visual.lightIcon:Hide()
-			end
-		end
+
+		bars.healthbar:SetRound(round)
+		bars.castbar:SetRound(round)
+		Borde(visual.lightHealth, HasVisibleBar(style.healthbar))
+		Borde(visual.lightCast, HasVisibleBar(style.castbar))
+		Borde(visual.lightIcon, HasVisibleBar(style.castbar) and style.spellicon.show)
+
+		if visual.roundTarget then SetBorderFile(visual.roundTarget, HealthBorderFile(round, "thick")) end
+		if visual.roundHighlight then SetBorderFile(visual.roundHighlight, HealthBorderFile(round, "thin")) end
+		SetGlowShape(visual.castGlow, round)
+		SetGlowShape(visual.iconGlow, round)
+		SetGlowShape(visual.healthGlow, round)
+		SetGlowShape(visual.targetGlow, round)
+		SetGlowShape(visual.mouseGlow, round)
 	end
 end
 
@@ -285,37 +445,72 @@ do
 	end
 
 	function UpdateIndicator_ThreatGlow()
+		local glow = visual.healthGlow
 		if not style.threatborder.show then
+			if glow then glow:Hide() end
 			return
 		end
 		threatborder = visual.threatborder
+		local r, g, b, a = 0, 0, 0, 0
 		if activetheme.SetThreatColor then
-			threatborder:SetVertexColor(activetheme.SetThreatColor(unit))
+			r, g, b, a = activetheme.SetThreatColor(unit)
+			threatborder:SetVertexColor(r, g, b, a)
 		else
 			if InCombat and unit.reaction ~= "FRIENDLY" and unit.type == "NPC" then
 				color.r = style.threatcolor[unit.threatSituation].r
 				color.g = style.threatcolor[unit.threatSituation].g
 				color.b = style.threatcolor[unit.threatSituation].b
 				color.a = style.threatcolor[unit.threatSituation].a
+				r, g, b, a = color.r, color.g, color.b, (color.a or 1)
 				threatborder:Show()
-				threatborder:SetVertexColor(color.r, color.g, color.b, (color.a or 1))
+				threatborder:SetVertexColor(r, g, b, a)
 			else
 				threatborder:Hide()
+			end
+		end
+
+		if not (InCombat and unit.type == "NPC" and unit.reaction ~= "FRIENDLY") then
+			a = 0
+		end
+		local mode = NidhausPlates_HealthGlow
+		threatborder:SetAlpha((mode == "classic" and (a or 0) > 0) and 1 or 0)
+		if glow then
+			if mode == "soft" and threatborder:IsShown() and (a or 0) > 0 then
+				for _, tx in ipairs(glow.piezas) do
+					tx:SetVertexColor(r, g, b, a)
+				end
+				glow:Show()
+			else
+				glow:Hide()
 			end
 		end
 	end
 
 	function UpdateIndicator_Target()
 
-		local round = NidhausPlates_RoundTarget
-		local on = unit.isTarget and style.target.show
+		local ts = NidhausPlates_TargetStyle
+		local on = unit.isTarget and style.target.show and HasVisibleBar(style.healthbar)
+		visual.target:Hide()
+
+		local tr, tg, tb = 1, 1, 1
+		local th = _G.NidhausPlatesTheme
+		local tw = th and th.db and th.db.profile and th.db.profile.targetWidget
+		if tw then tr, tg, tb = tw.r or 1, tw.g or 1, tw.b or 1 end
 		if visual.roundTarget then
-			if on and round then visual.roundTarget:Show() else visual.roundTarget:Hide() end
+			if on and (ts == "line" or ts == "both") then
+				visual.roundTarget:SetBackdropBorderColor(tr, tg, tb, 1)
+				visual.roundTarget:Show()
+			else
+				visual.roundTarget:Hide()
+			end
 		end
-		if on and not round then
-			visual.target:Show()
-		else
-			visual.target:Hide()
+		if visual.targetGlow then
+			if on and (ts == "glow" or ts == "both") then
+				ColorGlow(visual.targetGlow, tr, tg, tb, 0.9)
+				visual.targetGlow:Show()
+			else
+				visual.targetGlow:Hide()
+			end
 		end
 	end
 
@@ -665,6 +860,8 @@ do
 		unit.isCasting = false
 		bars.castbar:Hide()
 		visual.highlight:Hide()
+		if visual.roundHighlight then visual.roundHighlight:Hide() end
+		if visual.mouseGlow then visual.mouseGlow:Hide() end
 		regions.highlight:Hide()
 
 		if activetheme.OnInitialize then
@@ -832,7 +1029,21 @@ do
 		unit.isMouseover = regions.highlight:IsShown()
 
 		if unit.isMouseover then
-			visual.highlight:Show()
+
+			local ms = NidhausPlates_MouseStyle
+			local bar = HasVisibleBar(style.healthbar)
+			visual.highlight:Hide()
+			if visual.roundHighlight then
+				if bar and ms == "line" then visual.roundHighlight:Show() else visual.roundHighlight:Hide() end
+			end
+			if visual.mouseGlow then
+				if bar and ms == "glow" then
+					ColorGlow(visual.mouseGlow, 1, 1, 1, 0.5)
+					visual.mouseGlow:Show()
+				else
+					visual.mouseGlow:Hide()
+				end
+			end
 			if (not unit.guid) then
 				unit.guid = UnitGUID("mouseover")
 				if unit.guid then
@@ -841,6 +1052,8 @@ do
 			end
 		else
 			visual.highlight:Hide()
+			if visual.roundHighlight then visual.roundHighlight:Hide() end
+			if visual.mouseGlow then visual.mouseGlow:Hide() end
 		end
 
 		OnUpdateThreatSituation(plate)
@@ -942,26 +1155,40 @@ do
 
 			castbar:SetMinMaxValues(minval, maxval)
 			castbar:SetForegroundColor(r, g, b, a or 1)
+
+			if visual.castGlow then
+				if NidhausPlates_CastGlow then
+					for _, tx in ipairs(visual.castGlow.piezas) do
+						tx:SetVertexColor(r, g, b, 0.9)
+					end
+					visual.castGlow:Show()
+				else
+					visual.castGlow:Hide()
+				end
+			end
+
+			if visual.iconGlow then
+				if NidhausPlates_CastGlow and style.spellicon.show then
+					for _, tx in ipairs(visual.iconGlow.piezas) do
+						tx:SetVertexColor(r, g, b, 0.9)
+					end
+					visual.iconGlow:Show()
+				else
+					visual.iconGlow:Hide()
+				end
+			end
 			visual.spelltext:SetText(spell)
 
 			visual.spellicon:SetTexture(icon)
-			if NidhausPlates_LightCast then
 
-				visual.castnostop:Hide()
-				visual.castborder:Hide()
-				if visual.lightCast then
-					if notInterruptible then
-						visual.lightCast:SetBackdropBorderColor(1, 0.25, 0.25, 1)
-					else
-						visual.lightCast:SetBackdropBorderColor(1, 1, 1, 1)
-					end
+			visual.castnostop:Hide()
+			visual.castborder:Hide()
+			if visual.lightCast then
+				if notInterruptible then
+					visual.lightCast:SetBackdropBorderColor(1, 0.25, 0.25, 1)
+				else
+					visual.lightCast:SetBackdropBorderColor(1, 1, 1, 1)
 				end
-			elseif notInterruptible then
-				visual.castnostop:Show()
-				visual.castborder:Hide()
-			else
-				visual.castnostop:Hide()
-				visual.castborder:Show()
 			end
 
 			castbar:Show()
@@ -1102,8 +1329,16 @@ do
 		visual.lightHealth = CreateLightBorder(healthbar, healthbar, 2)
 		visual.lightCast   = CreateLightBorder(castbar, castbar, 2)
 		visual.lightIcon   = CreateLightBorder(castbar, visual.spellicon, 2)
+		visual.castGlow    = CreateCastGlow(castbar)
+		visual.healthGlow  = CreateCastGlow(healthbar)
+		visual.iconGlow    = CreateCastGlow(castbar, visual.spellicon, true)
+		visual.targetGlow  = CreateCastGlow(healthbar)
+		visual.mouseGlow   = CreateCastGlow(healthbar)
 
-		visual.roundTarget = CreateLightBorder(healthbar, healthbar, 3, ROUND_BACKDROP)
+		visual.roundTarget = CreateLightBorder(healthbar, healthbar, 3, true)
+
+		visual.roundHighlight = CreateLightBorder(healthbar, healthbar, 3, true)
+		visual.roundHighlight:SetBackdropBorderColor(1, 1, 1, 0.55)
 
 		visual.customtext = extended:CreateFontString(nil, "OVERLAY")
 		visual.name = extended:CreateFontString(nil, "OVERLAY")

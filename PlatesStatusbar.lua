@@ -8,6 +8,56 @@ local CreateFrame = CreateFrame
 local barFrame = CreateFrame("Frame")
 local barPrototype_SetScript = barFrame.SetScript
 
+local CAP_TEX = "Interface\\AddOns\\Nidhaus_Plates\\Theme\\Media\\Artwork\\Bar_RoundCap"
+local CAP_COORD = 0.25
+
+local function UsaPuntas(self)
+	return self.ROUND and not self.VACIA and self.ORIENTATION == "HORIZONTAL"
+		and self.FILLSTYLE == "STANDARD" and not self.REVERSE and not self.ROTATE
+end
+
+local function UpdateRound(self, width, height, progress)
+	local fill = width * progress
+	local c = height * 0.25
+	local cw = fill / 2
+	if cw > c then cw = c end
+	if cw < 0.1 then cw = 0.1 end
+
+	if self.anclaPunta ~= cw then
+		self.fg:ClearAllPoints()
+		self.fg:SetPoint("TOPLEFT", self, "TOPLEFT", cw, 0)
+		self.fg:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", cw, 0)
+		self.capL:ClearAllPoints()
+		self.capL:SetPoint("TOPLEFT")
+		self.capL:SetPoint("BOTTOMLEFT")
+		self.capR:ClearAllPoints()
+		self.capR:SetPoint("TOPLEFT", self.fg, "TOPRIGHT")
+		self.capR:SetPoint("BOTTOMLEFT", self.fg, "BOTTOMRIGHT")
+		self.anclaPunta = cw
+	end
+	local mid = fill - 2 * cw
+	if mid < 0.1 then mid = 0.1 end
+	self.fg:SetWidth(mid)
+
+	if width > 0 then
+		self.fg:SetTexCoord(cw / width, (cw + mid) / width, 0, 1)
+	end
+
+	local k = CAP_COORD * (cw / c)
+	self.capL:SetWidth(cw)
+	self.capL:SetTexCoord(0, k, 0, 1)
+	self.capR:SetWidth(cw)
+	self.capR:SetTexCoord(1 - k, 1, 0, 1)
+	local visible = fill > 0.2
+	if visible then
+		self.capL:Show()
+		self.capR:Show()
+	else
+		self.capL:Hide()
+		self.capR:Hide()
+	end
+end
+
 local function barPrototype_Update(self, sizeChanged, width, height)
 	local progress = (self.VALUE - self.MINVALUE) / (self.MAXVALUE - self.MINVALUE)
 
@@ -57,6 +107,21 @@ local function barPrototype_Update(self, sizeChanged, width, height)
 		TRx_, TRy_ = TRx * progress, TRy
 		BLx_, BLy_ = BLx, BLy
 		BRx_, BRy_ = BRx * progress, BRy
+	end
+
+	if UsaPuntas(self) then
+		UpdateRound(self, width, height, progress)
+		self.puntas = true
+		core.callbacks:Fire("OnValueChanged", self, self.VALUE)
+		return
+	end
+
+	if self.puntas then
+		self.puntas = false
+		self.anclaPunta = nil
+		self.capL:Hide()
+		self.capR:Hide()
+		sizeChanged = false
 	end
 
 	if not sizeChanged then
@@ -179,6 +244,11 @@ local barPrototype = setmetatable({
 	SetStatusBarTexture = function(self, texture)
 		self.fg:SetTexture(texture)
 		self.bg:SetTexture(texture)
+		local vacia = (type(texture) == "string" and texture:find("Empty$")) and true or false
+		if self.VACIA ~= vacia then
+			self.VACIA = vacia
+			barPrototype_Update(self)
+		end
 	end,
 
 	GetStatusBarTexture = function(self)
@@ -187,6 +257,16 @@ local barPrototype = setmetatable({
 
 	SetForegroundColor = function(self, r, g, b, a)
 		self.fg:SetVertexColor(r, g, b, a)
+		self.capL:SetVertexColor(r, g, b, a)
+		self.capR:SetVertexColor(r, g, b, a)
+	end,
+
+	SetRound = function(self, round)
+		round = round and true or false
+		if self.ROUND ~= round then
+			self.ROUND = round
+			barPrototype_Update(self)
+		end
 	end,
 
 	GetForegroundColor = function(self)
@@ -227,14 +307,22 @@ local barPrototype = setmetatable({
 
 	SetStatusBarGradient = function(self, r1, g1, b1, a1, r2, g2, b2, a2)
 		self.fg:SetGradientAlpha(self.ORIENTATION, r1, g1, b1, a1, r2, g2, b2, a2)
+		self.capL:SetVertexColor(r1, g1, b1, a1)
+		self.capR:SetVertexColor(r2, g2, b2, a2)
 	end,
 
 	SetStatusBarGradientAuto = function(self, r, g, b, a)
-		self.fg:SetGradientAlpha(self.ORIENTATION, 0.5 + (r * 1.1), g * 0.7, b * 0.7, a, r * 0.7, g * 0.7, 0.5 + (b * 1.1), a)
+		local r1, g1, b1 = 0.5 + (r * 1.1), g * 0.7, b * 0.7
+		local r2, g2, b2 = r * 0.7, g * 0.7, 0.5 + (b * 1.1)
+		self.fg:SetGradientAlpha(self.ORIENTATION, r1, g1, b1, a, r2, g2, b2, a)
+		self.capL:SetVertexColor(r1, g1, b1, a)
+		self.capR:SetVertexColor(r2, g2, b2, a)
 	end,
 
 	SetStatusBarSmartGradient = function(self, r1, g1, b1, r2, g2, b2)
 		self.fg:SetGradientAlpha(self.ORIENTATION, r1, g1, b1, 1, r2 or r1, g2 or g1, b2 or b1, 1)
+		self.capL:SetVertexColor(r1, g1, b1, 1)
+		self.capR:SetVertexColor(r2 or r1, g2 or g1, b2 or b1, 1)
 	end,
 
 	GetObjectType = function(self)
@@ -263,6 +351,12 @@ CreateNidhausPlatesStatusbar = function(parent, name)
 	bar.fg = bar.fg or bar:CreateTexture(name and "$parent.Texture", "ARTWORK")
 	bar.bg = bar.bg or bar:CreateTexture(name and "$parent.Background", "BACKGROUND")
 	bar.bg:Hide()
+	bar.capL = bar:CreateTexture(nil, "ARTWORK")
+	bar.capL:SetTexture(CAP_TEX)
+	bar.capL:Hide()
+	bar.capR = bar:CreateTexture(nil, "ARTWORK")
+	bar.capR:SetTexture(CAP_TEX)
+	bar.capR:Hide()
 
 	bar:HookScript("OnSizeChanged", barPrototype_OnSizeChanged)
 	bar:SetRotatesTexture(false)

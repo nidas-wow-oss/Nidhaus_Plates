@@ -30,15 +30,6 @@ local FontStyle = {
 	["OUTLINE, MONOCHROME"] = L["Outline, Monochrome"],
 	["THICKOUTLINE, MONOCHROME"] = L["Thick Outline, Monochrome"]
 }
-local DebuffMode = {
-	["whitelist"] = L["White List"],
-	["blacklist"] = L["Black List"],
-	["whitelistMine"] = L["White List (Mine)"],
-	["blacklistMine"] = L["Black List (Mine)"],
-	["all"] = L["All Debuffs"],
-	["allMine"] = L["All Debuffs (Mine)"],
-	["prefix"] = L["By Prefix"],
-}
 local totemID = {
 	[1] = {8177, "A1", "b8d1ff"},
 	[2] = {10595, "A2", "b8d1ff"},
@@ -405,51 +396,11 @@ local function SetThemeValueArt(info, val)
 	Update()
 end
 
-local function GetCastBorder(info)
-	if db.lightCast then return "Border_Light" end
-	return GetValue(info)
-end
-
-local function SetCastBorder(info, val)
-	local light = (val == "Border_Light")
-	db.lightCast = light
-	if NidhausPlates_RefreshLightBorder then NidhausPlates_RefreshLightBorder() end
-	if light then
+local function SetBarOption(key)
+	return function(_, val)
+		db[key] = val
+		if NidhausPlates_RefreshLightBorder then NidhausPlates_RefreshLightBorder() end
 		Update()
-	else
-		SetThemeValueArt(info, val)
-	end
-end
-
-local function GetTargetHighlight(info)
-	if db.roundTarget then return "Border_Rounded" end
-	return GetValue(info)
-end
-
-local function SetTargetHighlight(info, val)
-	local round = (val == "Border_Rounded")
-	db.roundTarget = round
-	if NidhausPlates_RefreshLightBorder then NidhausPlates_RefreshLightBorder() end
-	if round then
-		Update()
-	else
-		SetThemeValueArt(info, val)
-	end
-end
-
-local function GetHealthBorder(info)
-	if db.lightBorder then return "Border_Light" end
-	return GetValue(info)
-end
-
-local function SetHealthBorder(info, val)
-	local light = (val == "Border_Light")
-	db.lightBorder = light
-	if NidhausPlates_RefreshLightBorder then NidhausPlates_RefreshLightBorder() end
-	if light then
-		Update()
-	else
-		SetThemeValueArt(info, val)
 	end
 end
 
@@ -761,6 +712,7 @@ local function GetOptions()
 									args = {
 										HealthBarTexture = {
 											name = L["Healthbar"],
+											desc = "With Bar Shape set to Rounded, the rounded ends are drawn with the NidhausPlatesBar shading. Other textures still work, but the ends may look slightly different.",
 											type = "select",
 											width = "double",
 											dialogControl = "LSM30_Statusbar",
@@ -775,30 +727,47 @@ local function GetOptions()
 											order = 1.5,
 											name = ""
 										},
-										HealthBorderToggle = {
-											type = "toggle",
+
+										HealthShape = {
+											type = "select",
 											order = 2,
-											name = L["Show Border"],
-											get = GetValue,
-											set = SetThemeValue,
-											arg = {"settings", "healthborder", "show"}
+											name = "Bar Shape",
+											desc = "Square or rounded. Applies to every bar (health, cast bar, spell icon) and to the target and mouseover highlights.",
+											get = function() return db.roundHealth and "Rounded" or "Square" end,
+											set = function(_, val)
+												db.roundHealth = (val == "Rounded")
+												if NidhausPlates_RefreshLightBorder then NidhausPlates_RefreshLightBorder() end
+												Update()
+											end,
+											values = { Square = "Square", Rounded = "Rounded" },
 										},
 										HealthBorder = {
 											type = "select",
 											order = 3,
-											name = L["Normal Border"],
-											desc = L["The same thin frame the minimap uses. The cast bar has its own setting."],
-											get = GetHealthBorder,
-											set = SetHealthBorder,
-											disabled = function()
-												return not db.settings.healthborder.show
+											name = L["Border"],
+											desc = "Line thickness for every bar (health, cast bar, spell icon), in the shape chosen in Bar Shape.",
+											get = function()
+												return NidhausPlates_HealthBorder or "thin"
 											end,
-											values = {
-												TP_HealthBarOverlay = "Default",
-												TP_HealthBarOverlayThin = "Thin",
-												Border_Light = L["Light"],
-											},
-											arg = {"settings", "healthborder", "texture"}
+											set = SetBarOption("healthBorder"),
+											values = { none = "None", thin = "Thin line", thick = "Thick line" },
+										},
+										HealthGlow = {
+											type = "select",
+											order = 3.2,
+											name = "Threat Glow",
+											desc = "Soft is the same glow as the cast bar. Classic is the old glow texture.",
+
+											get = function()
+												if not db.settings.threatborder.show then return "none" end
+												return db.healthGlow or "soft"
+											end,
+											set = function(_, val)
+												db.healthGlow = val
+												if NidhausPlates_RefreshLightBorder then NidhausPlates_RefreshLightBorder() end
+												SetThemeValue({arg = {"settings", "threatborder", "show"}}, val ~= "none")
+											end,
+											values = { soft = "Soft", classic = "Classic", none = "None" },
 										},
 										Header2 = {
 											type = "header",
@@ -837,24 +806,19 @@ local function GetOptions()
 											type = "select",
 											order = 6,
 											name = L["Target"],
-											desc = L["Rounded swaps the square highlight for a frame with rounded corners."],
-											get = GetTargetHighlight,
-											set = SetTargetHighlight,
-											values = {
-												TP_HealthBarHighlight = "Default",
-												Border_Rounded = L["Rounded"],
-												Empty = "None",
-											},
-											arg = {"settings", "target", "texture"}
+											desc = "Highlight of your target, in the bar shape: a thick line, a soft glow, or both. The color is the Target Highlight color (Widgets tab).",
+											get = function() return NidhausPlates_TargetStyle or "line" end,
+											set = SetBarOption("targetStyle"),
+											values = { none = "None", line = "Line", glow = "Glow", both = "Line + Glow" },
 										},
 										Mouseover = {
 											type = "select",
 											order = 6.5,
 											name = L["Mouseover"],
-											get = GetValue,
-											set = SetThemeValueArt,
-											values = {TP_HealthBarHighlight = "Default", Empty = "None"},
-											arg = {"settings", "highlight", "texture"}
+											desc = "Highlight under the mouse, in the bar shape: a thin line or a faint glow.",
+											get = function() return NidhausPlates_MouseStyle or "line" end,
+											set = SetBarOption("mouseStyle"),
+											values = { none = "None", line = "Line", glow = "Glow" },
 										}
 									}
 								},
@@ -1117,18 +1081,23 @@ local function GetOptions()
 											set = SetLSMTexture,
 											arg = {"settings", "castbar", "texture"}
 										},
-										CastBorder = {
-											name = L["Border"],
-											type = "select",
+										CastBorderNote = {
+											type = "description",
 											order = 2,
-											desc = L["Light also frames the spell icon, which travels with the cast bar."],
-											get = GetCastBorder,
-											set = SetCastBorder,
-											values = {
-												TP_CastBarOverlay = "Default",
-												Border_Light = L["Light"],
-											},
-											arg = {"settings", "castborder", "texture"}
+											width = "full",
+											name = "Shape and border of the cast bar and the spell icon follow Bar Shape and Border in Healthbar.",
+										},
+										CastGlow = {
+											name = "Glow",
+											desc = "Soft glow around the cast bar and the spell icon, in the cast bar's color (red when it can't be interrupted).",
+											type = "toggle",
+											order = 3,
+											get = function() return db.castGlow ~= false end,
+											set = function(_, val)
+												db.castGlow = val
+												if NidhausPlates_RefreshLightBorder then NidhausPlates_RefreshLightBorder() end
+												Update()
+											end,
 										}
 									}
 								},
@@ -3553,132 +3522,6 @@ local function GetOptions()
 								}
 							}
 						},
-						DebuffWidget = {
-							name = L["Debuffs"],
-							type = "group",
-							order = 20,
-							set = SetValue,
-							get = GetValue,
-							args = {
-								Enable = {
-									name = L["Enable"],
-									type = "group",
-									inline = true,
-									order = 10,
-									args = {
-										Toggle = {
-											name = L["Enable"],
-											type = "toggle",
-											order = 1,
-											desc = L["This widget will display debuffs that match your filtering on your target nameplate and others you recently moused over."],
-											descStyle = "inline",
-											width = "double",
-											arg = {"debuffWidget", "ON"}
-										}
-									}
-								},
-								Sizing = {
-									name = L["Sizing"],
-									type = "group",
-									order = 15,
-									inline = true,
-									disabled = function()
-										return not db.debuffWidget.ON
-									end,
-									args = {
-										Scale = {
-											name = L["Scale"],
-											type = "range",
-											order = 1,
-											width = "double",
-											min = 0.6,
-											max = 1.3,
-											step = 0.05,
-											isPercent = true,
-											arg = {"debuffWidget", "scale"}
-										}
-									}
-								},
-								Placement = {
-									name = L["Placement"],
-									type = "group",
-									inline = true,
-									order = 20,
-									disabled = function()
-										return not db.debuffWidget.ON
-									end,
-									args = {
-										X = {
-											name = L["X"],
-											type = "range",
-											order = 1,
-											min = -120,
-											max = 120,
-											step = 1,
-											arg = {"debuffWidget", "x"}
-										},
-										Y = {
-											name = L["Y"],
-											type = "range",
-											order = 2,
-											min = -120,
-											max = 120,
-											step = 1,
-											arg = {"debuffWidget", "y"}
-										},
-										Anchor = {
-											name = L["Anchor"],
-											type = "select",
-											order = 3,
-											values = FullAlign,
-											arg = {"debuffWidget", "anchor"}
-										}
-									}
-								},
-								Filtering = {
-									name = L["Filtering"],
-									order = 30,
-									type = "group",
-									inline = true,
-									disabled = function()
-										return not db.debuffWidget.ON
-									end,
-									args = {
-										Mode = {
-											name = L["Mode"],
-											type = "select",
-											order = 1,
-											width = "double",
-											values = DebuffMode,
-											arg = {"debuffWidget", "mode"}
-										},
-										DebuffList = {
-											name = L["Filtered Debuffs"],
-											type = "input",
-											order = 2,
-											dialogControl = "MultiLineEditBox",
-											width = "double",
-											get = function(info)
-												local list = db.debuffWidget.filter
-												return TableToString(list)
-											end,
-											set = function(info, v)
-												v = v:trim()
-												if v == "" then
-													wipe(db.debuffWidget.filter)
-												else
-													local tbl = {strsplit("\n", v)}
-													db.debuffWidget.filter = tbl
-												end
-											end,
-											disabled = function()
-												return (db.debuffWidget.mode == "all" or db.debuffWidget.mode == "allMine")
-											end
-										}
-									}
-								}
-							}
-						},
 						SocialWidget = {
 							name = L["Social Widget"],
 							type = "group",
@@ -5208,8 +5051,7 @@ tpSkinTimer:SetScript("OnUpdate", function(self)
 end)
 
 function NidhausPlatesTheme:OpenOptions()
-	HideUIPanel(InterfaceOptionsFrame)
-	HideUIPanel(GameMenuFrame)
+
 	if not options then
 		NidhausPlatesTheme:SetUpOptions()
 	end

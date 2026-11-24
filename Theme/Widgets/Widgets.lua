@@ -5,111 +5,11 @@ local db
 local _
 
 NidhausPlatesUtility:EnableGroupWatcher()
-NidhausPlatesWidgets:EnableAuraWatcher()
 NidhausPlatesWidgets:EnableTankWatch()
-
-local DebuffHelpers = NidhausPlatesDebuffHelpers
-local DebuffPrefixModes = DebuffHelpers.DebuffPrefixModes
-local PrefixList = DebuffHelpers.PrefixList
-local PlayerGUID = DebuffHelpers.PlayerGUID
-
-local DebuffFilterModes = {}
-
-DebuffFilterModes.all = function(debuff, list) return true end
-
-DebuffFilterModes.allMine = function(debuff, list) return (debuff.caster == PlayerGUID()) end
-
-DebuffFilterModes.whitelist = function(debuff, list)
-	for _, name in ipairs(list) do
-		if name == debuff.name or tonumber(name) == debuff.spellid then
-			return true
-		end
-	end
-end
-
-DebuffFilterModes.whitelistMine = function(debuff, list)
-	local found = DebuffFilterModes.whitelist(debuff, list)
-	return (found and debuff.caster == PlayerGUID())
-end
-
-DebuffFilterModes.blacklist = function(debuff, list)
-	for _, name in ipairs(list) do
-		if name == debuff.name or tonumber(name) == debuff.spellid then
-			return false
-		end
-	end
-	return true
-end
-
-DebuffFilterModes.blacklistMine = function(debuff, list)
-	local found = DebuffFilterModes.blacklist(debuff, list)
-	return (found == true and debuff.caster == PlayerGUID())
-end
-
-local ParseDebuffString = nil
-DebuffFilterModes.prefix = function(debuff, list)
-
-	if ParseDebuffString == nil then
-		ParseDebuffString = function(str)
-			local func = nil
-			local _, _, prefix, suffix = string.find(str, "(%w+)[%s%p]*(.*)")
-			if prefix then
-				if PrefixList[prefix] then
-					str = suffix
-					func = DebuffPrefixModes[PrefixList[prefix]]
-				else
-					str = prefix
-					if suffix and suffix ~= "" then
-						str = str .. " " .. suffix
-					end
-					func = DebuffPrefixModes[1]
-				end
-			end
-
-			return str, func
-		end
-	end
-
-	for _, deb in ipairs(list) do
-
-		if deb == debuff.name or tonumber(deb) == debuff.spellid then
-			return true
-		end
-
-		local name, func = ParseDebuffString(deb)
-		if (name == debuff.name or tonumber(name) == debuff.spellid) and func then
-			return func(debuff)
-		end
-	end
-end
-
-local function DebuffFilter(debuff)
-
-	if debuff.target == 2 then
-		return false
-	end
-
-	db = NidhausPlatesTheme.db.profile
-	return DebuffFilterModes[db.debuffWidget.mode](debuff, db.debuffWidget.filter)
-end
 
 local function OnInitialize(plate)
 	db = NidhausPlatesTheme.db.profile
 	local w = plate.widgets
-
-	if db.debuffWidget.ON then
-		if not w.WidgetDebuff then
-			local widget = NidhausPlatesWidgets.CreateAuraWidget(plate)
-			widget:SetPoint("CENTER", plate, db.debuffWidget.x, db.debuffWidget.y)
-			widget:SetScale(db.debuffWidget.scale)
-			widget:SetFrameLevel(plate:GetFrameLevel() + 1)
-			widget.Filter = DebuffFilter
-			w.WidgetDebuff = widget
-		end
-	elseif w.WidgetDebuff then
-		w.WidgetDebuff:Hide()
-		w.WidgetDebuff = nil
-	end
 
 	if db.arenaPartyIDWidget and db.arenaPartyIDWidget.ON then
 		if not w.ArenaPartyID then
@@ -238,15 +138,6 @@ end
 local function OnContextUpdate(plate, unit)
 	db = NidhausPlatesTheme.db.profile
 	local w = plate.widgets
-
-	if db.debuffWidget.ON then
-		if not w.WidgetDebuff then
-			OnInitialize(plate)
-		end
-		w.WidgetDebuff:SetScale(db.debuffWidget.scale)
-		w.WidgetDebuff:SetPoint(db.debuffWidget.anchor, plate, db.debuffWidget.x, db.debuffWidget.y)
-		w.WidgetDebuff:UpdateContext(unit)
-	end
 
 	if db.comboWidget.ON then
 		if not w.ComboPoints then
